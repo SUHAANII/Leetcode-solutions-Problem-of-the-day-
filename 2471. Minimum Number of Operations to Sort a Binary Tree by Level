@@ -1,0 +1,68 @@
+Question: You are given the root of a binary tree with unique values.
+
+In one operation, you can choose any two nodes at the same level and swap their values.
+
+Return the minimum number of operations needed to make the values at each level sorted in a strictly increasing order.
+
+The level of a node is the number of edges along the path between it and the root node.
+
+Code: we will be using BFS to solve this particular question
+class Solution {
+public:
+    // Function to calculate the minimum operations required to sort each level of a binary tree
+    int minimumOperations(TreeNode* root) {
+        // If the tree is empty, no operations are needed
+        if (!root)
+            return 0;
+
+        // Queue to facilitate level order traversal of the tree
+        queue<TreeNode*> q;
+        q.push(root); // Start with the root node
+        int operations = 0; // Initialize the operation counter
+
+        // Perform level order traversal
+        while (!q.empty()) {
+            int size = q.size(); // Get the number of nodes at the current level
+            vector<int> level; // Vector to store the values of nodes at the current level
+
+            // Process each node at the current level
+            for (int i = 0; i < size; ++i) {
+                TreeNode* node = q.front(); // Get the front node in the queue
+                q.pop(); // Remove the front node
+                level.push_back(node->val); // Add its value to the level vector
+
+                // Add left and right children to the queue if they exist
+                if (node->left)
+                    q.push(node->left);
+                if (node->right)
+                    q.push(node->right);
+            }
+
+            // Create a sorted copy of the current level
+            vector<int> sort_level = level;
+            sort(sort_level.begin(), sort_level.end()); // Sort the values
+
+            // Map to track the original indices of the elements
+            unordered_map<int, int> mp;
+
+            // Fill the map with original indices of the elements
+            for (int i = 0; i < level.size(); ++i) {
+                mp[level[i]] = i; // Map each value to its index
+            }
+
+            // Rearranging elements to match the sorted order
+            for (int i = 0; i < level.size(); ++i) {
+                // While the current element is not in the correct position
+                while (level[i] != sort_level[i]) {
+                    ++operations; // Increment the operation count
+                    int cur = mp[sort_level[i]]; // Get the current index of the target value
+                    mp[level[i]] = cur; // Update the map with the new index
+                    swap(level[i], level[cur]); // Swap the elements to move them to the correct position
+                }
+            }
+        }
+
+        // Return the total number of operations required
+        return operations; 
+    }
+};
