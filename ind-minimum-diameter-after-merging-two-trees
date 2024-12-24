@@ -1,0 +1,82 @@
+Question: There exist two undirected trees with n and m nodes, numbered from 0 to n - 1 and from 0 to m - 1, respectively. You are given two 2D integer arrays edges1 and edges2 of lengths n - 1 and m - 1, respectively, where edges1[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the first tree and edges2[i] = [ui, vi] indicates that there is an edge between nodes ui and vi in the second tree.
+
+You must connect one node from the first tree with another node from the second tree with an edge.
+
+Return the minimum possible diameter of the resulting tree.
+
+The diameter of a tree is the length of the longest path between any two nodes in the tree.
+
+code:
+class Solution {
+private:
+    // Function to build the adjacency list from the edges
+    void build(vector<vector<int>>& adj, vector<vector<int>>& edges, int n) {
+        for (auto it : edges) {
+            // Add edges in both directions to create an undirected graph
+            adj[it[0]].push_back(it[1]);
+            adj[it[1]].push_back(it[0]);
+        }
+    }
+
+    // Function to find the farthest node and its distance using DFS
+    void get(pair<int, int>& p, vector<vector<int>>& adj, int node, int dis, vector<int>& vis) {
+        int d = p.second; // Current maximum distance found
+        vis[node] = 1;    // Mark the current node as visited
+
+        // If the current distance is greater than the recorded maximum
+        if (dis > d) {
+            p.second = dis; // Update the maximum distance
+            p.first = node; // Update the farthest node
+        }
+
+        // Explore all adjacent nodes
+        for (auto it : adj[node]) {
+            if (!vis[it]) { // If the node has not been visited
+                get(p, adj, it, dis + 1, vis); // Recursive DFS call
+            }
+        }
+    }
+
+public:
+    // Function to calculate the minimum diameter after merging two trees
+    int minimumDiameterAfterMerge(vector<vector<int>>& edges1, vector<vector<int>>& edges2) {
+        int n = edges1.size() + 1; // Number of nodes in the first tree
+        int m = edges2.size() + 1; // Number of nodes in the second tree
+        vector<vector<int>> adj1(n), adj2(m); // Adjacency lists for both trees
+
+        // Build adjacency lists
+        build(adj1, edges1, n);
+        build(adj2, edges2, m);
+
+        // For the first tree
+        vector<int> vis(n); // Visited array for the first tree
+        pair<int, int> p1 = {-1, INT_MIN}; // Pair to store farthest node and distance
+        get(p1, adj1, 0, 0, vis); // Find the farthest node from node 0
+
+        // Reset visited array for the second DFS
+        vis = vector<int>(n, 0);
+        pair<int, int> p2 = {-1, INT_MIN}; // Pair for second farthest search
+        get(p2, adj1, p1.first, 0, vis); // Find the farthest node from the previously found farthest node
+
+        int d1 = p2.second; // Diameter of the first tree
+
+        // Now for the second tree
+        p1 = {-1, INT_MIN}; // Reset pair for the second tree
+        vis = vector<int>(m, 0); // Visited array for the second tree
+        get(p1, adj2, 0, 0, vis); // Find the farthest node from node 0 in the second tree
+
+        // Reset visited array for the second DFS
+        p2 = {-1, INT_MIN}; 
+        vis = vector<int>(m, 0);
+        get(p2, adj2, p1.first, 0, vis); // Find the farthest node from the previously found farthest node in the second tree
+
+        int d2 = p2.second; // Diameter of the second tree
+
+        // If either tree is empty, set its diameter to 0
+        if (edges1.empty()) d1 = 0;
+        if (edges2.empty()) d2 = 0;
+
+        // Return the maximum diameter possible after merging the two trees
+        return max({d1, d2, (d1 + 1) / 2 + (d2 + 1) / 2 + 1});
+    }
+};
