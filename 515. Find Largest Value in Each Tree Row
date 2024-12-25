@@ -1,0 +1,45 @@
+Question: Given the root of a binary tree, return an array of the largest value in each row of the tree (0-indexed).
+
+code: 
+class Solution {
+public:
+    // Function to find the largest value in each row of a binary tree
+    vector<int> largestValues(TreeNode* root) {
+        
+        // Edge case: if the tree is empty, return an empty vector
+        if (!root) return {};
+        
+        // Queue to perform level order traversal
+        queue<TreeNode*> q;
+        q.push(root); // Start with the root node
+        
+        // Vector to store the largest values for each level
+        vector<int> arr;
+        
+        // Loop through each level of the tree
+        for(int level = 0; !q.empty(); level++) {
+            int qz = q.size(); // Number of nodes at the current level
+            
+            // Initialize the largest value for this level to the smallest integer
+            arr.push_back(INT_MIN);
+            
+            // Process each node at the current level
+            for(int i = 0; i < qz; i++) {
+                // Get the front node in the queue
+                auto Node = q.front();
+                q.pop(); // Remove the node from the queue
+                
+                // Update the largest value for this level
+                arr[level] = max(arr[level], Node->val);
+                
+                // If the left child exists, add it to the queue
+                if (Node->left) q.push(Node->left);
+                // If the right child exists, add it to the queue
+                if (Node->right) q.push(Node->right);
+            }
+        }
+        
+        // Return the vector containing the largest values for each level
+        return arr;
+    }
+};
