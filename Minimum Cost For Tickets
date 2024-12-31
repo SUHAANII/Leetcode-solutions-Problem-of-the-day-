@@ -1,0 +1,49 @@
+Question:  You have planned some train traveling one year in advance. The days of the year in which you will travel are given as an integer array days. Each day is an integer from 1 to 365.
+
+Train tickets are sold in three different ways:
+
+a 1-day pass is sold for costs[0] dollars,
+a 7-day pass is sold for costs[1] dollars, and
+a 30-day pass is sold for costs[2] dollars.
+The passes allow that many days of consecutive travel.
+
+For example, if we get a 7-day pass on day 2, then we can travel for 7 days: 2, 3, 4, 5, 6, 7, and 8.
+Return the minimum number of dollars you need to travel every day in the given list of days.
+
+code:  
+class Solution {
+public:
+    bitset<366> need = 0; // A bitset to track which days are needed for travel (1-365).
+    int dp[366]; // Array to store the minimum cost for each day (0-365).
+
+    // Recursive function to calculate minimum cost
+    int f(int d, int d0, vector<int>& costs) {
+        if (d < d0) return 0; // If the current day 'd' is before the start day 'd0', no cost is needed.
+        if (!need[d]) return f(d - 1, d0, costs); // If no travel is needed on day 'd', move to the previous day.
+
+        if (dp[d] != -1) return dp[d]; // If the cost for day 'd' has already been computed, return it.
+
+        // Calculate the minimum cost by considering three options:
+        // 1. Buy a 1-day pass (costs[0]) and move to the previous day.
+        // 2. Buy a 7-day pass (costs[1]) and move back 7 days.
+        // 3. Buy a 30-day pass (costs[2]) and move back 30 days.
+        return dp[d] = min({
+            costs[0] + f(d - 1, d0, costs), // Cost for 1-day pass
+            costs[1] + f(d - 7, d0, costs), // Cost for 7-day pass
+            costs[2] + f(d - 30, d0, costs), // Cost for 30-day pass
+        });
+    }
+
+    // Main function to calculate the minimum cost of tickets
+    int mincostTickets(vector<int>& days, vector<int>& costs) {
+        memset(dp, -1, sizeof(dp)); // Initialize the dp array with -1 (indicating uncomputed values).
+
+        // Mark the days when travel is needed in the bitset.
+        for (int d : days)
+            need[d] = 1;
+
+        // Start the recursive function from the last travel day to the first.
+        return f(days.back(), days[0], costs);
+    }
+};
+
