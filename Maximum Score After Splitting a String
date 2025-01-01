@@ -1,0 +1,37 @@
+Question: Given a string s of zeros and ones, return the maximum score after splitting the string into two non-empty substrings (i.e. left substring and right substring).
+
+The score after splitting a string is the number of zeros in the left substring plus the number of ones in the right substring.
+code:
+
+class Solution {
+public:
+    // Function to calculate the maximum score based on the input string
+    int maxScore(string inputStr) {
+        // Initialize counters for '1's and '0's
+        int onesCount = 0; // Count of '1's encountered
+        int zerosCount = 0; // Count of '0's encountered
+        int bestScore = INT_MIN; // Variable to track the best score found
+
+        // Iterate through the string except the last character
+        for (int i = 0; i < inputStr.size() - 1; i++) {
+            // Count '1's and '0's
+            if (inputStr[i] == '1') {
+                onesCount++; // Increment count of '1's
+            } else {
+                zerosCount++; // Increment count of '0's
+            }
+            
+            // Calculate the current score as the difference between zeros and ones
+            // Update the bestScore if the current score is higher
+            bestScore = max(bestScore, zerosCount - onesCount);
+        }
+        
+        // Check the last character of the string
+        if (inputStr[inputStr.size() - 1] == '1') {
+            onesCount++; // Increment count of '1's if the last character is '1'
+        }
+        
+        // Return the best score found plus the count of '1's
+        return bestScore + onesCount;
+    }
+};
