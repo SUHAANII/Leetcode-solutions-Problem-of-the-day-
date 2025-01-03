@@ -1,0 +1,44 @@
+Question: You are given a 0-indexed integer array nums of length n.
+
+nums contains a valid split at index i if the following are true:
+
+The sum of the first i + 1 elements is greater than or equal to the sum of the last n - i - 1 elements.
+There is at least one element to the right of i. That is, 0 <= i < n - 1.
+Return the number of valid splits in nums
+
+code:
+class Solution {
+public:
+    // Function to count the number of ways to split the array
+    int waysToSplitArray(vector<int>& nums) {
+        // Get the size of the input array
+        int N = nums.size();
+        
+        // Create a vector to store the prefix sums, initialized with zeros
+        vector<long long> Prefix(N + 1, 0);
+        
+        // Calculate the prefix sums
+        for (int i = 0; i < N; i++) {
+            // The prefix sum at index i+1 is the sum of the array elements from index 0 to i
+            Prefix[i + 1] = Prefix[i] + nums[i];
+        }
+        
+        // Initialize a counter for the number of valid splits
+        int ANS = 0;
+        
+        // Iterate through the array to check the conditions for valid splits
+        for (int i = 1; i < N; i++) {
+            // Check if the left sum (Prefix[i]) is greater than or equal to the right sum (total sum - left sum)
+            // The total sum is represented by Prefix[N]
+            if (Prefix[i] >= Prefix[N] - Prefix[i]) {
+                // If the condition is satisfied, increment the answer counter
+                ANS++;
+            }
+        }
+        
+        // Return the total number of valid splits found
+        return ANS;
+    }
+};
+
+
