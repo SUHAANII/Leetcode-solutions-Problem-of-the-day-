@@ -1,0 +1,55 @@
+Question:  Given a string s, return the number of unique palindromes of length three that are a subsequence of s.
+
+Note that even if there are multiple ways to obtain the same subsequence, it is still only counted once.
+
+A palindrome is a string that reads the same forwards and backwards.
+
+A subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.
+
+For example, "ace" is a subsequence of "abcde".
+
+code:
+
+#include <unordered_map>
+#include <unordered_set>
+#include <string>
+using namespace std;
+
+class Solution {
+public:
+    int countPalindromicSubsequence(string s) {
+        int ans = 0; // Variable to store the count of unique palindromic subsequences
+        int n = s.length(); // Get the length of the input string
+        
+        // Map to store the first and last occurrence of each character
+        unordered_map<char, pair<int, int>> M;
+        
+        // Populate the map with the first and last indices of each character
+        for (int i = 0; i < n; i++) {
+            if (M.find(s[i]) == M.end()) {
+                M[s[i]].first = i; // Set first occurrence if not already present
+            }
+            M[s[i]].second = i; // Always update the last occurrence
+        }
+        
+        // Iterate through each character and its positions
+        for (auto& [ch, positions] : M) {
+            int left = positions.first; // First occurrence index
+            int right = positions.second; // Last occurrence index
+            
+            // Check if there are characters between the first and last occurrence
+            if (right - left <= 1) continue; // No valid subsequences if the range is too small
+            
+            // Set to store unique characters between the first and last occurrence
+            unordered_set<char> uniqueChars;
+            for (int i = left + 1; i < right; i++) {
+                uniqueChars.insert(s[i]); // Insert characters into the set
+            }
+            
+            // The size of the set represents the number of unique palindromic subsequences
+            ans += uniqueChars.size(); // Add the count of unique characters to the answer
+        }
+        
+        return ans; // Return the total count of unique palindromic subsequences
+    }
+};
