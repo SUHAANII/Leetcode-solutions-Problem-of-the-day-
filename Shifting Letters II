@@ -1,0 +1,47 @@
+Question:  You are given a string s of lowercase English letters and a 2D integer array shifts where shifts[i] = [starti, endi, directioni]. For every i, shift the characters in s from the index starti to the index endi (inclusive) forward if directioni = 1, or shift the characters backward if directioni = 0.
+
+Shifting a character forward means replacing it with the next letter in the alphabet (wrapping around so that 'z' becomes 'a'). Similarly, shifting a character backward means replacing it with the previous letter in the alphabet (wrapping around so that 'a' becomes 'z').
+
+Return the final string after all such shifts to s are applied.
+
+code:
+
+class Solution {
+public:
+    // Function to shift letters in the string based on the given shifts
+    string shiftingLetters(string s, vector<vector<int>>& shifts) {
+        // Get the size of the string
+        int n = s.size();
+        // Create a vector to keep track of the shifts
+        vector<int> shift(n + 1, 0);
+
+        // Process each shift operation
+        for (auto& shiftOp : shifts) {
+            // Extract the start index, end index, and direction of the shift
+            int start = shiftOp[0], end = shiftOp[1], direction = shiftOp[2];
+            // Increment the start index by 1 if direction is 1 (right shift), otherwise decrement by 1 (left shift)
+            shift[start] += (direction == 1 ? 1 : -1);
+            // Decrement the position after the end index to mark the end of the shift effect
+            shift[end + 1] -= (direction == 1 ? 1 : -1);
+        }
+
+        // Variable to keep track of the cumulative shift
+        int currentShift = 0;
+        // Calculate the net shift for each character in the string
+        for (int i = 0; i < n; ++i) {
+            currentShift += shift[i]; // Update the cumulative shift
+            shift[i] = currentShift;   // Store the cumulative shift at index i
+        }
+
+        // Apply the calculated shifts to the original string
+        for (int i = 0; i < n; ++i) {
+            // Calculate the effective shift within the range of 0-25
+            int netShift = (shift[i] % 26 + 26) % 26;
+            // Update the character by shifting it and wrapping around the alphabet
+            s[i] = 'a' + (s[i] - 'a' + netShift) % 26;
+        }
+
+        // Return the modified string
+        return s;
+    }
+};
