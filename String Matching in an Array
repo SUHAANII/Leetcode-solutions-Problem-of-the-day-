@@ -1,0 +1,29 @@
+Question: Given an array of string words, return all strings in words that is a substring of another word. You can return the answer in any order.
+
+A substring is a contiguous sequence of characters within a string
+
+code: 
+
+//<---------------------Method 1------------------->//
+class Solution {
+public:
+    // Function to find all strings that are substrings of other strings
+    vector<string> stringMatching(vector<string>& words) {
+        int n = words.size(); // Get the number of words in the input vector
+        vector<string> ans; // Vector to store the result strings
+
+        // Outer loop to iterate through each word in the vector
+        for (int i = 0; i < n; ++i) {
+            // Inner loop to compare the current word with every other word
+            for (int j = 0; j < n; ++j) {
+                // Check if the indices are different and if words[j] contains words[i]
+                if (i != j && words[j].find(words[i]) != string::npos) {
+                    ans.push_back(words[i]); // Add the substring to the result
+                    break; // Exit the inner loop once a match is found
+                }
+            }
+        }
+
+        return ans; // Return the vector of substring matches
+    }
+};
