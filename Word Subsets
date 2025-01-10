@@ -1,0 +1,66 @@
+Question: You are given two string arrays words1 and words2.
+
+A string b is a subset of string a if every letter in b occurs in a including multiplicity.
+
+For example, "wrr" is a subset of "warrior" but is not a subset of "world".
+A string a from words1 is universal if for every string b in words2, b is a subset of a.
+
+Return an array of all the universal strings in words1. You may return the answer in any order.
+
+code:
+class Solution {
+public:
+    // Function to find all universal words from mainWords that meet the requirements of requiredWords
+    vector<string> wordSubsets(vector<string>& mainWords, vector<string>& requiredWords) {
+        // Array to store the maximum frequency of each character needed across all requiredWords
+        int maxCharFreq[26] = {0};
+        // Temporary array to count character frequencies for each required word
+        int tempCharFreq[26];
+        
+        // Iterate through each word in requiredWords to determine the maximum character frequencies
+        for (const auto& word : requiredWords) {
+            // Reset tempCharFreq to zero for the current word
+            memset(tempCharFreq, 0, sizeof tempCharFreq); // Alternatively, you can use vector<int> tempCharFreq(26,0);
+            
+            // Count the frequency of each character in the current required word
+            for (char ch : word) {
+                tempCharFreq[ch - 'a']++; // Increment the count for the character
+            }
+            // Update the maxCharFreq to ensure it holds the maximum frequency required
+            for (int i = 0; i < 26; ++i) {
+                maxCharFreq[i] = max(maxCharFreq[i], tempCharFreq[i]); // Keep the highest frequency found
+            }
+        }
+        
+        // Vector to store the resulting universal words
+        vector<string> universalWords;
+        
+        // Check each word in mainWords to see if it is universal
+        for (const auto& word : mainWords) {
+            // Reset tempCharFreq for the current main word
+            memset(tempCharFreq, 0, sizeof tempCharFreq);
+            
+            // Count the frequency of each character in the current main word
+            for (char ch : word) {
+                tempCharFreq[ch - 'a']++; // Increment the count for the character
+            }
+            // Flag to determine if the current word is universal
+            bool isUniversal = true;
+            // Check if the current word meets the maximum character frequency requirements
+            for (int i = 0; i < 26; ++i) {
+                if (maxCharFreq[i] > tempCharFreq[i]) { // If the current word lacks required frequency
+                    isUniversal = false; // Mark it as not universal
+                    break; // No need to check further
+                }
+            }
+            // If the word is universal, add it to the result list
+            if (isUniversal) {
+                universalWords.emplace_back(word); // Add the word to the list of universal words
+            }
+        }
+        
+        // Return the list of universal words
+        return universalWords;
+    }
+};
+
