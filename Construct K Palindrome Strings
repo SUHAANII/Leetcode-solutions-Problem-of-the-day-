@@ -1,0 +1,37 @@
+Question: Given a string s and an integer k, return true if you can use all the characters in s to construct k palindrome strings or false otherwise.
+
+code:
+class Solution {
+public:
+    // Function to determine if we can construct k palindromes from string s
+    bool canConstruct(string s, int k) {
+        // If the length of the string is less than k, it's impossible to create k palindromes
+        if (s.length() < k) return false;
+
+        // Sort the string to group identical characters together
+        sort(s.begin(), s.end());
+        
+        // Variable to count the number of characters with odd occurrences
+        int oddCount = 0;
+
+        // Iterate through the sorted string
+        for (int i = 0; i < s.length(); ) {
+            // Store the current character
+            char current = s[i];
+            // Count the occurrences of the current character
+            int count = 0;
+
+            // Count how many times the current character appears consecutively
+            while (i < s.length() && s[i] == current) {
+                count++;
+                i++;
+            }
+
+            // If the count of the current character is odd, increment the oddCount
+            if (count % 2 != 0) oddCount++;
+        }
+
+        // To form k palindromes, we can have at most k characters with odd occurrences
+        return oddCount <= k;
+    }
+};
