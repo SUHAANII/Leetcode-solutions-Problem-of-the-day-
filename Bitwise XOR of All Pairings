@@ -1,0 +1,35 @@
+Question: You are given two 0-indexed arrays, nums1 and nums2, consisting of non-negative integers. There exists another array, nums3, which contains the bitwise XOR of all pairings of integers between nums1 and nums2 (every integer in nums1 is paired with every integer in nums2 exactly once).
+
+Return the bitwise XOR of all integers in nums3.
+
+code:
+
+class Solution {
+public:
+    int xorAllNums(vector<int>& nums1, vector<int>& nums2) {
+        // Get the sizes of the two input arrays
+        int c1 = nums1.size(); // Size of nums1
+        int c2 = nums2.size(); // Size of nums2
+        
+        // Initialize variables to hold the XOR results
+        int x1 = 0; // XOR result for nums1
+        int x2 = 0; // XOR result for nums2
+        
+        // If the size of nums1 is odd, calculate the XOR of all elements in nums2
+        if (c1 % 2 != 0) {
+            for (int num : nums2) {
+                x2 ^= num; // XOR each element of nums2 with x2
+            }
+        }
+        
+        // If the size of nums2 is odd, calculate the XOR of all elements in nums1
+        if (c2 % 2 != 0) {
+            for (int num : nums1) {
+                x1 ^= num; // XOR each element of nums1 with x1
+            }
+        }
+        
+        // Return the final XOR result combining both x1 and x2
+        return x1 ^ x2; // XOR the results from nums1 and nums2
+    }
+};
