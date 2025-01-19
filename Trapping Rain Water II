@@ -1,0 +1,96 @@
+Question: Given an m x n integer matrix heightMap representing the height of each unit cell in a 2D elevation map, return the volume of water it can trap after raining.
+
+code: 
+#include <vector>
+#include <array>
+#include <algorithm>
+#include <iostream>
+
+using namespace std;
+
+const int di[4] = {1, -1, 0, 0}; // Directions for row movement (down, up)
+const int dj[4] = {0, 0, 1, -1}; // Directions for column movement (right, left)
+
+class Solution {
+public:
+    // Function to pack height, row index, and column index into a single unsigned integer
+    static unsigned pack(unsigned h, unsigned i, unsigned j) {
+        return (h << 16) | (i << 8) | j; // Combine h, i, j into a single unsigned integer
+    }
+
+    // Function to unpack the information from the packed unsigned integer
+    static array<int, 3> unpack(unsigned info) {
+        array<int, 3> ans;
+        ans[0] = info >> 16; // Extract height
+        ans[1] = (info >> 8) & 255; // Extract row index
+        ans[2] = info & 255; // Extract column index
+        return ans;
+    }
+
+    // Main function to calculate trapped rainwater
+    static int trapRainWater(vector<vector<int>>& height) {
+        const int m = height.size(), n = height[0].size(); // Dimensions of the height grid
+        if (m <= 2 || n <= 2) // If grid is too small, no water can be trapped
+            return 0;
+
+        vector<unsigned> boundary(2 * (m + n - 1)); // Vector to hold boundary cells
+
+        // Add boundary cells and mark them as visited
+        int idx = 0;
+        for (int i = 0; i < m; i++) {
+            boundary[idx++] = pack(height[i][0], i, 0); // Left boundary
+            boundary[idx++] = pack(height[i][n - 1], i, n - 1); // Right boundary
+            height[i][0] = height[i][n - 1] = -1; // Mark as visited
+        }
+
+        for (int j = 1; j < n - 1; j++) {
+            boundary[idx++] = pack(height[0][j], 0, j); // Top boundary
+            boundary[idx++] = pack(height[m - 1][j], m - 1, j); // Bottom boundary
+            height[0][j] = height[m - 1][j] = -1; // Mark as visited
+        }
+
+        // Build a min-heap from the boundary cells
+        make_heap(boundary.begin(), boundary.end(), greater<>());
+
+        int ans = 0; // Variable to accumulate the total trapped water
+        int water_level = 0; // Current water level
+
+        // Process cells until the boundary heap is empty
+        while (!boundary.empty()) {
+            // Extract the smallest element (the cell with the lowest height)
+            pop_heap(boundary.begin(), boundary.end(), greater<>());
+            unsigned info = boundary.back(); // Get the packed info
+            boundary.pop_back(); // Remove it from the heap
+
+            auto [h, i, j] = unpack(info); // Unpack height and indices
+            water_level = max(water_level, h); // Update the water level
+
+            // Check adjacent cells
+            for (int k = 0; k < 4; k++) {
+                int i0 = i + di[k], j0 = j + dj[k]; // Calculate new indices
+                // Skip out-of-bounds or visited cells
+                if (i0 < 0 || i0 >= m || j0 < 0 || j0 >= n || height[i0][j0] == -1)
+                    continue;
+
+                int currH = height[i0][j0]; // Get height of the adjacent cell
+                if (currH < water_level) // If current height is less than water level
+                    ans += water_level - currH; // Water can be trapped
+
+                // Mark the cell as visited and push it to the heap
+                height[i0][j0] = -1; // Mark as visited
+                boundary.push_back(pack(currH, i0, j0)); // Pack and add to the heap
+                push_heap(boundary.begin(), boundary.end(), greater<>()); // Re-heapify
+            }
+        }
+
+        return ans; // Return the total trapped water
+    }
+};
+
+// Initialization function to set up the input/output stream
+auto init = []() {
+    ios::sync_with_stdio(false); // Optimize input/output
+    cin.tie(nullptr); // Untie cin from cout
+    cout.tie(nullptr); // Untie cout from cin
+    return 'c';
+}();
