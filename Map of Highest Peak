@@ -1,0 +1,58 @@
+Question: You are given an integer matrix isWater of size m x n that represents a map of land and water cells.
+
+If isWater[i][j] == 0, cell (i, j) is a land cell.
+If isWater[i][j] == 1, cell (i, j) is a water cell.
+You must assign each cell a height in a way that follows these rules:
+
+The height of each cell must be non-negative.
+If the cell is a water cell, its height must be 0.
+Any two adjacent cells must have an absolute height difference of at most 1. A cell is adjacent to another cell if the former is directly north, east, south, or west of the latter (i.e., their sides are touching).
+Find an assignment of heights such that the maximum height in the matrix is maximized.
+
+Return an integer matrix height of size m x n where height[i][j] is cell (i, j)'s height. If there are multiple solutions, return any of them.
+
+code: 
+
+class Solution {
+public:
+    // Function to compute the heights of land cells based on water cell positions
+    vector<vector<int>> highestPeak(vector<vector<int>>& isWater) {
+        int R = isWater.size(); // Number of rows in the grid
+        int C = isWater[0].size(); // Number of columns in the grid
+        
+        // Initialize a height matrix with a large sentinel value
+        vector<vector<int>> height(R, vector<int>(C, R + C)); // Safe sentinel value
+
+        // First pass: Set water cells to height 0 and propagate heights
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                // If the cell is a water cell
+                if (isWater[i][j] == 1) {
+                    height[i][j] = 0; // Water cell has height 0
+                } else {
+                    // If not the first row, check the height from the cell above
+                    if (i > 0) 
+                        height[i][j] = min(height[i][j], height[i - 1][j] + 1); // Top
+                    // If not the first column, check the height from the left cell
+                    if (j > 0) 
+                        height[i][j] = min(height[i][j], height[i][j - 1] + 1); // Left
+                }
+            }
+        }
+
+        // Second pass: Propagate heights from bottom-right to top-left
+        for (int i = R - 1; i >= 0; i--) {
+            for (int j = C - 1; j >= 0; j--) {
+                // If not the last row, check the height from the cell below
+                if (i < R - 1) 
+                    height[i][j] = min(height[i][j], height[i + 1][j] + 1); // Bottom
+                // If not the last column, check the height from the right cell
+                if (j < C - 1) 
+                    height[i][j] = min(height[i][j], height[i][j + 1] + 1); // Right
+            }
+        }
+
+        // Return the final height matrix
+        return height;
+    }
+};
