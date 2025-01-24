@@ -1,0 +1,59 @@
+Question: There is a directed graph of n nodes with each node labeled from 0 to n - 1. The graph is represented by a 0-indexed 2D integer array graph where graph[i] is an integer array of nodes adjacent to node i, meaning there is an edge from node i to each node in graph[i].
+
+A node is a terminal node if there are no outgoing edges. A node is a safe node if every possible path starting from that node leads to a terminal node (or another safe node).
+
+Return an array containing all the safe nodes of the graph. The answer should be sorted in ascending order.
+
+code:
+
+class Solution {
+public:
+    int n;  // Number of nodes in the graph
+    vector<int> degreein;  // Vector to store the in-degrees of each node
+    vector<vector<int>> rGraph;  // Reverse graph representation
+    vector<int> ans;  // Vector to store the eventual safe nodes
+
+    // Initialize the graph and compute in-degrees
+    void init(vector<vector<int>>& G) {
+        n = G.size();  // Get the number of nodes
+        degreein = vector<int>(n, 0);  // Initialize in-degrees to 0
+        rGraph.resize(n, vector<int>(0));  // Resize reverse graph
+
+        // Build the reverse graph and calculate in-degrees
+        for (int u = 0; u < n; u++) {
+            for (int v : G[u]) {
+                rGraph[v].push_back(u);  // Add edge in the reverse graph
+                degreein[u]++;  // Increment in-degree for node u
+            }
+        }
+    }
+
+    // Function to find all eventual safe nodes in the directed graph
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph) {
+        init(graph);  // Initialize the graph and calculate in-degrees
+        queue<int> que;  // Queue for BFS
+
+        // Enqueue all nodes with in-degree 0 (safe nodes)
+        for (int i = 0; i < n; i++) {
+            if (degreein[i] == 0) que.push(i);
+        }
+
+        // Process the queue
+        while (que.size()) {
+            int u = que.front();  // Get the front node
+            que.pop();  // Remove the front node from the queue
+            ans.push_back(u);  // Add the node to the result list
+
+            // Decrease the in-degree of adjacent nodes in the reverse graph
+            for (int v : rGraph[u]) {
+                degreein[v]--;  // Decrement the in-degree of node v
+                // If in-degree becomes 0, enqueue node v
+                if (degreein[v] == 0) que.push(v);
+            }
+        }
+
+        // Sort the result list of safe nodes
+        sort(ans.begin(), ans.end());
+        return ans;  // Return the list of eventual safe nodes
+    }
+};
