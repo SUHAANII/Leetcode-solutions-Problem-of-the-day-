@@ -1,0 +1,72 @@
+Question: A company is organizing a meeting and has a list of n employees, waiting to be invited. They have arranged for a large circular table, capable of seating any number of employees.
+
+The employees are numbered from 0 to n - 1. Each employee has a favorite person and they will attend the meeting only if they can sit next to their favorite person at the table. The favorite person of an employee is not themself.
+
+Given a 0-indexed integer array favorite, where favorite[i] denotes the favorite person of the ith employee, return the maximum number of employees that can be invited to the meeting.
+
+code;
+
+class Solution {
+public:
+    int maximumInvitations(vector<int>& favorites) {
+        int n = favorites.size();  // Get the number of nodes
+        vector<int> inDegree(n, 0); // Vector to count incoming edges (favorites)
+        vector<int> chainLengths(n, 0); // Vector to store lengths of chains
+        vector<bool> visited(n, false); // Vector to track visited nodes
+
+        // Calculate the in-degree for each node
+        for (int fav : favorites) {
+            inDegree[fav]++;
+        }
+
+        queue<int> q; // Queue for processing nodes with in-degree of 0
+        // Initialize the queue with nodes that have no incoming edges
+        for (int i = 0; i < n; ++i) {
+            if (inDegree[i] == 0) {
+                q.push(i);
+            }
+        }
+
+        // Process the nodes in the queue
+        while (!q.empty()) {
+            int node = q.front(); // Get the front node
+            q.pop();
+            visited[node] = true; // Mark the node as visited
+
+            int next = favorites[node]; // Get the favorite of the current node
+            chainLengths[next] = chainLengths[node] + 1; // Update the chain length
+            // Decrease the in-degree of the next node
+            if (--inDegree[next] == 0) {
+                q.push(next); // Add to queue if in-degree becomes zero
+            }
+        }
+
+        int maxCycle = 0; // Variable to track the maximum cycle length
+        int totalChains = 0; // Variable to track total chain lengths from cycles
+
+        // Iterate through all nodes to find cycles and calculate total chains
+        for (int i = 0; i < n; ++i) {
+            if (!visited[i]) { // If the node hasn't been visited
+                int current = i, cycleLength = 0; // Start cycle detection
+                // Traverse the cycle
+                while (!visited[current]) {
+                    visited[current] = true; // Mark the current node as visited
+                    current = favorites[current]; // Move to the next favorite
+                    cycleLength++; // Increase the cycle length
+                }
+
+                // Check if the detected cycle length is 2
+                if (cycleLength == 2) {
+                    // If it's a cycle of length 2, add to total chains
+                    totalChains += 2 + chainLengths[i] + chainLengths[favorites[i]];
+                } else {
+                    // Update maxCycle if the current cycle is longer
+                    maxCycle = max(maxCycle, cycleLength);
+                }
+            }
+        }
+
+        // Return the maximum of the longest cycle or total chains from cycles of length 2
+        return max(maxCycle, totalChains);
+    }
+};
