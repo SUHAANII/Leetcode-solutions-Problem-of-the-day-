@@ -1,0 +1,48 @@
+Question: There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course ai first if you want to take course bi.
+
+For example, the pair [0, 1] indicates that you have to take course 0 before you can take course 1.
+Prerequisites can also be indirect. If course a is a prerequisite of course b, and course b is a prerequisite of course c, then course a is a prerequisite of course c.
+
+You are also given an array queries where queries[j] = [uj, vj]. For the jth query, you should answer whether course uj is a prerequisite of course vj or not.
+
+Return a boolean array answer, where answer[j] is the answer to the jth query.
+
+code:
+
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
+
+class Solution {
+public:
+    vector<bool> checkIfPrerequisite(int numCourses, vector<vector<int>>& prerequisites, vector<vector<int>>& queries) {
+        // Step 1: Initialize the reachability map
+        unordered_map<int, unordered_set<int>> reachable;
+
+        // Step 2: Build direct reachability chains
+        for (auto& prereq : prerequisites) {
+            // For each prerequisite pair [a, b], b is a prerequisite for a
+            reachable[prereq[1]].insert(prereq[0]); // b -> a
+        }
+
+        // Step 3: Propagate reachability to account for indirect prerequisites
+        for (int i = 0; i < numCourses; ++i) {
+            for (int j = 0; j < numCourses; ++j) {
+                // If j can reach i, then all courses that i can reach can also be reached from j
+                if (reachable[j].count(i)) {
+                    // Insert all courses reachable from i into the reachable set of j
+                    reachable[j].insert(reachable[i].begin(), reachable[i].end());
+                }
+            }
+        }
+
+        // Step 4: Answer the queries
+        vector<bool> result;
+        for (auto& query : queries) {
+            // Check if query[0] is reachable from query[1]
+            result.push_back(reachable[query[1]].count(query[0]) > 0); // query[1] -> query[0]
+        }
+        return result; // Return the results of all queries
+    }
+};
