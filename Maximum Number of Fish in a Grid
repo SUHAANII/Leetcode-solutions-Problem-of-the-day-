@@ -1,0 +1,57 @@
+Question: You are given a 0-indexed 2D matrix grid of size m x n, where (r, c) represents:
+
+A land cell if grid[r][c] = 0, or
+A water cell containing grid[r][c] fish, if grid[r][c] > 0.
+A fisher can start at any water cell (r, c) and can do the following operations any number of times:
+
+Catch all the fish at cell (r, c), or
+Move to any adjacent water cell.
+Return the maximum number of fish the fisher can catch if he chooses his starting cell optimally, or 0 if no water cell exists.
+
+An adjacent cell of the cell (r, c), is one of the cells (r, c + 1), (r, c - 1), (r + 1, c) or (r - 1, c) if it exists.
+
+code:
+
+class Solution {
+public:
+    // Function to find the maximum number of fish that can be caught in a grid
+    int findMaxFish(vector<vector<int>>& grid) {
+        int Max = 0; // Variable to keep track of the maximum fish caught
+        
+        // Iterate through each cell in the grid
+        for (int i = 0; i < grid.size(); i++) {
+            for (int j = 0; j < grid[0].size(); j++) {
+                // Check if the current cell has fish (greater than 0)
+                if (grid[i][j] > 0) {
+                    int C = 0; // Variable to count the fish in the current connected component
+                    queue<pair<int, int>> T; // Queue for BFS (Breadth-First Search)
+                    T.push({i, j}); // Start BFS from the current cell
+                    
+                    // Perform BFS to explore all connected cells with fish
+                    while (!T.empty()) {
+                        auto [x, y] = T.front(); // Get the front cell from the queue
+                        T.pop(); // Remove the front cell from the queue
+                        
+                        // If the cell has fish, add the count to C
+                        if (grid[x][y] > 0) {
+                            C += grid[x][y]; // Count fish in the current cell
+                            grid[x][y] = 0; // Mark the cell as visited by setting it to 0
+                            
+                            // Check and add adjacent cells with fish to the queue
+                            if (x > 0 && grid[x - 1][y] > 0) T.push({x - 1, y}); // Up
+                            if (x + 1 < grid.size() && grid[x + 1][y] > 0) T.push({x + 1, y}); // Down
+                            if (y > 0 && grid[x][y - 1] > 0) T.push({x, y - 1}); // Left
+                            if (y + 1 < grid[0].size() && grid[x][y + 1] > 0) T.push({x, y + 1}); // Right
+                        }
+                    }
+                    
+                    // Update Max if the current count C is greater
+                    Max = max(Max, C);
+                }
+            }
+        }
+        
+        // Return the maximum number of fish caught
+        return Max;
+    }
+};
