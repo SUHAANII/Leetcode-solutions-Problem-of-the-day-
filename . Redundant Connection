@@ -1,0 +1,61 @@
+Question: In this problem, a tree is an undirected graph that is connected and has no cycles.
+
+You are given a graph that started as a tree with n nodes labeled from 1 to n, with one additional edge added. The added edge has two different vertices chosen from 1 to n, and was not an edge that already existed. The graph is represented as an array edges of length n where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the graph.
+
+Return an edge that can be removed so that the resulting graph is a tree of n nodes. If there are multiple answers, return the answer that occurs last in the input.
+
+code:
+class Solution {
+    vector<int> parent; // Stores the parent of each node
+    vector<int> rank;   // Stores the rank (or depth) of each tree for union by rank
+
+    // Find function with path compression
+    int find(int i) {
+        // If the current node is not its own parent, recursively find the root
+        if (parent[i] != i)
+            parent[i] = find(parent[i]); // Path compression to flatten the structure
+        return parent[i]; // Return the root of the set
+    }
+
+    // Union function to join two sets
+    void join(int u, int v) {
+        int rootU = find(u); // Find the root of the first node
+        int rootV = find(v); // Find the root of the second node
+        
+        // Only join if they are in different sets
+        if (rootU != rootV) {
+            // Union by rank to keep the tree flat
+            if (rank[rootU] > rank[rootV]) 
+                parent[rootV] = rootU; // Attach smaller tree under larger tree
+            else if (rank[rootU] < rank[rootV]) 
+                parent[rootU] = rootV; // Attach smaller tree under larger tree
+            else {
+                parent[rootV] = rootU; // Attach one tree under the other
+                rank[rootU]++; // Increase the rank of the new root
+            }
+        }
+    }
+
+public:
+    // Function to find the redundant connection in a graph
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        int n = edges.size(); // Number of edges
+        parent.resize(n + 1); // Resize parent vector to hold all nodes (1-indexed)
+        rank.resize(n + 1, 0); // Initialize rank vector with zeros
+        
+        // Initialize each node as its own parent (each node is its own set)
+        for (int i = 1; i <= n; i++) 
+            parent[i] = i;
+
+        // Iterate through each edge in the graph
+        for (auto& edge : edges) {
+            int u = edge[0], v = edge[1]; // Get the two nodes of the edge
+            // Check if both nodes share the same root (cycle detection)
+            if (find(u) == find(v)) 
+                return edge; // Cycle detected, return the edge that caused it
+            join(u, v); // Merge the sets of the two nodes
+        }
+        
+        return {}; // Return empty if no redundant connection is found (shouldn't happen for valid input)
+    }
+};
