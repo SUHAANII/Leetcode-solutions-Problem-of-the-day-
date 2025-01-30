@@ -1,0 +1,94 @@
+Question: You are given a positive integer n representing the number of nodes in an undirected graph. The nodes are labeled from 1 to n.
+
+You are also given a 2D integer array edges, where edges[i] = [ai, bi] indicates that there is a bidirectional edge between nodes ai and bi. Notice that the given graph may be disconnected.
+
+Divide the nodes of the graph into m groups (1-indexed) such that:
+
+Each node in the graph belongs to exactly one group.
+For every pair of nodes in the graph that are connected by an edge [ai, bi], if ai belongs to the group with index x, and bi belongs to the group with index y, then |y - x| = 1.
+Return the maximum number of groups (i.e., maximum m) into which you can divide the nodes. Return -1 if it is impossible to group the nodes with the given conditions.
+
+code: 
+class Solution {
+public:
+    // Function to find the maximum number of magnificent sets
+    int magnificentSets(int n, vector<vector<int>>& edges) {
+        // Create an adjacency list to represent the graph
+        vector<vector<int>> graph(n + 1);
+        // Initialize visited array to track node visitation and depth
+        vector<int> visited(n + 1, -1);
+        
+        // Build the graph from the edges
+        for (const auto& edge : edges) {
+            graph[edge[0]].push_back(edge[1]);
+            graph[edge[1]].push_back(edge[0]);
+        }
+
+        int maxGroups = 0; // To count the maximum groups
+        unordered_set<int> componentNodes; // To hold nodes of the current connected component
+        
+        // Iterate through each node to find unvisited components
+        for (int i = 1; i <= n; i++) {
+            if (visited[i] != -1) continue; // Skip already visited nodes
+            
+            componentNodes.clear(); // Clear the set for the new component
+            // Find all nodes in the connected component
+            findConnectedComponent(i, graph, componentNodes);
+            
+            int maxDepth = -1; // Initialize max depth for the current component
+            // Calculate the maximum depth for each node in the component
+            for (int node : componentNodes) {
+                maxDepth = max(maxDepth, getMaxDepth(node, componentNodes, graph, visited));
+            }
+            
+            // If maxDepth is -1, it indicates an invalid configuration
+            if (maxDepth == -1) return -1;
+            maxGroups += maxDepth; // Add the max depth to the total group count
+        }
+        
+        return maxGroups; // Return the total maximum groups
+    }
+
+private:
+    // Helper function to find all nodes in the connected component
+    void findConnectedComponent(int node, vector<vector<int>>& graph, unordered_set<int>& componentNodes) {
+        componentNodes.insert(node); // Mark the current node as visited
+        // Recursively visit all neighbors
+        for (int neighbor : graph[node]) {
+            if (componentNodes.count(neighbor) == 0) {
+                findConnectedComponent(neighbor, graph, componentNodes);
+            }
+        }
+    }
+
+    // Function to get the maximum depth of the component starting from a given node
+    int getMaxDepth(int start, unordered_set<int>& componentNodes, vector<vector<int>>& graph, vector<int>& visited) {
+        // Reset visited array for the current component
+        for (int node : componentNodes) visited[node] = -1;
+        
+        queue<int> q; // Queue for BFS
+        int depth = 1; // Initialize depth
+        
+        q.push(start); // Start BFS from the starting node
+        visited[start] = 1; // Mark the starting node as visited
+        
+        // Perform BFS
+        while (!q.empty()) {
+            int cur = q.front(); // Get the current node
+            q.pop();
+            
+            // Explore all neighbors of the current node
+            for (int neighbor : graph[cur]) {
+                if (visited[neighbor] == -1) { // If the neighbor hasn't been visited
+                    visited[neighbor] = visited[cur] + 1; // Set its depth
+                    depth = max(depth, visited[neighbor]); // Update max depth
+                    q.push(neighbor); // Add neighbor to the queue
+                } else if (abs(visited[cur] - visited[neighbor]) != 1) {
+                    return -1; // If the depth difference is not 1, return -1 (invalid configuration)
+                }
+            }
+        }
+        
+        return depth; // Return the maximum depth found
+    }
+};
