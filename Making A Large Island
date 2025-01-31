@@ -1,0 +1,92 @@
+Question: You are given an n x n binary matrix grid. You are allowed to change at most one 0 to be 1.
+
+Return the size of the largest island in grid after applying this operation.
+
+An island is a 4-directionally connected group of 1s.
+
+code:
+
+class Solution {
+    // Direction vectors for moving in 4 directions (right, down, left, up)
+    int d[5] = {1, 0, -1, 0, 1}; 
+    int n; // Size of the grid
+
+    // Depth-First Search (DFS) to mark the island and calculate its size
+    int dfs(int row, int col, int id, vector<vector<int>>& grid) {
+        grid[row][col] = id; // Mark the current cell with the island ID
+        int cnt = 1; // Initialize the size of the island
+
+        // Explore all 4 possible directions
+        for (int i = 0; i < 4; i++) {
+            int nr = row + d[i]; // New row index
+            int nc = col + d[i + 1]; // New column index
+
+            // Check if the new indices are within bounds and if the cell is land (1)
+            if (nr >= 0 && nc >= 0 && nr < n && nc < n && grid[nr][nc] == 1)
+                cnt += dfs(nr, nc, id, grid); // Recursively mark the island
+        }
+
+        return cnt; // Return the total size of the island
+    }
+
+public:
+    // Function to find the size of the largest island after converting one water cell to land
+    int largestIsland(vector<vector<int>>& grid) {
+        n = grid.size(); // Get the size of the grid
+        vector<int> key; // Vector to store sizes of all identified islands
+        int id = 2; // Start island IDs from 2 (1 is used for land)
+
+        // Identify all islands and calculate their sizes
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                // If the cell is land, perform DFS to mark the island
+                if (grid[i][j] == 1)
+                    key.push_back(dfs(i, j, id++, grid)); // Store the size of the island
+            }
+        }
+
+        // If no islands are found, return 1 (the size of the largest island can be 1 by converting any water cell)
+        if (key.empty()) return 1;
+
+        int ans = 1; // Initialize the answer with the minimum possible island size
+
+        // Check all water cells to calculate potential island sizes if turned to land
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                // Only consider water cells (0)
+                if (grid[i][j] == 0) {
+                    int cnt = 1; // Start with the current water cell counted as land
+
+                    // Add sizes of neighboring islands
+                    for (int k = 0; k < 4; k++) {
+                        int nr = i + d[k]; // Neighboring row index
+                        int nc = j + d[k + 1]; // Neighboring column index
+
+                        // Check bounds and if the neighboring cell is an island (not water)
+                        if (nr >= 0 && nc >= 0 && nr < n && nc < n && grid[nr][nc] != 0 && key[grid[nr][nc] - 2] > 0) {
+                            cnt += key[grid[nr][nc] - 2]; // Add the size of the neighboring island
+                            key[grid[nr][nc] - 2] *= -1; // Mark this island as visited (negative size)
+                        }
+                    }
+
+                    // Reset the sizes of marked islands to their original values
+                    for (int k = 0; k < 4; k++) {
+                        int nr = i + d[k];
+                        int nc = j + d[k + 1];
+
+                        // Check bounds and if the neighboring cell is an island
+                        if (nr >= 0 && nc >= 0 && nr < n && nc < n && grid[nr][nc] != 0 && key[grid[nr][nc] - 2] < 0) {
+                            key[grid[nr][nc] - 2] *= -1; // Unmark the island
+                        }
+                    }
+
+                    // Update the maximum possible island size
+                    ans = max(ans, cnt);
+                }
+            }
+        }
+
+        // Return the largest island size found or n*n if the grid was entirely water
+        return ans == 1 ? n * n : ans;
+    }
+};
