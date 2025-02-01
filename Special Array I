@@ -1,0 +1,23 @@
+Question: An array is considered special if every pair of its adjacent elements contains two numbers with different parity.
+
+You are given an array of integers nums. Return true if nums is a special array, otherwise, return false.
+
+code:
+
+class Solution {
+public:
+    // Function to check if the array is special
+    bool isArraySpecial(vector<int>& nums) {
+        // Iterate through the array up to the second last element
+        for (int i = 0; i < nums.size() - 1; i++) {
+            // Check if the parity (even or odd) of the current element
+            // is the same as the next element
+            if (nums[i] % 2 == nums[i + 1] % 2) {
+                // If both have the same parity, return false
+                return false;
+            }
+        }
+        // If all adjacent elements have different parity, return true
+        return true;
+    }
+};
