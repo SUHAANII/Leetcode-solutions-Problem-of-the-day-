@@ -1,0 +1,32 @@
+Question: Given an array nums, return true if the array was originally sorted in non-decreasing order, then rotated some number of positions (including zero). Otherwise, return false.
+
+There may be duplicates in the original array.
+
+Note: An array A rotated by x positions results in an array B of the same length such that A[i] == B[(i+x) % A.length], where % is the modulo operation.
+
+ 
+
+
+code:
+class Solution {
+public:
+    bool check(vector<int>& nums) {
+        // Initialize a counter to track the number of times the order is violated
+        int count = 0;
+        // Get the size of the input array
+        int n = nums.size();
+
+        // Loop through the array
+        for (int i = 0; i < n; i++) {
+            // Check if the current element is greater than the next element
+            // The next element is accessed using modulo to wrap around the array
+            if (nums[i] > nums[(i + 1) % n]) {
+                // Increment the count of violations
+                // If more than one violation is found, return false
+                if (++count > 1) return false;
+            }
+        }
+        // If zero or one violation was found, the array is a sorted rotated array
+        return true;
+    }
+};
