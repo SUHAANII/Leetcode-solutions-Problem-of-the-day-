@@ -1,0 +1,46 @@
+Question: You are given an array of integers nums. Return the length of the longest 
+subarray
+ of nums which is either 
+strictly increasing
+ or 
+strictly decreasing
+.
+
+code:
+class Solution {
+public:
+    // Function to find the length of the longest monotonic subarray
+    int longestMonotonicSubarray(vector<int>& nums) {
+        int n = nums.size(); // Get the size of the input array
+        int i = 0;          // Initialize index variable
+        int ans = 0;       // Variable to store the maximum length found
+        int inc = 1;       // Counter for increasing subarray length
+        int dec = 1;       // Counter for decreasing subarray length
+
+        // If the array has only one element, the longest subarray is 1
+        if (n == 1) return 1;
+
+        // Iterate through the array starting from the second element
+        for (i = 1; i < n; i++) {
+            // Check if the current element is greater than the previous one
+            if (nums[i] > nums[i - 1]) {
+                inc++;   // Increment the increasing counter
+                dec = 1; // Reset the decreasing counter
+            }
+            // Check if the current element is less than the previous one
+            else if (nums[i] < nums[i - 1]) {
+                inc = 1; // Reset the increasing counter
+                dec++;   // Increment the decreasing counter
+            }
+            // If the current element is equal to the previous one
+            else {
+                inc = dec = 1; // Reset both counters
+            }
+            // Update the maximum length found so far
+            ans = max({ans, dec, inc});
+        } 
+        
+        // Return the length of the longest monotonic subarray
+        return ans;   
+    }
+};
