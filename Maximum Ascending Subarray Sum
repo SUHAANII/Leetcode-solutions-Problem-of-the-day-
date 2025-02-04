@@ -1,0 +1,31 @@
+Question: Given an array of positive integers nums, return the maximum possible sum of an ascending subarray in nums.
+
+A subarray is defined as a contiguous sequence of numbers in an array.
+
+A subarray [numsl, numsl+1, ..., numsr-1, numsr] is ascending if for all i where l <= i < r, numsi  < numsi+1. Note that a subarray of size 1 is ascending.
+
+code:
+class Solution {
+public:
+    // Function to find the maximum sum of an ascending subarray
+    int maxAscendingSum(vector<int>& nums) {
+        // Initialize `curr` to the first element of the array
+        int curr = nums[0];
+        // Initialize `ans` to the first element as the maximum found so far
+        int ans = nums[0];
+
+        // Iterate through the array starting from the second element
+        for (int i = 1; i < nums.size(); ++i) {
+            // Check if the current element is greater than the previous one
+            // If so, add it to the current sum `curr`
+            // Otherwise, reset `curr` to the current element
+            curr = nums[i] > nums[i - 1] ? curr + nums[i] : nums[i];
+
+            // Update `ans` to be the maximum of itself and the current sum `curr`
+            ans = max(ans, curr);
+        }
+
+        // Return the maximum ascending sum found
+        return ans;  
+    }
+};
