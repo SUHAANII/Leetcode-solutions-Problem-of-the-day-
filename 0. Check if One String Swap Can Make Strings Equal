@@ -1,0 +1,37 @@
+Question: You are given two strings s1 and s2 of equal length. A string swap is an operation where you choose two indices in a string (not necessarily different) and swap the characters at these indices.
+
+Return true if it is possible to make both strings equal by performing at most one string swap on exactly one of the strings. Otherwise, return false.
+
+code:
+// Initialize indices for the positions of differences and a counter for mismatches
+int i = -1, j = -1;
+int cnt = 0;
+
+// Loop through each character of the strings s1 and s2
+for (int k = 0; k < s1.length(); k++) {
+    // Check if characters at the current position are different
+    if (s1[k] != s2[k]) {
+        cnt++; // Increment the mismatch counter
+        
+        // If this is the first mismatch, record its index
+        if (i == -1) {
+            i = k; // Set i to the current index
+        } 
+        // If this is the second mismatch, record its index
+        else if (j == -1) {
+            j = k; // Set j to the current index
+        }
+    }
+}
+
+// Check if there were no mismatches
+if (cnt == 0) {
+    return true; // Strings are identical, return true
+} 
+// Check if there were exactly two mismatches and they can be swapped to make the strings equal
+else if (cnt == 2 && s1[i] == s2[j] && s1[j] == s2[i]) {
+    return true; // The two mismatched characters can be swapped, return true
+}
+
+// If none of the above conditions are met, return false
+return false; // Strings cannot be made equal by a single swap
