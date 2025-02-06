@@ -1,0 +1,32 @@
+Question: Given an array nums of distinct positive integers, return the number of tuples (a, b, c, d) such that a * b = c * d where a, b, c, and d are elements of nums, and a != b != c != d.
+
+code:
+#include <vector>
+#include <unordered_map>
+using namespace std;
+
+class Solution {
+public:
+    // Function to count the number of tuples with the same product
+    int tupleSameProduct(vector<int>& nums) {
+        unordered_map<int, int> mp; // Map to store the frequency of products
+        int ans = 0; // Variable to store the final count of tuples
+        int n = nums.size(); // Size of the input vector
+
+        // Iterate through all pairs of elements in the nums array
+        for (int i = 0; i < n; i++)
+            for (int j = i + 1; j < n; j++) {
+                int product = nums[i] * nums[j]; // Calculate the product of the pair
+
+                // For each product found, add to the answer the number of times this product
+                // has been seen before, multiplied by 8 (since each pair can form 8 unique tuples)
+                ans += 8 * mp[product];
+
+                // Increment the count of this product in the map
+                mp[product]++;
+            }
+
+        // Return the total count of tuples
+        return ans;
+    }
+};
