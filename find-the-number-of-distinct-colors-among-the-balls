@@ -1,0 +1,52 @@
+Question: You are given an integer limit and a 2D array queries of size n x 2.
+
+There are limit + 1 balls with distinct labels in the range [0, limit]. Initially, all balls are uncolored. For every query in queries that is of the form [x, y], you mark ball x with the color y. After each query, you need to find the number of distinct colors among the balls.
+
+Return an array result of length n, where result[i] denotes the number of distinct colors after ith query.
+
+Note that when answering a query, lack of a color will not be considered as a color.
+
+code:
+
+class Solution {
+public:
+    // Function to process queries and return the number of distinct colors after each query
+    vector<int> queryResults(int limit, vector<vector<int>>& queries) {
+        // Maps to keep track of the color of each ball at a position and the count of each color
+        unordered_map<int,int> ball;   // Maps position to color
+        unordered_map<int,int> color;   // Maps color to its count
+        vector<int> ans;                // Vector to store the results for each query
+        ans.reserve(queries.size());    // Reserve space for efficiency
+        int distinct = 0;               // Counter for distinct colors
+
+        // Iterate over each query
+        for(auto &q : queries) {
+            int pos = q[0];  // Get the position from the query
+            int c = q[1];    // Get the color from the query
+            
+            // Check if there is already a ball at the given position
+            if(ball.count(pos)) {
+                // If there is a ball, decrease the count of its current color
+                if(--color[ball[pos]] == 0) {
+                    // If the count of that color reaches zero, decrease the distinct count
+                    distinct--;
+                }
+            }
+
+            // Assign the new color to the position
+            ball[pos] = c;
+
+            // Increase the count of the new color
+            if(++color[c] == 1) {
+                // If this is the first ball of this color, increase the distinct count
+                distinct++;
+            }
+
+            // Append the current count of distinct colors to the result
+            ans.push_back(distinct);
+        }
+
+        // Return the results for all queries
+        return ans;
+    }
+};
