@@ -1,0 +1,56 @@
+Question: Design a number container system that can do the following:
+
+Insert or Replace a number at the given index in the system.
+Return the smallest index for the given number in the system.
+Implement the NumberContainers class:
+
+NumberContainers() Initializes the number container system.
+void change(int index, int number) Fills the container at index with the number. If there is already a number at that index, replace it.
+int find(int number) Returns the smallest index for the given number, or -1 if there is no index that is filled by number in the system.
+ 
+
+code:
+
+#include <unordered_map>
+#include <queue>
+#include <vector>
+using namespace std;
+
+class NumberContainers {
+    // Maps to store the current number for each index and a priority queue for each number
+    unordered_map<int, int> m; // Maps index to its current number
+    unordered_map<int, priority_queue<int, vector<int>, greater<int>>> d; // Maps number to a min-heap of indices
+
+public:
+    // Constructor to initialize the NumberContainers object
+    NumberContainers() {}
+
+    // Function to change the number at index 'i' to 'n'
+    void change(int i, int n) {
+        // If the index already has the same number, do nothing
+        if (m.count(i) && m[i] == n) return;
+        
+        // Update the map with the new number for the index
+        m[i] = n;
+
+        // Push the index 'i' into the priority queue for the number 'n'
+        d[n].push(i);
+    }
+
+    // Function to find the smallest index that has the number 'n'
+    int find(int n) {
+        // If no index corresponds to the number 'n', return -1
+        if (!d.count(n)) return -1;
+
+        // Reference to the priority queue for the number 'n'
+        auto &pq = d[n];
+
+        // Remove indices from the priority queue that no longer hold the number 'n'
+        while (!pq.empty() && m[pq.top()] != n) {
+            pq.pop(); // Remove the top index if its number is not 'n'
+        }
+
+        // If the priority queue is empty after cleanup, return -1
+        return pq.empty() ? -1 : pq.top(); // Return the smallest valid index or -1
+    }
+};
