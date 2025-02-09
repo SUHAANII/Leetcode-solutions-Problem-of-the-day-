@@ -1,0 +1,35 @@
+Question: You are given a 0-indexed integer array nums. A pair of indices (i, j) is a bad pair if i < j and j - i != nums[j] - nums[i].
+
+Return the total number of bad pairs in nums.
+
+code:
+class Solution {
+public:
+    // Function to count the number of bad pairs in the array
+    long long countBadPairs(vector<int>& nums) {
+        // Get the size of the input array
+        int n = nums.size();
+
+        // Calculate the total number of pairs in the array
+        long long totalPairs = (long long)n * (n - 1) / 2;
+
+        // Map to count occurrences of each difference (nums[i] - i)
+        unordered_map<int, long long> diffCount;
+
+        // Iterate through the array
+        for (int i = 0; i < n; i++) {
+            // Calculate the difference between the current element and its index
+            int diff = nums[i] - i;
+
+            // Subtract the number of good pairs (which have the same difference)
+            // from the total pairs. This is because good pairs do not count as bad pairs.
+            totalPairs -= diffCount[diff];
+
+            // Increment the count of the current difference in the map
+            diffCount[diff]++;
+        }
+
+        // Return the total number of bad pairs
+        return totalPairs;
+    }
+};
