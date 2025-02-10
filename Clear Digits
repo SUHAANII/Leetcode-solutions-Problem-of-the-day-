@@ -1,0 +1,37 @@
+Question: You are given a string s.
+
+Your task is to remove all digits by doing this operation repeatedly:
+
+Delete the first digit and the closest non-digit character to its left.
+Return the resulting string after removing all digits.
+
+ 
+
+code:
+class Solution {
+public:
+    // Function to clear digits from the string
+    static string clearDigits(string& s) {
+        int n = s.size(); // Get the size of the string
+        int j = 0; // Initialize a pointer j to track the position to write non-digit characters
+        
+        // Iterate through each character in the string
+        for (int i = 0; i < n; i++) {
+            // Check if the current character is a digit
+            if (isdigit(s[i]) && j > 0) {
+                // If it's a digit and j is greater than 0, decrement j to "remove" the last non-digit character
+                j--;
+            } else {
+                // If it's not a digit, write the character at position j and increment j
+                s[j++] = s[i];
+            }
+        }
+        
+        // Resize the string to the new length, effectively removing the unwanted characters
+        s.resize(j);
+        
+        // Return the modified string
+        return s;
+    }
+};
+
