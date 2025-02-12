@@ -1,0 +1,40 @@
+Question: You are given a 0-indexed array nums consisting of positive integers. You can choose two indices i and j, such that i != j, and the sum of digits of the number nums[i] is equal to that of nums[j].
+
+Return the maximum value of nums[i] + nums[j] that you can obtain over all possible indices i and j that satisfy the conditions.
+
+ 
+code:
+
+class Solution {
+public:
+    // Function to find the maximum sum of two numbers with the same digit sum
+    int maximumSum(vector<int>& nums) {
+        int mp[82];  // Array to store the maximum number for each possible digit sum (0 to 81)
+        memset(mp, -1, sizeof(mp));  // Initialize the array with -1 (indicating no number found yet)
+        int ans = -1;  // Variable to store the maximum sum found
+
+        // Iterate through each number in the input vector
+        for (int num : nums) {
+            int sumDigits = 0;  // Variable to store the sum of digits
+            int temp = num;  // Temporary variable to manipulate the number
+            
+            // Calculate the sum of digits of the current number
+            while (temp) {
+                sumDigits += temp % 10;  // Add the last digit to sum
+                temp /= 10;  // Remove the last digit
+            }
+
+            // Check if there's a previously stored number with the same digit sum
+            if (mp[sumDigits] != -1) {
+                // If found, calculate the potential maximum sum
+                ans = max(ans, num + mp[sumDigits]);
+            }
+
+            // Update the maximum number for the current digit sum
+            mp[sumDigits] = max(mp[sumDigits], num);
+        }
+
+        // Return the maximum sum found, or -1 if no valid pairs were found
+        return ans;
+    }
+};
