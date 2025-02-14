@@ -1,0 +1,51 @@
+Question: Design an algorithm that accepts a stream of integers and retrieves the product of the last k integers of the stream.
+
+Implement the ProductOfNumbers class:
+
+ProductOfNumbers() Initializes the object with an empty stream.
+void add(int num) Appends the integer num to the stream.
+int getProduct(int k) Returns the product of the last k numbers in the current list. You can assume that always the current list has at least k numbers.
+The test cases are generated so that, at any time, the product of any contiguous sequence of numbers will fit into a single 32-bit integer without overflowing.
+
+code:
+
+class ProductOfNumbers {
+public:
+    // Vector to store the cumulative product of numbers
+    vector<int> product = {1}; // Start with 1 to handle products correctly
+    int n = 1; // Counter to keep track of the number of elements added
+
+    // Constructor to reserve space for the product vector
+    ProductOfNumbers() {
+        product.reserve(40000); // Reserve space for efficiency
+    }
+    
+    // Method to add a number to the product sequence
+    void add(int num) {
+        // If the number is 0, reset the product vector and counter
+        if (num == 0) {
+            product = {1}; // Reset to only contain the initial product (1)
+            n = 1; // Reset count to 1
+        }
+        else {
+            // Calculate the new product by multiplying the last product with the current number
+            product.push_back(product[n - 1] * num);
+            n++; // Increment the count of added numbers
+        }
+    }
+    
+    // Method to get the product of the last k numbers added
+    int getProduct(int k) {
+        // If k is greater than the number of elements added, return 0
+        if (n <= k) return 0;
+        // Return the product of the last k numbers using division of cumulative products
+        return product[n - 1] / product[n - k - 1];
+    }
+};
+
+/**
+ * Your ProductOfNumbers object will be instantiated and called as such:
+ * ProductOfNumbers* obj = new ProductOfNumbers();
+ * obj->add(num); // Add a number to the product sequence
+ * int param_2 = obj->getProduct(k); // Get the product of the last k numbers
+ */
