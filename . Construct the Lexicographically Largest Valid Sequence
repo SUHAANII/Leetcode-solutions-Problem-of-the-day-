@@ -1,0 +1,68 @@
+Question: Given an integer n, find a sequence that satisfies all of the following:
+
+The integer 1 occurs once in the sequence.
+Each integer between 2 and n occurs twice in the sequence.
+For every integer i between 2 and n, the distance between the two occurrences of i is exactly i.
+The distance between two numbers on the sequence, a[i] and a[j], is the absolute difference of their indices, |j - i|.
+
+Return the lexicographically largest sequence. It is guaranteed that under the given constraints, there is always a solution.
+
+code:
+
+class Solution {
+public:
+    // Function to construct a distanced sequence of numbers from 1 to n
+    vector<int> constructDistancedSequence(int n) {
+        // Initialize the result vector with size 2*n - 1, filled with 0s
+        vector<int> result(2 * n - 1, 0);
+        // Initialize a used array to track which numbers have been placed in the result
+        vector<bool> used(n + 1, false);
+        // Start backtracking to fill the result
+        backtrack(result, used, n, 0);
+        return result; // Return the constructed sequence
+    }
+
+private:
+    // Backtracking function to fill the result array
+    bool backtrack(vector<int>& result, vector<bool>& used, int n, int index) {
+        // Find the next empty position in the result array
+        while (index < result.size() && result[index] != 0) {
+            index++;
+        }
+        
+        // If we have filled the whole result array, return true
+        if (index == result.size()) {
+            return true;
+        }
+
+        // Try to place numbers from n down to 1
+        for (int i = n; i >= 1; i--) {
+            // Skip if the number i has already been used
+            if (used[i]) continue;
+
+            // Special case for number 1, which can only be placed in one spot
+            if (i == 1) {
+                result[index] = 1; // Place 1 at the current index
+                used[1] = true; // Mark 1 as used
+                // Recursively try to fill the next index
+                if (backtrack(result, used, n, index + 1)) return true;
+                // If it didn't work out, backtrack
+                result[index] = 0; // Reset the current index
+                used[1] = false; // Mark 1 as unused
+            } 
+            // Check if we can place the number i at current index and its distance
+            else if (index + i < result.size() && result[index + i] == 0) {
+                result[index] = i; // Place i at the current index
+                result[index + i] = i; // Place i at the distance index
+                used[i] = true; // Mark i as used
+                // Recursively try to fill the next index
+                if (backtrack(result, used, n, index + 1)) return true;
+                // If it didn't work out, backtrack
+                result[index] = 0; // Reset the current index
+                result[index + i] = 0; // Reset the distance index
+                used[i] = false; // Mark i as unused
+            }
+        }
+        return false; // Return false if no valid placement was found
+    }
+};
