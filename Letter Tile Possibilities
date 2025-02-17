@@ -1,0 +1,31 @@
+Question: You have n  tiles, where each tile has one letter tiles[i] printed on it.
+
+Return the number of possible non-empty sequences of letters you can make using the letters printed on those tiles.
+
+ 
+code:
+class Solution {
+public:
+    // Function to calculate the number of distinct tile possibilities
+    int numTilePossibilities(string tiles) {
+        sort(tiles.begin(), tiles.end()); // Sort the tiles to handle duplicates
+        vector<bool> used(tiles.size(), false); // Vector to track used tiles
+        return backtrack(tiles, used); // Start backtracking to count possibilities
+    }
+
+    // Backtracking function to explore all arrangements
+    int backtrack(string& tiles, vector<bool>& used) {
+        int count = 0; // Initialize count of arrangements
+
+        // Loop through each tile
+        for (int i = 0; i < tiles.size(); i++) {
+            // Skip used tiles or duplicates (to avoid counting the same arrangement)
+            if (used[i] || (i > 0 && tiles[i] == tiles[i - 1] && !used[i - 1])) continue;
+
+            used[i] = true; // Mark the current tile as used
+            count += 1 + backtrack(tiles, used); // Count this arrangement and recurse
+            used[i] = false; // Backtrack: unmark the tile for the next iteration
+        }
+        return count; // Return the total count of arrangements found
+    }
+};
