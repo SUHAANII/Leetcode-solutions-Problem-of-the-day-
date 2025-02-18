@@ -1,0 +1,38 @@
+Question: You are given a 0-indexed string pattern of length n consisting of the characters 'I' meaning increasing and 'D' meaning decreasing.
+
+A 0-indexed string num of length n + 1 is created using the following conditions:
+
+num consists of the digits '1' to '9', where each digit is used at most once.
+If pattern[i] == 'I', then num[i] < num[i + 1].
+If pattern[i] == 'D', then num[i] > num[i + 1].
+Return the lexicographically smallest possible string num that meets the conditions.
+
+code:  
+
+class Solution {
+public:
+    string smallestNumber(string pattern) {
+        // Initialize the result string with "1" and a temporary string for holding characters
+        string ans = "1", temp;
+
+        // Iterate through each character in the pattern
+        for (int i = 0; i < pattern.size(); i++) {
+            // If the current character in the pattern is 'I' (Increasing)
+            if (pattern[i] == 'I') {
+                // Append the temporary string to the result, followed by the next number (i + 2)
+                ans += temp + char(i + '2');
+                // Clear the temporary string for the next segment
+                temp = "";
+            } else { // If the current character in the pattern is 'D' (Decreasing)
+                // Store the last character of the result in temp, then remove it from ans
+                temp = char(ans.back()) + temp;
+                ans.pop_back(); // Remove the last character from ans
+                // Add the next number (i + 2) to the result
+                ans += char(i + '2');
+            }
+        }
+
+        // Append any remaining characters in temp to the result before returning
+        return ans + temp;
+    }
+};
