@@ -1,0 +1,46 @@
+Question: A happy string is a string that:
+
+consists only of letters of the set ['a', 'b', 'c'].
+s[i] != s[i + 1] for all values of i from 1 to s.length - 1 (string is 1-indexed).
+For example, strings "abc", "ac", "b" and "abcbabcbcb" are all happy strings and strings "aa", "baa" and "ababbc" are not happy strings.
+
+Given two integers n and k, consider a list of all happy strings of length n sorted in lexicographical order.
+
+Return the kth string of this list or return an empty string if there are less than k happy strings of length n.
+
+code;
+class Solution {
+    int n2; // Variable to store the original length of the string
+
+    // Depth-First Search (DFS) function to generate happy strings
+    string dfs(string prefix, int n, int k) {
+        // If no more characters are left to add, return the current prefix
+        if (n == 0)
+            return prefix;
+
+        // Iterate through characters 'a', 'b', and 'c'
+        for (char c = 'a'; c <= 'c'; c++) {
+            // Skip adding the same character as the last one in the prefix
+            if (!prefix.empty() && c == prefix.back())
+                continue;
+
+            // Calculate the number of valid strings that can be formed with the remaining characters
+            int cnt = (1 << (n2 - prefix.length() - 1)); // 2^(n2 - prefix.length() - 1)
+
+            // If the count of valid strings is greater than or equal to k,
+            // it means the k-th string is within this branch
+            if (cnt >= k)
+                return dfs(prefix + c, n - 1, k); // Continue building the string
+            else
+                k -= cnt; // Skip this branch and reduce k by the count
+        }
+        return ""; // Return an empty string if no valid string is found
+    }
+
+public:
+    // Function to get the k-th happy string of length n
+    string getHappyString(int n, int k) {
+        n2 = n; // Store the original length of the string
+        return dfs("", n, k); // Start DFS with an empty prefix
+    }
+};
