@@ -1,0 +1,27 @@
+Question: Given an array of strings nums containing n unique binary strings each of length n, return a binary string of length n that does not appear in nums. If there are multiple answers, you may return any of them.
+
+ 
+code:
+class Solution {
+public:
+    string findDifferentBinaryString(vector<string>& nums) {
+        // Create a binary string of the same length as nums, initialized to "000...0"
+        string ans = string(nums.size(), '0');  
+
+        // Check if the string "000...0" is not present in nums
+        if(find(nums.begin(), nums.end(), ans) == nums.end()) 
+            return ans;  // If it's not found, return it as the answer
+
+        // Loop through each index of the binary string
+        for(int i = 0; i < nums.size(); i++) { 
+            ans[i] = '1';  // Flip the current bit to '1'
+            
+            // Check if the modified string is not present in nums
+            if(find(nums.begin(), nums.end(), ans) == nums.end()) 
+                return ans;  // If it's not found, return it as the answer
+            
+            ans[i] = '0';  // Revert the bit back to '0' if needed
+        }
+        return ans;  // Fallback case (should not reach here in valid input)
+    }
+};
