@@ -1,0 +1,58 @@
+Question: Given a binary tree with the following rules:
+
+root.val == 0
+For any treeNode:
+If treeNode.val has a value x and treeNode.left != null, then treeNode.left.val == 2 * x + 1
+If treeNode.val has a value x and treeNode.right != null, then treeNode.right.val == 2 * x + 2
+Now the binary tree is contaminated, which means all treeNode.val have been changed to -1.
+
+Implement the FindElements class:
+
+FindElements(TreeNode* root) Initializes the object with a contaminated binary tree and recovers it.
+bool find(int target) Returns true if the target value exists in the recovered binary tree.
+
+code:
+
+class FindElements {
+public:
+    // HashMap to store the recovered values of the tree nodes
+    unordered_map<int, bool> mp;
+
+    // Recursive function to recover the values of the nodes in the binary tree
+    void recover(TreeNode* root) {
+        // Check if the left child exists
+        if (root->left) {
+            // Set the value of the left child: 2 * parent value + 1
+            root->left->val = root->val * 2 + 1;
+            // Mark this value as existing in the map
+            mp[root->left->val] = true;
+            // Recursively recover the left subtree
+            recover(root->left);
+        }
+        // Check if the right child exists
+        if (root->right) {
+            // Set the value of the right child: 2 * parent value + 2
+            root->right->val = root->val * 2 + 2;
+            // Mark this value as existing in the map
+            mp[root->right->val] = true;
+            // Recursively recover the right subtree
+            recover(root->right);
+        }
+    }
+
+    // Constructor for the FindElements class
+    FindElements(TreeNode* root) {
+        // Set the root value to 0
+        root->val = 0;
+        // Mark the root value as existing in the map
+        mp[0] = true;
+        // Start the recovery process from the root
+        recover(root);
+    }
+    
+    // Function to check if a target value exists in the recovered tree
+    bool find(int target) {
+        // Return true if the target exists in the map, otherwise false
+        return mp[target];
+    }
+};
