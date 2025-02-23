@@ -1,0 +1,47 @@
+Question: Given two integer arrays, preorder and postorder where preorder is the preorder traversal of a binary tree of distinct values and postorder is the postorder traversal of the same tree, reconstruct and return the binary tree.
+
+If there exist multiple answers, you can return any of them.
+
+ 
+
+coed:
+
+class Solution {
+public:
+    // Function to construct a binary tree from its preorder and postorder traversal arrays
+    TreeNode* constructFromPrePost(vector<int>& pre, vector<int>& post) {
+        // Initialize index to keep track of the current position in the preorder array
+        int index = 0;
+        // Call the recursive helper function to construct the tree
+        return construct(pre, post, index, 0, pre.size() - 1);
+    }
+    
+private:
+    // Recursive function to construct the tree
+    TreeNode* construct(vector<int>& pre, vector<int>& post, int& index, int l, int h) {
+        // Base case: if the index exceeds the size of preorder or the range is invalid
+        if (index >= pre.size() || l > h) 
+            return nullptr;
+
+        // Create a new TreeNode with the current value from the preorder array
+        TreeNode* root = new TreeNode(pre[index++]);
+
+        // If the current range has only one element, return the created node
+        if (l == h) return root;
+
+        // Find the index in the postorder array that matches the next value in preorder
+        int i = l;
+        while (i <= h && post[i] != pre[index]) i++;
+
+        // If a valid index is found in postorder, construct the left and right subtrees
+        if (i <= h) {
+            // Construct the left subtree from the left part of the postorder array
+            root->left = construct(pre, post, index, l, i);
+            // Construct the right subtree from the remaining part of the postorder array
+            root->right = construct(pre, post, index, i + 1, h - 1);
+        }
+
+        // Return the constructed root node
+        return root;
+    }
+};
