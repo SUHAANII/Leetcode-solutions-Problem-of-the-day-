@@ -1,0 +1,94 @@
+Question: There is an undirected tree with n nodes labeled from 0 to n - 1, rooted at node 0. You are given a 2D integer array edges of length n - 1 where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the tree.
+
+At every node i, there is a gate. You are also given an array of even integers amount, where amount[i] represents:
+
+the price needed to open the gate at node i, if amount[i] is negative, or,
+the cash reward obtained on opening the gate at node i, otherwise.
+The game goes on as follows:
+
+Initially, Alice is at node 0 and Bob is at node bob.
+At every second, Alice and Bob each move to an adjacent node. Alice moves towards some leaf node, while Bob moves towards node 0.
+For every node along their path, Alice and Bob either spend money to open the gate at that node, or accept the reward. Note that:
+If the gate is already open, no price will be required, nor will there be any cash reward.
+If Alice and Bob reach the node simultaneously, they share the price/reward for opening the gate there. In other words, if the price to open the gate is c, then both Alice and Bob pay c / 2 each. Similarly, if the reward at the gate is c, both of them receive c / 2 each.
+If Alice reaches a leaf node, she stops moving. Similarly, if Bob reaches node 0, he stops moving. Note that these events are independent of each other.
+Return the maximum net income Alice can have if she travels towards the optimal leaf node.
+
+ 
+
+code:
+class Solution {
+public:
+    // Function to find the most profitable path
+    int mostProfitablePath(vector<vector<int>>& edges, int bob, vector<int>& amount) {
+        // Get the number of nodes (amounts)
+        int n = amount.size();
+        // Create an adjacency list for the graph
+        vector<vector<int>> graph(n);
+        
+        // Build the graph from the edges
+        for (auto& edge : edges) {
+            graph[edge[0]].push_back(edge[1]);
+            graph[edge[1]].push_back(edge[0]);
+        }
+
+        // Array to track Bob's path
+        vector<int> bobPath(n, -1);
+        vector<int> path;
+        
+        // Recursive function to fill Bob's path from his starting node to the root (node 0)
+        function<bool(int, int)> fillBobPath = [&](int node, int parent) {
+            // If we reach the root node (0), we found Bob's path
+            if (node == 0) return true;
+            
+            // Explore neighbors
+            for (int neighbor : graph[node]) {
+                if (neighbor != parent) {  // Avoid going back to the parent
+                    path.push_back(node);  // Add current node to the path
+                    // Recursively call to find Bob's path
+                    if (fillBobPath(neighbor, node)) return true;
+                    path.pop_back();  // Backtrack if not found
+                }
+            }
+            return false;  // Return false if no path found
+        };
+
+        // Fill Bob's path
+        fillBobPath(bob, -1);
+        // Mark the nodes in Bob's path with their respective timestamps
+        for (int i = 0; i < path.size(); i++) {
+            bobPath[path[i]] = i;
+        }
+
+        // Recursive function to calculate Alice's maximum score
+        function<int(int, int, int, int)> getAliceMaxScore = [&](int node, int parent, int currScore, int timestamp) {
+            // Check if Bob reaches this node before or at the same time as Alice
+            if (bobPath[node] == -1 || bobPath[node] > timestamp) {
+                // Bob does not reach this node, Alice can take full amount
+                currScore += amount[node];
+            } else if (bobPath[node] == timestamp) {
+                // Bob reaches this node at the same time, Alice takes half the amount
+                currScore += amount[node] / 2;
+            }
+
+            // If it's a leaf node and not the root, return the current score
+            if (graph[node].size() == 1 && node != 0) return currScore;
+
+            // Variable to track the maximum score from this node
+            int maxScore = INT_MIN;
+            // Explore neighbors to calculate scores
+            for (int neighbor : graph[node]) {
+                if (neighbor != parent) {  // Avoid going back to the parent
+                    // Recursively get the maximum score from the neighbor
+                    maxScore = max(maxScore, getAliceMaxScore(neighbor, node, currScore, timestamp + 1));
+                }
+            }
+            return maxScore;  // Return the maximum score found
+        };
+
+        // Start calculating Alice's maximum score from the root node (0)
+        return getAliceMaxScore(0, -1, 0, 0);
+    }
+};
+
+
