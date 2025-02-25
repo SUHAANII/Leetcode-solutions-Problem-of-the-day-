@@ -1,0 +1,30 @@
+Question: Given an array of integers arr, return the number of subarrays with an odd sum.
+
+Since the answer can be very large, return it modulo 109 + 7.
+code:
+
+class Solution {
+public:
+    int numOfSubarrays(vector<int>& arr) {
+        // Initialize variables to count odd prefix sums and to store the cumulative sum
+        long long oddCount = 0, prefixSum = 0;
+        
+        // Iterate through each element in the array
+        for (int a : arr) {
+            // Update the cumulative prefix sum
+            prefixSum += a;
+            // Increment the count of odd prefix sums
+            // If the current prefix sum is odd (prefixSum % 2 == 1), increment oddCount
+            oddCount += prefixSum % 2;
+        }
+        
+        // Calculate the total number of valid subarrays
+        // The total number of subarrays that can be formed with odd prefix sums
+        // (arr.size() - oddCount) gives the count of even prefix sums
+        // Each odd prefix can pair with every even prefix to form an odd-sum subarray
+        oddCount += (arr.size() - oddCount) * oddCount;
+        
+        // Return the result modulo 1,000,000,007 to handle large numbers
+        return oddCount % 1'000'000'007;
+    }
+};
