@@ -1,0 +1,45 @@
+Question: A sequence x1, x2, ..., xn is Fibonacci-like if:
+
+n >= 3
+xi + xi+1 == xi+2 for all i + 2 <= n
+Given a strictly increasing array arr of positive integers forming a sequence, return the length of the longest Fibonacci-like subsequence of arr. If one does not exist, return 0.
+
+A subsequence is derived from another sequence arr by deleting any number of elements (including none) from arr, without changing the order of the remaining elements. For example, [3, 5, 8] is a subsequence of [3, 4, 5, 6, 7, 8]
+
+code:
+
+class Solution {
+public:
+    // Function to find the length of the longest Fibonacci-like subsequence
+    int lenLongestFibSubseq(vector<int>& arr) {
+        // Get the size of the input array
+        int n = arr.size();
+        // Store array elements in a set for O(1) lookup time
+        unordered_set<int> numSet(arr.begin(), arr.end());
+
+        // Variable to track the maximum length of Fibonacci-like subsequence found
+        int maxLen = 0;
+
+        // Try all possible pairs of starting numbers in the sequence
+        for (int start = 0; start < n; ++start) {
+            for (int next = start + 1; next < n; ++next) {
+                // Initialize the first two numbers of the Fibonacci-like sequence
+                int prev = arr[next]; // Second number
+                int curr = arr[start] + arr[next]; // First number + Second number
+                int len = 2; // Length of the current Fibonacci-like sequence (starting with two numbers)
+
+                // Keep finding the next Fibonacci number in the sequence
+                while (numSet.find(curr) != numSet.end()) {
+                    // Update values for the next iteration
+                    int temp = curr; // Store the current Fibonacci number
+                    curr += prev; // Calculate the next Fibonacci number
+                    prev = temp; // Update previous number to the current
+                    maxLen = max(maxLen, ++len); // Update the maximum length found
+                }
+            }
+        }
+
+        // Return the maximum length of the Fibonacci-like subsequence found
+        return maxLen;
+    }
+};
