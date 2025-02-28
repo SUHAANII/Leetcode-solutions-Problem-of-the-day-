@@ -1,0 +1,60 @@
+Question: Given two strings str1 and str2, return the shortest string that has both str1 and str2 as subsequences. If there are multiple valid strings, return any of them.
+
+A string s is a subsequence of string t if deleting some number of characters from t (possibly 0) results in the string s.
+
+ code:
+
+class Solution {
+public:
+    // Function to find the shortest common supersequence of str1 and str2
+    string shortestCommonSupersequence(string str1, string str2) {
+        // Get lengths of the input strings
+        int m = str1.length(), n = str2.length();
+        
+        // Create a 2D vector to store lengths of longest common subsequence (LCS)
+        vector<vector<int>> lcs(m + 1, vector<int>(n + 1, 0));
+
+        // Compute LCS table
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                // If characters match, increment the count from the previous indices
+                if (str1[i - 1] == str2[j - 1]) {
+                    lcs[i][j] = 1 + lcs[i - 1][j - 1];
+                } else {
+                    // Take the maximum from the left or above
+                    lcs[i][j] = max(lcs[i - 1][j], lcs[i][j - 1]);
+                }
+            }
+        }
+
+        // Build the shortest supersequence
+        int i = m, j = n;
+        string result = ""; // Initialize result string
+        
+        // Backtrack through the LCS table to build the SCS
+        while (i > 0 && j > 0) {
+            // If characters match, add to result and move diagonally
+            if (str1[i - 1] == str2[j - 1]) {
+                result += str1[i - 1]; // or str2[j - 1], both are the same
+                i--, j--;
+            } 
+            // If not matching, decide which character to add based on LCS values
+            else if (lcs[i - 1][j] > lcs[i][j - 1]) {
+                result += str1[i - 1]; // Add character from str1
+                i--; // Move up in the LCS table
+            } else {
+                result += str2[j - 1]; // Add character from str2
+                j--; // Move left in the LCS table
+            }
+        }
+
+        // If there are remaining characters in str1, add them to result
+        while (i > 0) result += str1[--i];
+        // If there are remaining characters in str2, add them to result
+        while (j > 0) result += str2[--j];
+
+        // Reverse the result string as we built it backwards
+        reverse(result.begin(), result.end());
+        return result; // Return the final shortest common supersequence
+    }
+};
