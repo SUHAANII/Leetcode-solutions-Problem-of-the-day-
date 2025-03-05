@@ -1,0 +1,21 @@
+question: There exists an infinitely large two-dimensional grid of uncolored unit cells. You are given a positive integer n, indicating that you must do the following routine for n minutes:
+
+At the first minute, color any arbitrary unit cell blue.
+Every minute thereafter, color blue every uncolored cell that touches a blue cell.
+Below is a pictorial representation of the state of the grid after minutes 1, 2, and 3.
+
+code"
+
+class Solution {
+public:
+    long long coloredCells(int n) {
+        // Calculate the total number of colored cells in an n x n grid.
+        
+        // The formula used is:
+        // 1 (for the center cell) + 4 * (number of edges) * (number of edges - 1) / 2
+        // This accounts for the cells colored along the edges of the grid.
+        
+        // The 4LL ensures that the multiplication is done using long long to avoid overflow.
+        return 1 + 4LL * n * (n - 1) / 2; 
+    }
+};
