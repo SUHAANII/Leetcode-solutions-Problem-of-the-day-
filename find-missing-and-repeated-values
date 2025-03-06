@@ -1,0 +1,38 @@
+question: You are given a 0-indexed 2D integer matrix grid of size n * n with values in the range [1, n2]. Each integer appears exactly once except a which appears twice and b which is missing. The task is to find the repeating and missing numbers a and b.
+
+Return a 0-indexed integer array ans of size 2 where ans[0] equals to a and ans[1] equals to b.
+
+code:
+class Solution {
+public:
+    // Function to find the missing and repeated values in a grid
+    vector<int> findMissingAndRepeatedValues(vector<vector<int>>& grid) {
+        // Get the size of the grid (n x n)
+        int n = grid.size(); // Number of rows (and columns)
+        int size = n * n;    // Total number of elements expected (1 to n^2)
+
+        // Create a count vector to keep track of occurrences of each number
+        vector<int> count(size + 1, 0); // Size + 1 to include index from 1 to n^2
+
+        // Count occurrences of each number in the grid
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                count[grid[i][j]]++; // Increment the count for the number found in the grid
+            }
+        }
+
+        int a = -1, b = -1; // Variables to store the repeated (a) and missing (b) numbers
+
+        // Iterate through the count vector to find the repeated and missing numbers
+        for (int num = 1; num <= size; num++) {
+            if (count[num] == 2) {
+                a = num; // Found the repeated number
+            } else if (count[num] == 0) {
+                b = num; // Found the missing number
+            }
+        }
+
+        // Return a vector containing the repeated and missing numbers
+        return {a, b};
+    }
+};
