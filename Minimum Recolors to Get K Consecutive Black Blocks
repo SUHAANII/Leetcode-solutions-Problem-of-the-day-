@@ -1,0 +1,40 @@
+Question: You are given a 0-indexed string blocks of length n, where blocks[i] is either 'W' or 'B', representing the color of the ith block. The characters 'W' and 'B' denote the colors white and black, respectively.
+
+You are also given an integer k, which is the desired number of consecutive black blocks.
+
+In one operation, you can recolor a white block such that it becomes a black block.
+
+Return the minimum number of operations needed such that there is at least one occurrence of k consecutive black blocks.
+
+ 
+
+code:
+
+class Solution {
+public:
+    // Function to find the minimum number of recolors needed
+    int minimumRecolors(string blocks, int k) {
+        int black_count = 0; // Count of black blocks ('B') in the current window
+        int ans = INT_MAX;   // Initialize answer to maximum possible value
+
+        // Iterate through the blocks string
+        for (int i = 0; i < blocks.size(); i++) {
+            // If we have moved past the first k elements, remove the contribution of the leftmost element of the window
+            if (i - k >= 0 && blocks[i - k] == 'B') {
+                black_count--; // Decrease count if the leftmost block is black
+            }
+            
+            // Count the current block
+            if (blocks[i] == 'B') {
+                black_count++; // Increase count if the current block is black
+            }
+
+            // Calculate the number of white blocks ('W') in the current window of size k
+            // which is equal to k - black_count
+            ans = min(ans, k - black_count);
+        }
+        
+        // Return the minimum number of recolors needed
+        return ans;
+    }
+};
