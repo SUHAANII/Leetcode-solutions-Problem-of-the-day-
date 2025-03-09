@@ -1,0 +1,39 @@
+Question: There is a circle of red and blue tiles. You are given an array of integers colors and an integer k. The color of tile i is represented by colors[i]:
+
+colors[i] == 0 means that tile i is red.
+colors[i] == 1 means that tile i is blue.
+An alternating group is every k contiguous tiles in the circle with alternating colors (each tile in the group except the first and last one has a different color from its left and right tiles).
+
+Return the number of alternating groups.
+
+Note that since colors represents a circle, the first and the last tiles are considered to be next to each other.
+
+ 
+code:
+
+class Solution {
+public:
+    // Function to count the number of alternating groups of size at least 'k'
+    int numberOfAlternatingGroups(vector<int>& colors, int k) {
+        // Extend the colors vector by duplicating the first (k-1) elements at the end
+        colors.insert(colors.end(), colors.begin(), colors.begin() + (k - 1));
+        
+        int count = 0; // Variable to store the count of valid alternating groups
+        int left = 0;  // Left pointer to track the start of the current group
+        
+        // Iterate through the colors vector using 'right' as the right pointer
+        for (int right = 0; right < colors.size(); ++right) {
+            // If the current color is the same as the previous one, update the left pointer
+            if (right > 0 && colors[right] == colors[right - 1]) {
+                left = right;  // Reset the left pointer to the current position
+            }
+            
+            // Check if the size of the current group (right - left + 1) is at least 'k'
+            if (right - left + 1 >= k) {
+                count++;  // Increment the count for valid groups
+            }
+        }
+        
+        return count; // Return the total count of alternating groups of size at least 'k'
+    }
+};
