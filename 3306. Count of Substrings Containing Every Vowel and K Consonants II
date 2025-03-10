@@ -1,0 +1,53 @@
+Question: You are given a string word and a non-negative integer k.
+
+Return the total number of substrings of word that contain every vowel ('a', 'e', 'i', 'o', and 'u') at least once and exactly k consonants.
+
+
+code:
+
+class Solution {
+public:
+    long long countOfSubstrings(string word, int k) {
+        // Frequency arrays for vowels and consonants
+        int frequencies[2][128] = {};
+        frequencies[0]['a'] = frequencies[0]['e'] = frequencies[0]['i'] = frequencies[0]['o'] = frequencies[0]['u'] = 1;
+
+        long long response = 0;
+        int currentK = 0, vowels = 0, extraLeft = 0, left = 0;
+
+        for (int right = 0; right < word.length(); right++) {
+            char rightChar = word[right];
+
+            // Check if the character is a vowel
+            if (frequencies[0][rightChar]) {
+                if (++frequencies[1][rightChar] == 1) vowels++; // Count unique vowels
+            } else {
+                currentK++; // Count consonants
+            }
+
+            // Adjust the left pointer when currentK exceeds k
+            while (currentK > k) {
+                char leftChar = word[left++];
+                if (frequencies[0][leftChar]) {
+                    if (--frequencies[1][leftChar] == 0) vowels--; // Decrease unique vowel count
+                } else {
+                    currentK--; // Decrease consonant count
+                }
+                extraLeft = 0; // Reset extraLeft
+            }
+
+            // Count substrings with the required conditions
+            while (vowels == 5 && currentK == k && left < right && frequencies[0][word[left]] && frequencies[1][word[left]] > 1) {
+                extraLeft++;
+                frequencies[1][word[left++]]--;
+            }
+
+            // If we have exactly k consonants and all vowels, add to response
+            if (currentK == k && vowels == 5) {
+                response += (1 + extraLeft); // Count valid substrings
+            }
+        }
+
+        return response;
+    }
+};
