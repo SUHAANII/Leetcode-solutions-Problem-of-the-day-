@@ -1,0 +1,64 @@
+question: You are given an integer array nums of length n and a 2D array queries where queries[i] = [li, ri, vali].
+
+Each queries[i] represents the following action on nums:
+
+Decrement the value at each index in the range [li, ri] in nums by at most vali.
+The amount by which each value is decremented can be chosen independently for each index.
+A Zero Array is an array with all its elements equal to 0.
+
+Return the minimum possible non-negative value of k, such that after processing the first k queries in sequence, nums becomes a Zero Array. If no such k exists, return -1.
+
+code:
+
+class Solution {
+public:
+    // Function to find the minimum number of queries required to make all elements of the array zero
+    int minZeroArray(vector<int>& nums, vector<vector<int>>& queries) {
+        int n = nums.size(); // Get the size of the nums array
+        
+        // Lambda function to check if it's possible to make the array zero
+        // using the first k queries
+        auto canMakeZeroArray = [&](int k) {
+            // Create a difference array to track the increments and decrements
+            vector<int> diff(n + 1, 0);
+            
+            // Apply the first k queries to the difference array
+            for (int i = 0; i < k; i++) {
+                int left = queries[i][0];   // Start index of the query
+                int right = queries[i][1];  // End index of the query
+                int val = queries[i][2];    // Value to add
+                diff[left] += val;          // Increment at the start index
+                diff[right + 1] -= val;     // Decrement just after the end index
+            }
+            
+            // Current value to track the cumulative sum from the difference array
+            int currVal = 0;
+            // Iterate through the nums array to check if we can make all elements zero
+            for (int i = 0; i < n; i++) {
+                currVal += diff[i]; // Update the current value with the difference
+                // If the current value is less than the corresponding nums value, return false
+                if (currVal < nums[i]) return false;
+            }
+            return true; // Return true if all values can be made zero
+        };
+        
+        // Check if all elements in nums are already zero
+        if (all_of(nums.begin(), nums.end(), [](int x) { return x == 0; })) return 0;
+        
+        int left = 1, right = queries.size(); // Initialize binary search bounds
+        // If it's not possible to make the array zero with all queries, return -1
+        if (!canMakeZeroArray(right)) return -1;
+        
+        // Perform binary search to find the minimum number of queries
+        while (left < right) {
+            int mid = left + (right - left) / 2; // Calculate the middle point
+            // Check if we can make the array zero with mid queries
+            if (canMakeZeroArray(mid)) 
+                right = mid; // If yes, try with fewer queries
+            else 
+                left = mid + 1; // If no, try with more queries
+        }
+        
+        return left; // Return the minimum number of queries needed
+    }
+};
