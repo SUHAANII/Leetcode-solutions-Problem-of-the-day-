@@ -1,0 +1,56 @@
+question: There are several consecutive houses along a street, each of which has some money inside. There is also a robber, who wants to steal money from the homes, but he refuses to steal from adjacent homes.
+
+The capability of the robber is the maximum amount of money he steals from one house of all the houses he robbed.
+
+You are given an integer array nums representing how much money is stashed in each house. More formally, the ith house from the left has nums[i] dollars.
+
+You are also given an integer k, representing the minimum number of houses the robber will steal from. It is always possible to steal at least k houses.
+
+Return the minimum capability of the robber out of all the possible ways to steal at least k houses.
+
+code:
+
+class Solution {
+public:
+    // Function to check if it's possible to rob at least k houses with a maximum capability of 'mid'
+    bool canRob(vector<int>& nums, int mid, int k) {
+        int count = 0; // Count of houses that can be robbed
+        int n = nums.size(); // Total number of houses
+        
+        // Iterate through the list of houses
+        for (int i = 0; i < n; i++) {
+            // Check if the current house can be robbed with the given capability
+            if (nums[i] <= mid) {
+                count++; // Increment the count of houses robbed
+                i++; // Skip the next house (cannot rob two adjacent houses)
+            }
+        }
+        
+        // Return true if we can rob at least k houses
+        return count >= k;
+    }
+
+    // Function to find the minimum capability needed to rob at least k houses
+    int minCapability(vector<int>& nums, int k) {
+        // Initialize binary search boundaries
+        int left = 1; // Minimum capability (assuming at least 1)
+        int right = *max_element(nums.begin(), nums.end()); // Maximum capability is the highest value in nums
+        int ans = right; // Initialize answer as the maximum capability
+        
+        // Perform binary search
+        while (left <= right) {
+            int mid = (left + right) / 2; // Calculate the middle capability
+            
+            // Check if it's possible to rob at least k houses with the current mid capability
+            if (canRob(nums, mid, k)) {
+                ans = mid; // Update the answer to the current mid
+                right = mid - 1; // Try to find a smaller capability
+            } else {
+                left = mid + 1; // Increase the capability since mid is not sufficient
+            }
+        }
+        
+        // Return the minimum capability found
+        return ans;
+    }
+};
