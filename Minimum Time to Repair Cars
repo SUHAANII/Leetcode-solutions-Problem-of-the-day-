@@ -1,0 +1,47 @@
+question: You are given an integer array ranks representing the ranks of some mechanics. ranksi is the rank of the ith mechanic. A mechanic with a rank r can repair n cars in r * n2 minutes.
+
+You are also given an integer cars representing the total number of cars waiting in the garage to be repaired.
+
+Return the minimum time taken to repair all the cars.
+
+Note: All the mechanics can repair the cars simultaneously.
+
+code:
+
+#include <cmath>       // For mathematical functions like sqrt and floor
+#include <vector>     // For using vector container
+using namespace std;
+
+class Solution {
+public:
+    // Function to determine if the given time is sufficient to repair the required number of cars
+    bool timeIsSuff(vector<int>& ranks, int cars, long long minGiven) {
+        long long carsDone = 0; // Counter for the number of cars repaired
+        // Iterate through each rank in the ranks vector
+        for (int r : ranks) {
+            // Calculate how many cars can be repaired with the given time
+            long long c2 = minGiven / r; // Determine the total time divided by the rank
+            long long c = floor(sqrt(c2)); // Calculate the maximum number of cars that can be repaired
+            carsDone += c; // Accumulate the total cars repaired
+        }
+        // Check if the total repaired cars are at least equal to the required number of cars
+        return carsDone >= cars;
+    }
+    
+    // Function to find the minimum time required to repair all cars
+    long long repairCars(vector<int>& ranks, int cars) {
+        long long l = 1, r = 1e14; // Initialize the search range for binary search
+        // Perform binary search to find the minimum time
+        while (l < r) {
+            long long mid = (l + r) / 2; // Calculate the mid-point of the current range
+            // Check if the current mid-point time is sufficient
+            if (timeIsSuff(ranks, cars, mid)) {
+                r = mid; // If sufficient, search the left half (including mid)
+            } else {
+                l = mid + 1; // If not sufficient, search the right half (excluding mid)
+            }
+        }
+        // Return the minimum time found
+        return l;
+    }
+};
