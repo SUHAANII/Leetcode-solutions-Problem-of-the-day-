@@ -1,0 +1,38 @@
+question: You are given a binary array nums.
+
+You can do the following operation on the array any number of times (possibly zero):
+
+Choose any 3 consecutive elements from the array and flip all of them.
+Flipping an element means changing its value from 0 to 1, and from 1 to 0.
+
+Return the minimum number of operations required to make all elements in nums equal to 1. If it is impossible, return -1.
+
+ 
+
+code:
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    int minOperations(vector<int>& nums) {
+        int count = 0; // Initialize the operation count
+        int n = nums.size(); // Get the size of the input array
+        
+        // Iterate through the array until the third last element
+        for (int i = 0; i < n - 2; i++) {
+            // Check if the current element is 0
+            if (nums[i] == 0) {
+                // Perform a toggle operation on the current and the next two elements
+                nums[i] ^= 1;       // Toggle nums[i]
+                nums[i + 1] ^= 1;   // Toggle nums[i + 1]
+                nums[i + 2] ^= 1;   // Toggle nums[i + 2]
+                count++; // Increment the operation count
+            }
+        }
+        
+        // Check if the last two elements are both 1
+        return (nums[n - 2] == 1 && nums[n - 1] == 1) ? count : -1;
+        // If they are, return the count of operations; otherwise, return -1
+    }
+};
