@@ -1,0 +1,75 @@
+question: You have information about n different recipes. You are given a string array recipes and a 2D string array ingredients. The ith recipe has the name recipes[i], and you can create it if you have all the needed ingredients from ingredients[i]. A recipe can also be an ingredient for other recipes, i.e., ingredients[i] may contain a string that is in recipes.
+
+You are also given a string array supplies containing all the ingredients that you initially have, and you have an infinite supply of all of them.
+
+Return a list of all the recipes that you can create. You may return the answer in any order.
+
+Note that two recipes may contain each other in their ingredients.
+
+code:
+
+class Solution {
+public:
+    // Function to find all recipes that can be made with available supplies
+    vector<string> findAllRecipes(vector<string>& recipes, vector<vector<string>>& ingredients, vector<string>& supplies) {
+        // Create a set of available supplies for quick lookup
+        unordered_set<string> available_supplies(supplies.begin(), supplies.end());
+        
+        // Map to associate each recipe with its required ingredients
+        unordered_map<string, vector<string>> recipe_to_ingredients;
+        
+        // Map to track the state of each recipe during DFS
+        unordered_map<string, int> visited; // 0 = visiting, -1 = cannot make, 1 = can make
+        
+        // Result vector to store the recipes that can be made
+        vector<string> result;
+        
+        // Populate the recipe_to_ingredients map
+        for (size_t i = 0; i < recipes.size(); i++) {
+            recipe_to_ingredients[recipes[i]] = ingredients[i];
+        }
+        
+        // Helper function to determine if a recipe can be made
+        function<bool(string)> can_make = [&](string recipe) {
+            // Check if the recipe state has already been determined
+            if (visited.count(recipe)) {
+                return visited[recipe] == 1; // Return true if it can be made
+            }
+            
+            // If the recipe is in available supplies, it can be made
+            if (available_supplies.count(recipe)) {
+                return true;
+            }
+            
+            // If the recipe is not found in the map, it cannot be made
+            if (!recipe_to_ingredients.count(recipe)) {
+                return false;
+            }
+            
+            // Mark the recipe as being visited
+            visited[recipe] = 0;
+            
+            // Check each ingredient needed for the recipe
+            for (const string& ingredient : recipe_to_ingredients[recipe]) {
+                // If any ingredient cannot be made, mark this recipe as not possible
+                if (!can_make(ingredient)) {
+                    visited[recipe] = -1; // Mark as cannot make
+                    return false;
+                }
+            }
+            
+            // If all ingredients can be made, mark the recipe as can be made
+            visited[recipe] = 1;
+            result.push_back(recipe); // Add to the result list
+            return true;
+        };
+        
+        // Check each recipe to see if it can be made
+        for (const string& recipe : recipes) {
+            can_make(recipe);
+        }
+        
+        // Return the list of recipes that can be made
+        return result;
+    }
+};
