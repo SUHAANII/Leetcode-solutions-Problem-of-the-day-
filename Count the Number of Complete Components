@@ -1,0 +1,81 @@
+question:  you are given an integer n. There is an undirected graph with n vertices, numbered from 0 to n - 1. You are given a 2D integer array edges where edges[i] = [ai, bi] denotes that there exists an undirected edge connecting vertices ai and bi.
+
+Return the number of complete connected components of the graph.
+
+A connected component is a subgraph of a graph in which there exists a path between any two vertices, and no vertex of the subgraph shares an edge with a vertex outside of the subgraph.
+
+A connected component is said to be complete if there exists an edge between every pair of its vertices.
+
+code:
+
+class Solution {
+public:
+    // Function to count the number of complete components in a graph
+    int countCompleteComponents(int n, vector<vector<int>>& edges) {
+        // Initialize the parent and rank vectors for Union-Find
+        vector<int> parent(n), rank(n, 0);
+        // Fill the parent vector with initial values (self-parenting)
+        iota(parent.begin(), parent.end(), 0);
+        
+        // Find function with path compression
+        function<int(int)> find = [&](int x) {
+            // If x is not its own parent, recursively find the root
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]); // Path compression
+            }
+            return parent[x]; // Return the root
+        };
+        
+        // Union function to connect two components
+        auto unionSets = [&](int x, int y) {
+            int rootX = find(x); // Find root of x
+            int rootY = find(y); // Find root of y
+            // If they are already in the same component, do nothing
+            if (rootX == rootY) return;
+            // Union by rank
+            if (rank[rootX] < rank[rootY]) {
+                parent[rootX] = rootY; // Attach smaller tree under larger tree
+            } else if (rank[rootX] > rank[rootY]) {
+                parent[rootY] = rootX; // Attach smaller tree under larger tree
+            } else {
+                parent[rootY] = rootX; // Attach one tree under another
+                rank[rootX]++; // Increase rank if trees were of the same height
+            }
+        };
+        
+        // Process each edge to form components
+        for (auto& edge : edges) {
+            unionSets(edge[0], edge[1]); // Union the vertices connected by the edge
+        }
+        
+        // Maps to track vertices and edges in each component
+        unordered_map<int, unordered_set<int>> componentVertices;
+        unordered_map<int, int> componentEdges;
+        
+        // Group vertices by their root component
+        for (int i = 0; i < n; ++i) {
+            int root = find(i); // Find the root of the current vertex
+            componentVertices[root].insert(i); // Add vertex to its component
+        }
+        
+        // Count edges in each component
+        for (auto& edge : edges) {
+            int root = find(edge[0]); // Find the root of the component for the edge
+            componentEdges[root]++; // Increment edge count for the component
+        }
+        
+        int completeCount = 0; // Counter for complete components
+        // Check each component for completeness
+        for (auto& [root, vertices] : componentVertices) {
+            int numVertices = vertices.size(); // Number of vertices in the component
+            // Calculate the expected number of edges for a complete graph
+            int expectedEdges = numVertices * (numVertices - 1) / 2;
+            // If the actual edges match the expected edges, it's a complete component
+            if (componentEdges[root] == expectedEdges) {
+                completeCount++; // Increment the complete component count
+            }
+        }
+        
+        return completeCount; // Return the total count of complete components
+    }
+};
