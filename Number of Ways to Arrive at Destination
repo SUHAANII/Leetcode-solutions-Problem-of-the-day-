@@ -1,0 +1,61 @@
+question:You are in a city that consists of n intersections numbered from 0 to n - 1 with bi-directional roads between some intersections. The inputs are generated such that you can reach any intersection from any other intersection and that there is at most one road between any two intersections.
+
+You are given an integer n and a 2D integer array roads where roads[i] = [ui, vi, timei] means that there is a road between intersections ui and vi that takes timei minutes to travel. You want to know in how many ways you can travel from intersection 0 to intersection n - 1 in the shortest amount of time.
+
+Return the number of ways you can arrive at your destination in the shortest amount of time. Since the answer may be large, return it modulo 109 + 7.
+
+code:
+
+class Solution {
+public:
+    int countPaths(int n, vector<vector<int>>& roads) {
+        // Step 1: Build the graph as an adjacency list
+        vector<vector<pair<int, int>>> graph(n);
+        for (const auto& road : roads) {
+            int u = road[0], v = road[1], time = road[2];
+            // Add both directions since the roads are bidirectional
+            graph[u].emplace_back(v, time);
+            graph[v].emplace_back(u, time);
+        }
+
+        // Step 2: Initialize distance and ways arrays
+        vector<long long> dist(n, LLONG_MAX); // Distance to each node, initialized to infinity
+        vector<int> ways(n, 0); // Number of ways to reach each node, initialized to 0
+
+        // Step 3: Set the distance to the starting node (node 0) to 0
+        dist[0] = 0;
+        ways[0] = 1; // There's one way to reach the starting node
+
+        // Step 4: Priority queue for Dijkstra's algorithm
+        priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<>> pq;
+        pq.emplace(0, 0); // Start with the starting node
+
+        const int MOD = 1e9 + 7; // Modulus for the number of ways to prevent overflow
+
+        // Step 5: Dijkstra's algorithm loop
+        while (!pq.empty()) {
+            auto [d, node] = pq.top(); // Get the node with the smallest distance
+            pq.pop();
+
+            // If the distance is greater than the recorded distance, skip this node
+            if (d > dist[node]) continue;
+
+            // Step 6: Explore neighbors
+            for (const auto& [neighbor, time] : graph[node]) {
+                // If a shorter path to neighbor is found
+                if (dist[node] + time < dist[neighbor]) {
+                    dist[neighbor] = dist[node] + time; // Update distance
+                    ways[neighbor] = ways[node]; // Update number of ways
+                    pq.emplace(dist[neighbor], neighbor); // Add neighbor to the priority queue
+                } 
+                // If another shortest path to neighbor is found
+                else if (dist[node] + time == dist[neighbor]) {
+                    ways[neighbor] = (ways[neighbor] + ways[node]) % MOD; // Update number of ways
+                }
+            }
+        }
+
+        // Step 7: Return the number of ways to reach the destination node (node n-1)
+        return ways[n - 1];
+    }
+};
