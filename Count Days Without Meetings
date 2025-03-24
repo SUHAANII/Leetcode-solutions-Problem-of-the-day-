@@ -1,0 +1,41 @@
+question: You are given a positive integer days representing the total number of days an employee is available for work (starting from day 1). You are also given a 2D array meetings of size n where, meetings[i] = [start_i, end_i] represents the starting and ending days of meeting i (inclusive).
+
+Return the count of days when the employee is available for work but no meetings are scheduled.
+
+Note: The meetings may overlap.
+
+code:
+class Solution {
+public:
+    // Function to count the number of days without meetings
+    int countDays(int days, vector<vector<int>>& meetings) {
+        // Sort the meetings based on their start times
+        sort(meetings.begin(), meetings.end());
+
+        // Vector to hold merged meeting intervals
+        vector<vector<int>> mergedMeetings;
+        
+        // Merge overlapping meetings
+        for (const auto& meeting : meetings) {
+            // If there are no meetings in mergedMeetings or the current meeting does not overlap
+            if (mergedMeetings.empty() || meeting[0] > mergedMeetings.back()[1]) {
+                mergedMeetings.push_back(meeting); // Add the current meeting
+            } else {
+                // If overlapping, merge the current meeting with the last one in mergedMeetings
+                mergedMeetings.back()[1] = max(mergedMeetings.back()[1], meeting[1]);
+            }
+        }
+
+        // Variable to count the total number of meeting days
+        int meetingDaysCount = 0;
+
+        // Calculate the total number of days occupied by meetings
+        for (const auto& m : mergedMeetings) {
+            // Add the number of days for the merged meeting interval
+            meetingDaysCount += (m[1] - m[0] + 1);
+        }
+
+        // Return the total days minus the occupied meeting days
+        return days - meetingDaysCount;
+    }
+};
