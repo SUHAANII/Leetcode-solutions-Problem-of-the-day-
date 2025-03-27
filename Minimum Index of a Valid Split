@@ -1,0 +1,48 @@
+question: An element x of an integer array arr of length m is dominant if more than half the elements of arr have a value of x.
+
+You are given a 0-indexed integer array nums of length n with one dominant element.
+
+You can split nums at an index i into two arrays nums[0, ..., i] and nums[i + 1, ..., n - 1], but the split is only valid if:
+
+0 <= i < n - 1
+nums[0, ..., i], and nums[i + 1, ..., n - 1] have the same dominant element.
+Here, nums[i, ..., j] denotes the subarray of nums starting at index i and ending at index j, both ends being inclusive. Particularly, if j < i then nums[i, ..., j] denotes an empty subarray.
+
+Return the minimum index of a valid split. If no valid split exists, return -1.
+
+code:
+
+class Solution {
+public:
+    // Function to find the minimum index for a valid split
+    int minimumIndex(vector<int>& nums) {
+        const int n = nums.size(); // Get the size of the input array
+        
+        // Boyer–Moore majority vote algorithm to find the candidate for majority element
+        int cnt = 0; // Counter for the current majority element
+        int xM = 0;  // Variable to store the candidate for majority element
+        
+        // First pass: Finding the candidate for the majority element
+        for (int x : nums) {
+            if (cnt == 0) xM = x; // If count is zero, set the current element as candidate
+            cnt += (x == xM) ? 1 : -1; // Increment or decrement the count based on the candidate
+        }
+        
+        // Count the frequency of the candidate element
+        int maxF = count(nums.begin(), nums.end(), xM);
+        
+        // Second pass: Finding the valid split index
+        int cntxM = 0; // Counter for the occurrences of xM in the left part
+        for (int i = 0; i < n; i++) {
+            cntxM += (nums[i] == xM); // Update the count of xM
+            
+            // Check if the left part has more than half of its elements as xM
+            // and the right part has less than half of its elements as xM
+            if (cntxM * 2 > (i + 1) && ((maxF - cntxM) * 2 > (n - i - 1))) {
+                return i; // Return the index if both conditions are satisfied
+            }
+        }
+        
+        return -1; // Return -1 if no valid split index is found
+    }
+};
