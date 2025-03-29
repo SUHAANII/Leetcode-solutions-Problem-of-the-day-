@@ -1,0 +1,127 @@
+question: You are given an array nums of n positive integers and an integer k.
+
+Initially, you start with a score of 1. You have to maximize your score by applying the following operation at most k times:
+
+Choose any non-empty subarray nums[l, ..., r] that you haven't chosen previously.
+Choose an element x of nums[l, ..., r] with the highest prime score. If multiple such elements exist, choose the one with the smallest index.
+Multiply your score by x.
+Here, nums[l, ..., r] denotes the subarray of nums starting at index l and ending at the index r, both ends being inclusive.
+
+The prime score of an integer x is equal to the number of distinct prime factors of x. For example, the prime score of 300 is 3 since 300 = 2 * 2 * 3 * 5 * 5.
+
+Return the maximum possible score after applying at most k operations.
+
+Since the answer may be large, return it modulo 109 + 7.
+
+code:
+class Solution {
+private:
+    // Function to count distinct prime factors of a number
+    int countDistinctPrimeFactors(int n) {
+        int count = 0; // Initialize count of distinct prime factors
+
+        // Check for factor 2
+        if (n % 2 == 0) {
+            count++; // Found a prime factor (2)
+            // Divide out all factors of 2
+            while (n % 2 == 0) {
+                n /= 2;
+            }
+        }
+
+        // Check for odd factors from 3 to sqrt(n)
+        for (long long i = 3; i * i <= n; i += 2) {
+            if (n % i == 0) {
+                count++; // Found a prime factor
+                // Divide out all factors of i
+                while (n % i == 0) {
+                    n /= i;
+                }
+            }
+        }
+
+        // If n is still greater than 1, it is a prime factor itself
+        if (n > 1)
+            count++;
+        
+        return count; // Return the count of distinct prime factors
+    }
+
+    // Function to perform modular exponentiation
+    int modPow(int base, int exp, int mod) {
+        long long result = 1; // Initialize result
+        long long b = base % mod; // Handle base modulo
+
+        // Loop until exponent is zero
+        while (exp > 0) {
+            // If exp is odd, multiply the result by the base
+            if (exp & 1) {
+                result = (result * b) % mod;
+            }
+            // Square the base
+            b = (b * b) % mod;
+            exp >>= 1; // Divide exponent by 2
+        }
+        return (int)result; // Return the result as int
+    }
+
+public:
+    // Function to calculate the maximum score
+    int maximumScore(vector<int>& nums, int k) {
+        int n = (int)nums.size(); // Get the size of the input array
+        if (n == 0)
+            return 1; // If there are no elements, return 1
+
+        // Priority queue to store numbers with their indices
+        priority_queue<pair<int, int>> maxValues;
+        // Arrays to track the nearest larger elements on the right and left
+        vector<int> rightLarge(n, n), LeftLarge(n, -1), primeScores(n, 0);
+        stack<int> st, reverse; // Stacks for tracking indices
+
+        // Calculate distinct prime factors for each number
+        for (int i = 0; i < n; i++) {
+            primeScores[i] = countDistinctPrimeFactors(nums[i]);
+            maxValues.emplace(nums[i], i); // Push number and index into the priority queue
+        }
+
+        // Find the nearest larger element to the right for each index
+        for (int i = 0; i < n; i++) {
+            while (!st.empty() && primeScores[i] > primeScores[st.top()]) {
+                rightLarge[st.top()] = i; // Update right larger index
+                st.pop();
+            }
+            st.push(i); // Push current index onto the stack
+        }
+
+        // Find the nearest larger element to the left for each index
+        for (int i = n - 1; i >= 0; i--) {
+            while (!reverse.empty() && primeScores[i] >= primeScores[reverse.top()]) {
+                LeftLarge[reverse.top()] = i; // Update left larger index
+                reverse.pop();
+            }
+            reverse.push(i); // Push current index onto the stack
+        }
+
+        int score = 1; // Initialize score
+        const int MODULE = 1000000007; // Define modulo constant
+
+        // Calculate the maximum score using the priority queue
+        while (!maxValues.empty() && k > 0) {
+            auto [val, idx] = maxValues.top(); // Get the highest value and its index
+            maxValues.pop(); // Remove it from the queue
+
+            // Calculate the number of steps we can take with this value
+            long long t = 1LL * (rightLarge[idx] - idx) * (idx - LeftLarge[idx]);
+            long long steps = min(t, (long long)k); // Limit steps to remaining k
+
+            // Calculate the contribution to the score using modular exponentiation
+            int multiply = modPow(val, (int)steps, MODULE);
+            score = (int)((1LL * score * multiply) % MODULE); // Update score
+
+            k -= steps; // Decrease k by the number of steps taken
+        }
+        
+        return score % MODULE; // Return the final score modulo the defined constant
+    }
+};
+
