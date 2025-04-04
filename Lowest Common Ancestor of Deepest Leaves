@@ -1,0 +1,39 @@
+question: Given the root of a binary tree, return the lowest common ancestor of its deepest leaves.
+
+Recall that:
+
+The node of a binary tree is a leaf if and only if it has no children
+The depth of the root of the tree is 0. if the depth of a node is d, the depth of each of its children is d + 1.
+The lowest common ancestor of a set S of nodes, is the node A with the largest depth such that every node in S is in the subtree with root A.
+
+code"
+class Solution {
+public:
+    // Helper function that returns a pair: 
+    // 1. The depth of the current node
+    // 2. The LCA of the deepest leaves found so far
+    pair<int, TreeNode*> helper(TreeNode* node) {
+        // Base case: if the node is null, return depth 0 and null for LCA
+        if (!node) return {0, nullptr};
+
+        // Recursively get the depth and LCA from the left and right subtrees
+        auto left = helper(node->left);
+        auto right = helper(node->right);
+
+        // If both left and right depths are equal, the current node is the LCA
+        if (left.first == right.first)
+            return {left.first + 1, node}; // Return current depth and node as LCA
+        // If the left depth is greater, propagate the left LCA
+        else if (left.first > right.first)
+            return {left.first + 1, left.second}; // Return left depth and left LCA
+        // If the right depth is greater, propagate the right LCA
+        else
+            return {right.first + 1, right.second}; // Return right depth and right LCA
+    }
+
+    // Main function to find the LCA of the deepest leaves
+    TreeNode* lcaDeepestLeaves(TreeNode* root) {
+        // Call helper function and return the LCA of the deepest leaves
+        return helper(root).second;
+    }
+};
