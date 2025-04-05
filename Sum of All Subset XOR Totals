@@ -1,0 +1,38 @@
+question: The XOR total of an array is defined as the bitwise XOR of all its elements, or 0 if the array is empty.
+
+For example, the XOR total of the array [2,5,6] is 2 XOR 5 XOR 6 = 1.
+Given an array nums, return the sum of all XOR totals for every subset of nums. 
+
+Note: Subsets with the same elements should be counted multiple times.
+
+An array a is a subset of an array b if a can be obtained from b by deleting some (possibly zero) elements of b.
+
+code:
+class Solution {
+public:
+    // Function to calculate the sum of XOR of all subsets
+    int subsetXORSum(vector<int>& nums) {
+        // Get the number of elements in the input array
+        int n = nums.size();
+        // Initialize total sum of XOR values of all subsets
+        int totalSum = 0;
+
+        // Iterate through all possible subsets (2^n subsets)
+        for (int i = 0; i < (1 << n); i++) {
+            // Initialize XOR for the current subset
+            int subsetXor = 0;
+            // Check each element to see if it is included in the current subset
+            for (int j = 0; j < n; j++) {
+                // If the j-th element is included in the i-th subset
+                if (i & (1 << j)) {
+                    // Perform XOR with the current element
+                    subsetXor ^= nums[j];
+                }
+            }
+            // Add the XOR of the current subset to the total sum
+            totalSum += subsetXor;
+        }
+        // Return the total sum of XORs of all subsets
+        return totalSum;
+    }
+};
