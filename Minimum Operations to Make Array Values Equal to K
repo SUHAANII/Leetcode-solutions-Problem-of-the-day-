@@ -1,0 +1,44 @@
+question: You are given an integer array nums and an integer k.
+
+An integer h is called valid if all values in the array that are strictly greater than h are identical.
+
+For example, if nums = [10, 8, 10, 8], a valid integer is h = 9 because all nums[i] > 9 are equal to 10, but 5 is not a valid integer.
+
+You are allowed to perform the following operation on nums:
+
+Select an integer h that is valid for the current values in nums.
+For each index i where nums[i] > h, set nums[i] to h.
+Return the minimum number of operations required to make every element in nums equal to k. If it is impossible to make all elements equal to k, return -1.
+
+code:
+class Solution {
+public:
+    // Function to find the minimum operations needed to ensure all elements in nums are >= k
+    int minOperations(vector<int>& nums, int k) {
+        // Sort the array to facilitate the comparison
+        sort(nums.begin(), nums.end());
+        
+        // Get the minimum value in the sorted array
+        int mini = nums[0];
+        
+        // Edge case: if the minimum value is less than k, return -1
+        if (mini < k) return -1; 
+        
+        int cnt = 0; // Counter for the number of operations needed
+        
+        // Iterate through the sorted array
+        for (int i = 0; i < nums.size(); i++) {
+            // If the current number is greater than k, it needs to be counted
+            if (nums[i] > k) {
+                cnt++; // Increment the operation count
+                
+                // Skip over any duplicate numbers
+                while (i + 1 < nums.size() && nums[i] == nums[i + 1]) 
+                    i++; // Move to the next unique number
+            }
+        }
+        
+        // Return the total count of operations needed
+        return cnt;
+    }
+};
