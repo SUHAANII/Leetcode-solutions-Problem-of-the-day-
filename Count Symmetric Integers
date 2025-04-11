@@ -1,0 +1,46 @@
+question: You are given two positive integers low and high.
+
+An integer x consisting of 2 * n digits is symmetric if the sum of the first n digits of x is equal to the sum of the last n digits of x. Numbers with an odd number of digits are never symmetric.
+
+Return the number of symmetric integers in the range [low, high].
+
+ 
+
+code:
+
+class Solution {
+public:
+    // Function to count symmetric integers between 'low' and 'high'
+    int countSymmetricIntegers(int low, int high) {
+        int count = 0; // 🍥 Count of symmetric integers (chakra-balanced)
+
+        // Iterate through each number from 'low' to 'high'
+        for (int num = low; num <= high; ++num) {
+            string str = to_string(num); // 🎭 Convert number to string form
+            int len = str.length(); // Get the length of the string representation
+
+            // 🚫 Skip numbers with odd digits (can't balance chakra evenly)
+            if (len % 2 != 0) continue; // If length is odd, move to the next number
+
+            int half = len / 2; // Calculate half the length of the number
+            int leftSum = 0, rightSum = 0; // Initialize sums for both halves
+
+            // ⬅️ Calculate chakra in the left half
+            for (int i = 0; i < half; ++i) {
+                leftSum += str[i] - '0'; // Convert character to integer and accumulate
+            }
+
+            // ➡️ Calculate chakra in the right half
+            for (int i = half; i < len; ++i) {
+                rightSum += str[i] - '0'; // Convert character to integer and accumulate
+            }
+
+            // ☯️ If both halves have equal chakra, count it
+            if (leftSum == rightSum) {
+                count++; // Increment the count if both sums are equal
+            }
+        }
+
+        return count; // 🎯 Return total balanced numbers
+    }
+};
