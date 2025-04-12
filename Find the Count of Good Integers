@@ -1,0 +1,87 @@
+question: You are given two positive integers n and k.
+
+An integer x is called k-palindromic if:
+
+x is a palindrome.
+x is divisible by k.
+An integer is called good if its digits can be rearranged to form a k-palindromic integer. For example, for k = 2, 2020 can be rearranged to form the k-palindromic integer 2002, whereas 1010 cannot be rearranged to form a k-palindromic integer.
+
+Return the count of good integers containing n digits.
+
+Note that any integer must not have leading zeros, neither before nor after rearrangement. For example, 1010 cannot be rearranged to form 101.
+
+code:
+
+class Solution {
+public:
+    // 🔢 Chakra Resource Counter (Factorial)
+    long long factorial(int num) {
+        long long chakra = 1; // Initialize the factorial result
+        for (int i = 1; i <= num; i++) chakra *= i; // Calculate factorial
+        return chakra; // Return the factorial value
+    }
+
+    // 🌀 Shadow Clone Builder
+    void generatePalindromes(string& clone, int index, vector<string>& validClones, int k) {
+        // Base case: if the index has reached the middle of the string
+        if (index >= (clone.length() + 1) / 2) {
+            // Check if the palindrome is divisible by k
+            if (stoll(clone) % k == 0) validClones.push_back(clone); // Store valid clones
+            return; // Exit the function
+        }
+
+        // Allow leading zeros only if index is not zero
+        if (index != 0) {
+            clone[index] = '0'; // Set the current index to '0'
+            clone[clone.size() - 1 - index] = '0'; // Mirror the '0' for palindrome
+            generatePalindromes(clone, index + 1, validClones, k); // Recursive call
+        }
+
+        // Generate digits from '1' to '9' for the palindrome
+        for (char c = '1'; c <= '9'; c++) {
+            clone[index] = c; // Set the current index to 'c'
+            clone[clone.size() - 1 - index] = c; // Mirror 'c' for palindrome
+            generatePalindromes(clone, index + 1, validClones, k); // Recursive call
+        }
+    }
+
+    // 💥 Hidden Leaf’s Main Function
+    long long countGoodIntegers(int n, int k) {
+        vector<string> validClones; // To store valid palindromic numbers
+        string baseClone(n, '0'); // Initialize a base string of length n with '0's
+        generatePalindromes(baseClone, 0, validClones, k); // Generate palindromes
+
+        set<string> chakraPatterns; // To store unique frequency patterns of digits
+
+        // 🧠 Unique Frequency Fingerprint for each Clone
+        for (auto& clone : validClones) {
+            vector<int> freq(10, 0); // Frequency array for digits 0-9
+            for (char c : clone) freq[c - '0']++; // Count occurrences of each digit
+            string pattern; // To create a frequency pattern string
+            for (int f : freq) pattern += (char)('a' + f); // Convert frequencies to characters
+            chakraPatterns.insert(pattern); // Store the unique pattern
+        }
+
+        long long basePerms = factorial(n); // Total permutations of n digits
+        long long total = 0; // Total count of good integers
+
+        // Calculate valid permutations for each unique pattern
+        for (auto& pattern : chakraPatterns) {
+            long long perms = basePerms; // Start with the total permutations
+            for (char f : pattern) perms /= factorial(f - 'a'); // Adjust for character frequencies
+
+            // Handle cases where the first character is not 'a'
+            if (pattern[0] != 'a') {
+                int zeros = pattern[0] - 'a' - 1; // Count leading zeros
+                long long zeroPerms = factorial(n - 1); // Permutations without leading zeros
+                for (int j = 1; j < pattern.size(); j++) zeroPerms /= factorial(pattern[j] - 'a'); // Adjust for other frequencies
+                zeroPerms /= factorial(zeros); // Adjust for zero frequencies
+                perms -= zeroPerms; // Subtract invalid permutations
+            }
+
+            total += perms; // Add valid permutations to the total
+        }
+
+        return total; // Return the total count of good integers
+    }
+};
