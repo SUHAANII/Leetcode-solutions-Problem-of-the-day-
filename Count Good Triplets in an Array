@@ -1,0 +1,98 @@
+question: You are given two 0-indexed arrays nums1 and nums2 of length n, both of which are permutations of [0, 1, ..., n - 1].
+
+A good triplet is a set of 3 distinct values which are present in increasing order by position both in nums1 and nums2. In other words, if we consider pos1v as the index of the value v in nums1 and pos2v as the index of the value v in nums2, then a good triplet will be a set (x, y, z) where 0 <= x, y, z <= n - 1, such that pos1x < pos1y < pos1z and pos2x < pos2y < pos2z.
+
+Return the total number of good triplets.
+
+code:
+
+// Define a structure for the Segment Tree.
+struct SegmentTree {
+    int n; // Size of the input array.
+    vector<int> tree; // The segment tree array.
+
+    // Constructor to initialize the segment tree.
+    SegmentTree(int size) : n(size), tree(4 * size, 0) {}
+
+    // Update the segment tree at a specific position with a given value.
+    void update(int idx, int l, int r, int pos, int val) {
+        // If the current segment is a leaf node (l == r), update the value.
+        if (l == r) {
+            tree[idx] += val; // Increment the value at this position.
+            return;
+        }
+        int mid = (l + r) / 2; // Calculate the midpoint of the segment.
+        // Decide whether to go to the left or right child based on the position.
+        if (pos <= mid)
+            update(2 * idx, l, mid, pos, val); // Update the left child.
+        else
+            update(2 * idx + 1, mid + 1, r, pos, val); // Update the right child.
+        
+        // Update the current node's value based on its children.
+        tree[idx] = tree[2 * idx] + tree[2 * idx + 1];
+    }
+
+    // Query the sum of values in a given range.
+    int query(int idx, int l, int r, int ql, int qr) {
+        // If the query range is outside the segment range, return 0.
+        if (qr < l || r < ql) return 0;
+        // If the segment is completely within the query range, return its value.
+        if (ql <= l && r <= qr) return tree[idx];
+        
+        int mid = (l + r) / 2; // Calculate the midpoint of the segment.
+        // Recursively query the left and right children and return their sum.
+        return query(2 * idx, l, mid, ql, qr) +
+               query(2 * idx + 1, mid + 1, r, ql, qr);
+    }
+
+    // Public method to add a value at a specific position.
+    void add(int pos, int val) {
+        update(1, 0, n - 1, pos, val); // Start updating from the root node.
+    }
+
+    // Public method to get the sum from the start to a specific position.
+    int sum(int pos) {
+        return query(1, 0, n - 1, 0, pos); // Query from the root node.
+    }
+};
+
+// Define a class for the solution.
+class Solution {
+public:
+    // Method to count good triplets.
+    long long goodTriplets(vector<int>& nums1, vector<int>& nums2) {
+        const int n = nums1.size(); // Get the size of the input arrays.
+        vector<int> id2(n); // Array to store indices of elements in nums2.
+        
+        // Fill the id2 array with indices from nums2.
+        for (int i = 0; i < n; i++)
+            id2[nums2[i]] = i;
+
+        vector<int> inv(n); // Array to store the inverse mapping.
+        // Fill the inv array based on the id2 mapping.
+        for (int i = 0; i < n; i++)
+            inv[id2[nums1[i]]] = i;
+
+        SegmentTree tree(n); // Create a segment tree for range queries.
+
+        long long ans = 0; // Variable to store the result.
+        // Iterate through each element in nums1.
+        for (int x = 0; x < n; x++) {
+            int pos = inv[x]; // Get the position of the current element in the inverse array.
+            long long L = tree.sum(pos); // Query the number of elements less than the current position.
+            tree.add(pos, 1); // Add the current position to the segment tree.
+            long long R = (n - 1 - pos) - (x - L); // Calculate right count based on remaining elements.
+            ans += L * R; // Update the answer with the product of left and right counts.
+        }
+
+        return ans; // Return the final count of good triplets.
+    }
+};
+
+// Initialize input/output optimizations.
+auto init = []() {
+    ios::sync_with_stdio(false); // Disable synchronization with C I/O for faster input.
+    cin.tie(nullptr); // Untie cin from cout for faster input.
+    cout.tie(nullptr); // Untie cout from cin for faster output.
+    return 'c'; // Return a character to avoid compiler warnings.
+}();
