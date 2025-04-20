@@ -1,0 +1,36 @@
+question: There is a forest with an unknown number of rabbits. We asked n rabbits "How many rabbits have the same color as you?" and collected the answers in an integer array answers where answers[i] is the answer of the ith rabbit.
+
+Given the array answers, return the minimum number of rabbits that could be in the forest.
+
+code:
+
+class Solution {
+public:
+    int numRabbits(vector<int>& nums, int total = 0) {
+        // The function calculates the minimum number of rabbits based on their reported colors.
+        // Each rabbit reports its color and the total number of rabbits of that color it sees.
+
+        // Create a hash map to count occurrences of each color
+        unordered_map<int, int> mpp;
+        
+        // Count how many times each color is reported
+        for (int i : nums) {
+            mpp[i]++; // Increment the count for the reported color
+        }
+
+        // Iterate through each unique color and its count
+        for (auto& p : mpp) {
+            // p.first is the color, p.second is the count of rabbits reporting that color
+            
+            // Calculate the number of rabbits based on the reports
+            // Each rabbit reports seeing (p.first) other rabbits of the same color
+            // Hence, to find the total number of rabbits, we need to divide the count
+            // by (p.first + 1) and round up (using ceil) since one rabbit is included in the count.
+            // Multiply by (p.first + 1) to get the total number of rabbits for that color.
+            total += ceil((double)p.second / (p.first + 1)) * (p.first + 1);
+        }
+        
+        // Return the total number of rabbits calculated
+        return total;
+    }
+};
