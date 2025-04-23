@@ -1,0 +1,47 @@
+question: You are given an integer n.
+
+Each number from 1 to n is grouped according to the sum of its digits.
+
+Return the number of groups that have the largest size.
+
+ 
+
+code:
+class Solution {
+public:
+    // Function to count the number of groups with the largest size
+    int countLargestGroup(int n) {
+        // Create a map to store the frequency of each digit sum
+        unordered_map<int, int> digitCountFreq;
+        int maxDigitCount = 0; // Variable to track the maximum size of any group
+        int maxDigitFreq = 0;   // Variable to count how many groups have the maximum size
+
+        // Loop through each number from 1 to n
+        for (int i = 1; i <= n; i++) {
+            int digitSum = 0; // Variable to store the sum of digits of the current number
+            int key = i;      // Variable to manipulate the current number
+
+            // Calculate the sum of digits of the current number
+            while (key > 0) {
+                digitSum += key % 10; // Add the last digit to digitSum
+                key /= 10;             // Remove the last digit from key
+            }
+
+            // Increment the frequency of the current digit sum in the map
+            digitCountFreq[digitSum]++;
+            // Update maxDigitCount if the current frequency is greater
+            maxDigitCount = max(maxDigitCount, digitCountFreq[digitSum]);
+        }
+
+        // Loop through the map to count how many groups have the maximum size
+        for (auto digit : digitCountFreq) {
+            // If the frequency of a digit sum equals the maximum size, increment maxDigitFreq
+            if (digit.second == maxDigitCount) {
+                maxDigitFreq++;
+            }
+        }
+
+        // Return the count of groups that have the largest size
+        return maxDigitFreq;
+    }
+};
