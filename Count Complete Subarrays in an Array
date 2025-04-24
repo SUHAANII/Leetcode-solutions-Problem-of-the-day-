@@ -1,0 +1,41 @@
+question: You are given an array nums consisting of positive integers.
+
+We call a subarray of an array complete if the following condition is satisfied:
+
+The number of distinct elements in the subarray is equal to the number of distinct elements in the whole array.
+Return the number of complete subarrays.
+
+A subarray is a contiguous non-empty part of an array.
+
+codE:
+
+class Solution {
+public:
+    // Function to count the number of complete subarrays in the given array
+    int countCompleteSubarrays(vector<int>& nums) {
+        // Determine the number of unique elements in the input array
+        int k = unordered_set<int>(nums.begin(), nums.end()).size();
+        // Initialize the result counter to zero
+        int res = 0;
+
+        // Iterate through each starting index of the subarray
+        for (int i = 0; i < nums.size(); i++) {
+            // Create an unordered set to store unique elements in the current subarray
+            unordered_set<int> st;
+
+            // Iterate through the subarray starting from index i
+            for (int j = i; j < nums.size(); j++) {
+                // Insert the current element into the set
+                st.insert(nums[j]);
+
+                // Check if the current set size equals the total unique elements (k)
+                if (st.size() == k) {
+                    // If so, increment the result counter
+                    res++;
+                }
+            }
+        }
+        // Return the total count of complete subarrays
+        return res;
+    }
+};
