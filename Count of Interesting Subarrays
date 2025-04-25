@@ -38,6 +38,43 @@ public:
                 }
             }
         }
+
+
+
+or
+
+class Solution {
+public:
+    // Function to count interesting subarrays efficiently
+    long long countInterestingSubarrays(vector<int>& nums, int modulo, int k) {
+        const int n = nums.size(); // Get the size of the input array
+        unordered_map<int, int> mp; // Create a map to store the frequency of prefix sums
+        mp[0] = 1; // Initialize the map with the base case: prefix sum of 0 occurs once
+        mp.reserve(n); // Reserve space for 'n' elements to optimize performance
+        
+        long long ans = 0; // Variable to store the final count of interesting subarrays
+        int prefix = 0; // Variable to maintain the current prefix sum count
+        
+        // Iterate through each element in the array
+        for (int i = 0; i < n; i++) {
+            // Increment the prefix count if the current number satisfies the modulo condition
+            prefix += ((nums[i] % modulo) == k);
+            
+            // Calculate the adjusted prefix to find how many times the required condition has been met
+            ans += mp[(prefix + modulo - k) % modulo];
+
+            // Update the frequency of the current prefix sum modulo
+            mp[prefix % modulo]++;
+        }
+        
+        // Return the total count of interesting subarrays found
+        return ans;
+    }
+};
+
+
+
+
         // Return the total count of interesting subarrays
         return res;
     }
