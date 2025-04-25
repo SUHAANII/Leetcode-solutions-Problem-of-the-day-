@@ -1,0 +1,44 @@
+question: You are given a 0-indexed integer array nums, an integer modulo, and an integer k.
+
+Your task is to find the count of subarrays that are interesting.
+
+A subarray nums[l..r] is interesting if the following condition holds:
+
+Let cnt be the number of indices i in the range [l, r] such that nums[i] % modulo == k. Then, cnt % modulo == k.
+Return an integer denoting the count of interesting subarrays.
+
+Note: A subarray is a contiguous non-empty sequence of elements within an array.
+
+
+
+code:
+
+class Solution {
+public:
+    // Function to count interesting subarrays
+    int countInterestingSubarrays(vector<int>& nums, int modulo, int k) {
+        // Initialize the result counter
+        int res = 0;
+
+        // Outer loop to select the starting point of the subarray
+        for (int i = 0; i < nums.size(); i++) {
+            // Initialize a counter for the current subarray
+            int cnt = 0;
+
+            // Inner loop to select the ending point of the subarray
+            for (int j = i; j < nums.size(); j++) {
+                // Check if the current number satisfies the modulo condition
+                if (nums[j] % modulo == k) {
+                    cnt++; // Increment the count if it does
+                }
+                
+                // Check if the count of interesting elements satisfies the modulo condition
+                if (cnt % modulo == k) {
+                    res++; // Increment the result counter
+                }
+            }
+        }
+        // Return the total count of interesting subarrays
+        return res;
+    }
+};
