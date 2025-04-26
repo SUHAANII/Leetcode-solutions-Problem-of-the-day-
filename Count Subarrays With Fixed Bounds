@@ -1,0 +1,54 @@
+question: You are given an integer array nums and two integers minK and maxK.
+
+A fixed-bound subarray of nums is a subarray that satisfies the following conditions:
+
+The minimum value in the subarray is equal to minK.
+The maximum value in the subarray is equal to maxK.
+Return the number of fixed-bound subarrays.
+
+A subarray is a contiguous part of an array.
+
+ 
+
+code:
+
+class Solution {
+public:
+    // Static function to count the number of subarrays where the minimum is minK and the maximum is maxK
+    static long long countSubarrays(vector<int>& nums, int minK, int maxK) {
+        long long ans = 0; // Initialize the count of valid subarrays
+        int maxi = -1; // Index to track the last occurrence of maxK
+        int mini = -1; // Index to track the last occurrence of minK
+        int s = nums.size(); // Get the size of the input array
+        
+        // Iterate through the array using two pointers: r (right) and l (left)
+        for (int r = 0, l = 0; r < s; r++) {
+            const int x = nums[r]; // Current element
+            
+            // Check if the current element is outside the bounds defined by minK and maxK
+            if (x < minK || x > maxK) {
+                l = r + 1; // Move the left pointer to the next position after r
+                continue; // Skip the rest of the loop for this iteration
+            }
+            
+            // Update the index of the last occurrence of maxK
+            if (x == maxK) maxi = r; 
+            // Update the index of the last occurrence of minK
+            if (x == minK) mini = r; 
+            
+            // Calculate the number of valid subarrays ending at r
+            // The count is based on the minimum of the last indices of mini and maxi minus the left pointer l
+            ans += max((min(maxi, mini) - l + 1), 0);
+        }
+        
+        return ans; // Return the total count of valid subarrays
+    }
+};
+
+// Initialization for fast input/output
+auto init = []() { 
+    ios::sync_with_stdio(0); // Disable synchronization with C I/O
+    cin.tie(0); // Untie cin from cout for faster I/O
+    cout.tie(0); // Untie cout from cin for faster I/O
+    return 'c'; // Dummy return to satisfy the lambda function
+}();
