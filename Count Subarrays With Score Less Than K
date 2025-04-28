@@ -1,0 +1,48 @@
+question: The score of an array is defined as the product of its sum and its length.
+
+For example, the score of [1, 2, 3, 4, 5] is (1 + 2 + 3 + 4 + 5) * 5 = 75.
+Given a positive integer array nums and an integer k, return the number of non-empty subarrays of nums whose score is strictly less than k.
+
+A subarray is a contiguous sequence of elements within an array.
+
+ 
+
+
+code:
+
+class Solution 
+{
+public:
+    // Function to count subarrays where the condition is satisfied
+    long long countSubarrays(vector<int>& nums, long long k) 
+    {
+        // Step 0: Initialize Pointers and Trackers
+        int n = nums.size(); // Get the size of the input array
+        long long result = 0; // Initialize the result to store the count of valid subarrays
+        long long sum = 0; // Initialize the sum of the current subarray
+        
+        int i = 0; // Left pointer
+        int j = 0; // Right pointer
+
+        // Step 1: Expand the window with the right pointer j
+        while (j < n) 
+        {
+            sum += nums[j]; // Add the current element at j to the sum
+
+            // Step 2: Shrink the window from the left if the condition is violated
+            while (i <= j && sum * (j - i + 1) >= k) 
+            {
+                sum -= nums[i]; // Subtract the element at the left pointer from the sum
+                i++; // Move the left pointer to the right
+            }
+
+            // Step 3: Add the count of valid subarrays ending at j
+            result += (j - i + 1); // Count all valid subarrays that end at j
+
+            j++; // Move the right pointer forward
+        }
+
+        // Step 4: Return the final count
+        return result; // Return the total count of valid subarrays
+    }
+};
