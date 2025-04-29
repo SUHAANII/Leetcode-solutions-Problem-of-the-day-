@@ -1,0 +1,42 @@
+question: You are given an integer array nums and a positive integer k.
+
+Return the number of subarrays where the maximum element of nums appears at least k times in that subarray.
+
+A subarray is a contiguous sequence of elements within an array.
+
+ 
+code:
+
+class Solution {
+public:
+    long long countSubarrays(vector<int>& nums, int k) {
+        // Find the maximum number in the array
+        long long int max_num = *max_element(nums.begin(), nums.end());
+        long long int count = 0; // To count occurrences of max_num
+        long long int left = 0, right = 0; // Two pointers for the sliding window
+        long long int ans = 0; // To store the total count of valid subarrays
+        
+        // Iterate through the array using the right pointer
+        while (right < nums.size()) {
+            // If the current element is the maximum number, increment the count
+            if (nums[right] == max_num) 
+                count++;
+            
+            // While the count of max_num is greater than or equal to k
+            while (count >= k) {
+                // If the left pointer points to the maximum number, decrement the count
+                if (nums[left] == max_num) 
+                    count--;
+                // Move the left pointer to shrink the window
+                left++;
+                // Add the number of valid subarrays that can be formed from the current right pointer
+                ans += nums.size() - right;
+            }    
+            // Move the right pointer to expand the window
+            right++;
+        }
+
+        // Return the total count of valid subarrays
+        return ans;
+    }
+};
