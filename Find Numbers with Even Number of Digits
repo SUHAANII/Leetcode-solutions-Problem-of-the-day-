@@ -1,0 +1,26 @@
+question: given an array nums of integers, return how many of them contain an even number of digits.
+code:
+
+class Solution {
+public:
+    // Function to count how many numbers in the vector have an even number of digits.
+    int findNumbers(vector<int>& nums) {
+        // Initialize a counter to keep track of numbers with an even number of digits.
+        int count = 0;
+
+        // Iterate through each number in the vector.
+        for (int i : nums) {
+            // Convert the current number to a string to check its length.
+            string s = to_string(i);
+
+            // Check if the length of the string representation is even.
+            if (s.size() % 2 == 0) {
+                // If even, increment the count.
+                count++;
+            }
+        }
+
+        // Return the total count of numbers with an even number of digits.
+        return count;
+    }
+};
