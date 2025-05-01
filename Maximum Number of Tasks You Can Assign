@@ -1,0 +1,66 @@
+question: You have n tasks and m workers. Each task has a strength requirement stored in a 0-indexed integer array tasks, with the ith task requiring tasks[i] strength to complete. The strength of each worker is stored in a 0-indexed integer array workers, with the jth worker having workers[j] strength. Each worker can only be assigned to a single task and must have a strength greater than or equal to the task's strength requirement (i.e., workers[j] >= tasks[i]).
+
+Additionally, you have pills magical pills that will increase a worker's strength by strength. You can decide which workers receive the magical pills, however, you may only give each worker at most one magical pill.
+
+Given the 0-indexed integer arrays tasks and workers and the integers pills and strength, return the maximum number of tasks that can be completed.
+
+ 
+code:
+class Solution {
+public:
+    int maxTaskAssign(vector<int>& tasks, vector<int>& workers, int pills, int strength) {
+        // Initialize binary search bounds
+        int left = 0, right = min(tasks.size(), workers.size());
+
+        // Sort tasks and workers in ascending order
+        sort(tasks.begin(), tasks.end());
+        sort(workers.begin(), workers.end());
+
+        // Perform binary search to find the maximum number of tasks that can be assigned
+        while(left < right) {
+            // Calculate the mid-point of the current range
+            int mid = (left + right + 1) / 2;
+            int usedPills = 0; // Counter for used pills
+            
+            // Create a multiset of the strongest workers available for the current mid-point
+            multiset<int> workersFree(workers.end() - mid, workers.end());
+
+            bool canAssign = true; // Flag to check if all tasks can be assigned
+            
+            // Iterate over the tasks from the strongest to the weakest
+            for(int i = mid - 1; i >= 0; --i) {
+                // Get the strongest available worker
+                auto it = prev(workersFree.end());
+
+                // Check if the strongest worker can handle the task without pills
+                if(*it < tasks[i]) {
+                    // If not, check if we can use a pill
+                    it = workersFree.lower_bound(tasks[i] - strength);
+                    if(it == workersFree.end()) {
+                        // No suitable worker found, cannot assign all tasks
+                        canAssign = false;
+                        break;
+                    }
+                    // Use a pill to boost the worker's strength
+                    ++usedPills;
+                    if(usedPills > pills) {
+                        // Exceeded the number of available pills
+                        canAssign = false;
+                        break;
+                    }
+                }
+                // Remove the worker from the available set
+                workersFree.erase(it);
+            }
+
+            // If all tasks can be assigned, move the left pointer up
+            if(canAssign)
+                left = mid;
+            else
+                // Otherwise, move the right pointer down
+                right = mid - 1;
+        }
+        // Return the maximum number of tasks that can be assigned
+        return left;
+    }
+};
