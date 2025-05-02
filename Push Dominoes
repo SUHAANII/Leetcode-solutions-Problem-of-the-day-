@@ -1,0 +1,63 @@
+question: There are n dominoes in a line, and we place each domino vertically upright. In the beginning, we simultaneously push some of the dominoes either to the left or to the right.
+
+After each second, each domino that is falling to the left pushes the adjacent domino on the left. Similarly, the dominoes falling to the right push their adjacent dominoes standing on the right.
+
+When a vertical domino has dominoes falling on it from both sides, it stays still due to the balance of the forces.
+
+For the purposes of this question, we will consider that a falling domino expends no additional force to a falling or already fallen domino.
+
+You are given a string dominoes representing the initial state where:
+
+dominoes[i] = 'L', if the ith domino has been pushed to the left,
+dominoes[i] = 'R', if the ith domino has been pushed to the right, and
+dominoes[i] = '.', if the ith domino has not been pushed.
+Return a string representing the final state.
+
+code:
+
+class Solution {
+public:
+    // Function to simulate the pushing of dominoes and return the final state
+    string pushDominoes(string s) {
+        // Add 'L' at the beginning and 'R' at the end to simplify boundary conditions
+        s = 'L' + s + 'R';
+        string res; // Resulting string to store the final state of the dominoes
+
+        int prev = 0; // Index of the last non-dot character
+        // Iterate through the string starting from the second character
+        for (int curr = 1; curr < s.size(); ++curr) {
+            // If the current character is a dot, skip to the next iteration
+            if (s[curr] == '.') {
+                continue;
+            }
+
+            // Calculate the number of dots between the last non-dot character and the current one
+            int span = curr - prev - 1;
+
+            // If there was a character before the current one, add it to the result
+            if (prev > 0) 
+                res += s[prev];
+
+            // Check the characters at prev and curr positions
+            if (s[prev] == s[curr]) {
+                // If both characters are the same (either 'L' or 'R'), fill the span with that character
+                res += string(span, s[prev]);
+            }
+            else if (s[prev] == 'L' && s[curr] == 'R') {
+                // If the previous character is 'L' and the current is 'R', fill the span with dots
+                res += string(span, '.');
+            }
+            else { 
+                // If the previous character is 'R' and the current is 'L'
+                // Fill half the span with 'R', then check if there's an odd dot in the middle, fill it with '.', 
+                // and fill the other half with 'L'
+                res += string(span / 2, 'R')
+                     + string(span % 2, '.') // Add a dot if there's an odd dot in the middle
+                     + string(span / 2, 'L');
+            }
+            // Update the previous character index to the current one
+            prev = curr;
+        }
+        return res; // Return the final state of the dominoes
+    }
+};
