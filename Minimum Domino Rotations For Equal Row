@@ -1,0 +1,48 @@
+question: In a row of dominoes, tops[i] and bottoms[i] represent the top and bottom halves of the ith domino. (A domino is a tile with two numbers from 1 to 6 - one on each half of the tile.)
+
+We may rotate the ith domino, so that tops[i] and bottoms[i] swap values.
+
+Return the minimum number of rotations so that all the values in tops are the same, or all the values in bottoms are the same.
+
+If it cannot be done, return -1.
+
+code:
+
+class Solution {
+public:
+    // Function to find the minimum number of rotations required to make all dominoes show the same number
+    int minDominoRotations(vector<int>& tops, vector<int>& bottoms) {
+        // Start with the rotations needed to make all tops equal to the first top value
+        int res = getRotation(tops, bottoms, tops[0]);
+        
+        // If the first top and bottom values are different, check rotations for the first bottom value as well
+        if (tops[0] != bottoms[0]) {
+            res = min(res, getRotation(tops, bottoms, bottoms[0]));
+        }
+        
+        // If no valid rotation is found, return -1; otherwise, return the minimum rotations found
+        return res == INT_MAX ? -1 : res;
+    }
+
+private:
+    // Helper function to calculate the number of rotations needed to make all dominoes show the target value
+    int getRotation(vector<int>& tops, vector<int>& bottoms, int target) {
+        int rotateTop = 0;    // Count of rotations needed for the tops
+        int rotateBottom = 0; // Count of rotations needed for the bottoms
+
+        // Iterate through all dominoes
+        for (int i = 0; i < tops.size(); i++) {
+            // If neither top nor bottom can be made equal to the target, return a large value
+            if (tops[i] != target && bottoms[i] != target) {
+                return INT_MAX; // Impossible to make all equal to target
+            }
+            // Count rotations needed for the tops
+            if (tops[i] != target) rotateTop++; // Increment if top needs rotation
+            // Count rotations needed for the bottoms
+            if (bottoms[i] != target) rotateBottom++; // Increment if bottom needs rotation
+        }
+        
+        // Return the minimum rotations needed between tops and bottoms
+        return min(rotateTop, rotateBottom);
+    }
+};
