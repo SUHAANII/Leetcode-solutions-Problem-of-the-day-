@@ -1,0 +1,31 @@
+question: Given a list of dominoes, dominoes[i] = [a, b] is equivalent to dominoes[j] = [c, d] if and only if either (a == c and b == d), or (a == d and b == c) - that is, one domino can be rotated to be equal to another domino.
+
+Return the number of pairs (i, j) for which 0 <= i < j < dominoes.length, and dominoes[i] is equivalent to dominoes[j].
+
+ 
+
+code:
+
+class Solution {
+public:
+    int numEquivDominoPairs(vector<vector<int>>& dominoes) {
+        int count = 0; // Initialize a counter for equivalent domino pairs
+
+        // Loop through each domino using index i
+        for (int i = 0; i < dominoes.size(); i++) {
+            // Loop through each domino using index j, starting from i + 1
+            for (int j = i + 1; j < dominoes.size(); j++) {
+                // Extract values from the current dominoes
+                int a = dominoes[i][0], b = dominoes[i][1];
+                int c = dominoes[j][0], d = dominoes[j][1];
+
+                // Check if the two dominoes are equivalent
+                // They are equivalent if they have the same numbers in any order
+                if ((a == c && b == d) || (a == d && b == c)) {
+                    ++count; // Increment the count for equivalent pairs
+                }
+            }
+        }
+        return count; // Return the total count of equivalent domino pairs
+    }
+};
