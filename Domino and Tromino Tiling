@@ -1,0 +1,39 @@
+question: You have two types of tiles: a 2 x 1 domino shape and a tromino shape. You may rotate these shapes.
+
+
+Given an integer n, return the number of ways to tile an 2 x n board. Since the answer may be very large, return it modulo 109 + 7.
+
+In a tiling, every square must be covered by a tile. Two tilings are different if and only if there are two 4-directionally adjacent cells on the board such that exactly one of the tilings has both squares occupied by a tile.
+code:
+
+class Solution {
+public:
+    // Define a constant for the modulo value
+    const long mod = 1e9 + 7;
+
+    // Recursive function to calculate the number of ways to tile the dominoes
+    long dominoes(int i, int n, bool possible) {
+        // Base case: if we have reached the end of the board
+        if (i == n) return !possible; // Return 1 if the last domino is not placed (possible is false)
+        
+        // If we exceed the board length, return 0 (invalid configuration)
+        if (i > n) return 0;
+
+        // If the last domino was placed vertically (possible is true)
+        if (possible) {
+            // We can either place the next domino vertically or horizontally
+            return (dominoes(i + 1, n, false) + 
+                    dominoes(i + 1, n, true)) % mod; // Use modulo to prevent overflow
+        }
+        
+        // If the last domino was placed horizontally (possible is false)
+        return (dominoes(i + 1, n, false) + // Place the next domino vertically
+                dominoes(i + 2, n, false) + // Place the next domino horizontally
+                2L * dominoes(i + 2, n, true)) % mod; // Two ways to place the next domino (horizontally or vertically)
+    }
+
+    // Main function to initiate the domino tiling calculation
+    int numTilings(int n) {
+        return dominoes(0, n, false); // Start from index 0 with no domino placed
+    }
+};
