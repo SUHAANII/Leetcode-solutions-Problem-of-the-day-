@@ -1,0 +1,73 @@
+question: There is a dungeon with n x m rooms arranged as a grid.
+
+You are given a 2D array moveTime of size n x m, where moveTime[i][j] represents the minimum time in seconds when you can start moving to that room. You start from the room (0, 0) at time t = 0 and can move to an adjacent room. Moving between adjacent rooms takes exactly one second.
+
+Return the minimum time to reach the room (n - 1, m - 1).
+
+Two rooms are adjacent if they share a common wall, either horizontally or vertically.
+
+
+
+code:
+
+class Solution {
+public:
+    // Function to find the minimum time to reach the bottom-right corner of the grid
+    int minTimeToReach(vector<vector<int>>& moveTime) {
+        int n = moveTime.size(); // Number of rows in the grid
+        int m = moveTime[0].size(); // Number of columns in the grid
+        
+        // DP table to store the minimum time to reach each cell
+        vector<vector<int>> dp(n, vector<int>(m, INT_MAX));
+        
+        // Min-heap priority queue to explore cells based on minimum time
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> minh;
+        
+        // Start from the top-left corner (0,0) with initial time 0
+        minh.push({0, 0, 0});
+        moveTime[0][0] = 0; // Initial cell time is 0 (not used later)
+
+        // Directions for moving down, right, up, and left
+        vector<vector<int>> directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+        
+        // While there are cells to explore
+        while (!minh.empty()) {
+            // Get the cell with the minimum time
+            auto current = minh.top();
+            minh.pop();
+            
+            int currTime = current[0]; // Current accumulated time
+            int currRow = current[1]; // Current row
+            int currCol = current[2]; // Current column
+            
+            // If the current time is not better than previously recorded time, skip it
+            if (currTime >= dp[currRow][currCol]) continue;
+            
+            // If we reach the bottom-right corner, return the time taken
+            if (currRow == n - 1 && currCol == m - 1) return currTime;
+            
+            // Record the minimum time to reach the current cell
+            dp[currRow][currCol] = currTime;
+
+            // Explore all possible directions (down, right, up, left)
+            for (auto& direction : directions) {
+                int nextRow = currRow + direction[0]; // Calculate next row
+                int nextCol = currCol + direction[1]; // Calculate next column
+                
+                // Check if the next cell is within bounds and not yet visited
+                if (nextRow >= 0 && nextRow < n &&
+                    nextCol >= 0 && nextCol < m &&
+                    dp[nextRow][nextCol] == INT_MAX) {
+                    
+                    // Calculate the time to reach the next cell
+                    int nextTime = max(moveTime[nextRow][nextCol], currTime) + 1;
+                    // Push the next cell into the priority queue
+                    minh.push({nextTime, nextRow, nextCol});
+                }
+            }
+        }
+        
+        // If the bottom-right corner is not reachable, return -1
+        return -1;
+    }
+};
