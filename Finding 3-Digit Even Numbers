@@ -1,0 +1,49 @@
+question: You are given an integer array digits, where each element is a digit. The array may contain duplicates.
+
+You need to find all the unique integers that follow the given requirements:
+
+The integer consists of the concatenation of three elements from digits in any arbitrary order.
+The integer does not have leading zeros.
+The integer is even.
+For example, if the given digits were [1, 2, 3], integers 132 and 312 follow the requirements.
+
+Return a sorted array of the unique integers.
+
+ 
+
+code:
+class Solution {
+public:
+    vector<int> findEvenNumbers(vector<int>& digits) {
+        // Create a frequency array to count occurrences of each digit (0-9)
+        vector<int> mpp(10, 0);
+        for (int i = 0; i < digits.size(); i++)
+            mpp[digits[i]]++; // Increment the count for the digit found
+
+        vector<int> res; // To store the resulting even numbers
+
+        // Iterate over possible first digits (1 to 9)
+        for (int i = 1; i <= 9; i++) {
+            if (mpp[i] == 0) continue; // Skip if digit is not available
+            mpp[i]--; // Use this digit as the first digit
+
+            // Iterate over possible second digits (0 to 9)
+            for (int j = 0; j <= 9; j++) {
+                if (mpp[j] == 0) continue; // Skip if digit is not available
+                mpp[j]--; // Use this digit as the second digit
+
+                // Iterate over possible last digits (even numbers: 0, 2, 4, 6, 8)
+                for (int k = 0; k <= 8; k += 2) {
+                    if (mpp[k] == 0) continue; // Skip if digit is not available
+                    res.push_back(i * 100 + j * 10 + k); // Form the number and add to result
+                }
+
+                mpp[j]++; // Backtrack: restore the count of the second digit
+            }
+
+            mpp[i]++; // Backtrack: restore the count of the first digit
+        }
+
+        return res; // Return the list of even numbers formed
+    }
+};
