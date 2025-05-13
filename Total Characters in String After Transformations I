@@ -1,0 +1,65 @@
+question: You are given a string s and an integer t, representing the number of transformations to perform. In one transformation, every character in s is replaced according to the following rules:
+
+If the character is 'z', replace it with the string "ab".
+Otherwise, replace it with the next character in the alphabet. For example, 'a' is replaced with 'b', 'b' is replaced with 'c', and so on.
+Return the length of the resulting string after exactly t transformations.
+
+Since the answer may be very large, return it modulo 109 + 7.
+
+code:
+// Constant for modulo operation
+const int mod = 1e9 + 7;
+
+// Function to perform modular addition
+int mod_add(int a, int b) {
+    // Ensure both a and b are within the modulo range
+    a = a % mod; 
+    b = b % mod; 
+    // Return the result of (a + b) mod mod, ensuring non-negativity
+    return (((a + b) % mod) + mod) % mod;
+}
+
+class Solution {
+public:
+    // Function to calculate the length of the string after transformations
+    int lengthAfterTransformations(string s, int t) {
+        // Array to count occurrences of each character (a-z)
+        int nums[26] = {0};
+        
+        // Count the frequency of each character in the input string
+        for (char ch : s) 
+            nums[ch - 'a']++;
+
+        // Perform transformations t times
+        while (t--) {
+            // Temporary array to hold the new counts after transformation
+            int cur[26] = {0};
+            
+            // Iterate through each character from 'a' to 'z'
+            for (int j = 0; j < 26; j++) {
+                // If we reach 'z' (index 25), we need to transform it into 'a' and 'b'
+                if (j == 25 && nums[j] > 0) {
+                    // Add the count of 'z' to 'a' and 'b'
+                    cur[0] = mod_add(cur[0], nums[j]); // 'z' becomes 'a'
+                    cur[1] = mod_add(cur[1], nums[j]); // 'z' also becomes 'b'
+                } else {
+                    // For other characters, just shift them to the next character
+                    if (j < 25) 
+                        cur[j + 1] = mod_add(cur[j + 1], nums[j]);
+                }
+            }
+            // Update nums with the new counts after this transformation
+            for (int j = 0; j < 26; j++) 
+                nums[j] = cur[j];
+        }
+
+        // Calculate the total length after all transformations
+        int ans = 0;
+        for (int i : nums) 
+            ans = mod_add(ans, i); // Sum up all counts
+
+        // Return the total length as an integer
+        return (int)ans;
+    }
+};
+
