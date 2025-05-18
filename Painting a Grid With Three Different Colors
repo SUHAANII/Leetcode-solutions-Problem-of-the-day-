@@ -1,0 +1,181 @@
+question: ou are given two integers m and n. Consider an m x n grid where each cell is initially white. You can paint each cell red, green, or blue. All cells must be painted.
+
+Return the number of ways to color the grid with no two adjacent cells having the same color. Since the answer can be very large, return it modulo 109 + 7.
+
+code:
+
+const int mod = 1e9 + 7; // Define a constant for modulo operations
+using matrix = vector<vector<int>>; // Define a type alias for a 2D integer matrix
+static matrix I; // Declare a static identity matrix
+
+// Function to create an identity matrix of size 'sz'
+matrix Id(int sz) {
+    matrix I(sz, vector<int>(sz, 0)); // Initialize a sz x sz matrix filled with 0s
+    for (int i = 0; i < sz; i++)
+        I[i][i] = 1; // Set the diagonal elements to 1
+    return I; // Return the identity matrix
+}
+
+// Matrix multiplication defined by operator overloading
+matrix operator*(const matrix& A, const matrix& B) {
+    const int n = A.size(), p = A[0].size(), q = B.size(), m = B[0].size();
+    if (p != q) return {}; // If dimensions don't match, return an empty matrix
+    matrix C(n, vector<int>(m, 0)); // Initialize result matrix C with 0s
+    for (int i = 0; i < n; i++) {
+        for (int k = 0; k < p; k++) {
+            for (int j = 0; j < m; j++) {
+                // Perform matrix multiplication with modulo
+                C[i][j] = (C[i][j] + 1LL * A[i][k] * B[k][j]) % mod;
+            }
+        }
+    }
+    return C; // Return the result matrix
+}
+
+// Modular matrix exponentiation using the method of successive squaring (MSBF)
+matrix modPow(const matrix& M, unsigned n, int sz) {
+    if (n == 0) return I; // Base case: M^0 is the identity matrix
+    bitset<32> B(n); // Create a bitset representation of n
+    int bMax = 31 - countl_zero(n); // Find the highest set bit
+    matrix ans = M; // Initialize result with M
+    for (int i = bMax - 1; i >= 0; i--) {
+        ans = ans * ans; // Square the current result
+        if (B[i]) // If the ith bit is set
+            ans = ans * M; // Multiply by M
+    }
+    return ans; // Return the result of M^n
+}
+
+// Integer modular exponentiation
+int modPow(int base, unsigned n) {
+    if (n == 0) return 1; // Base case: base^0 is 1
+
+    bitset<32> B(n); // Create a bitset representation of n
+    int bMax = 31 - countl_zero(n); // Find the highest set bit
+    long long ans = 1; // Initialize result
+    long long b = base % mod; // Ensure base is within mod
+
+    for (int i = bMax; i >= 0; i--) {
+        ans = (ans * ans) % mod; // Square the current result
+        if (B[i]) // If the ith bit is set
+            ans = (ans * b) % mod; // Multiply by base
+    }
+    return ans; // Return the result
+}
+
+// Function to print a matrix
+void print(const vector<vector<int>>& M) {
+    int s = M.size(), i = 0; // Get the size of the matrix
+    cout << "\nM={";
+    for (const auto& row : M) {
+        cout << "\n\t{";
+        int j = 0, sz = row.size();
+        for (int v : row) {
+            cout << v; // Print each value
+            if (++j < sz) cout << ","; // Add comma if not the last element
+            else cout << "}";
+        }
+        if (++i < s) cout << ","; // Add comma if not the last row
+    }
+    cout << "\n};\n"; // Close the matrix output
+}
+
+class Solution {
+public:
+    matrix M; // Transition matrix
+    vector<string> Type; // Store types of patterns
+    int i0 = 0; // Index for types
+    int n, m; // Dimensions of the grid
+    int map[27]; // Encode number -> Type Id
+
+    // Recursive function to build types of patterns
+    void build_Type(int i, string& pattern) {
+        if (i == 0) {
+            int key = 0;
+            for (int j = 2; j < m; j++)
+                key = key * 3 + (pattern[j] - '0'); // Create a key for the pattern
+            map[key] = i0; // Map key to its index
+            Type.push_back(pattern); // Store the pattern
+            i0++; // Increment the index
+            return;
+        }
+        for (int x = '0'; x <= '2'; x++) {
+            if (x == pattern.back()) // Avoid consecutive colors
+                continue;
+            pattern += x; // Add color to the pattern
+            build_Type(i - 1, pattern); // Recur for the next position
+            pattern.pop_back(); // Backtrack
+        }
+    }
+
+    // Function to find the type ID based on the column
+    void find_typeId(const string& col, int colIndex) {
+        char x = col[0], y = col[1], z;
+        // Find the third color not in the first two
+        for (char c : {'a', 'b', 'c'}) {
+            if (c == x || c == y) continue;
+            z = c; // Assign the third color
+        }
+        int f[128] = {}; // Frequency array
+        f[x] = 0, f[y] = 1, f[z] = 2; // Map colors to indices
+
+        int key = 0;
+        for (int j = 2; j < m; j++)
+            key = key * 3 + f[col[j]]; // Create a key for the column
+        if (map[key] != -1) // If the key is valid
+            M[map[key]][colIndex]++; // Increment the transition count
+    }
+
+    // Recursive function to build the transition matrix M
+    void build_M(int i, string& curr, const string& col0, int colIndex) {
+        if (i < 0) {
+            find_typeId(curr, colIndex); // Find the type ID for the current pattern
+            return;
+        }
+        for (char x = 'a'; x <= 'c'; x++) {
+            if (x == (col0[i] - '0' + 'a')) // Avoid using the same color as in col0
+                continue;
+            if (!curr.empty() && x == curr.back()) // Avoid consecutive colors
+                continue;
+            curr += x; // Add color
+            build_M(i - 1, curr, col0, colIndex); // Recur
+            curr.pop_back(); // Backtrack
+        }
+    }
+
+    // Main function to calculate the number of ways to color the grid
+    int colorTheGrid(int m, int n) {
+        this->m = m, this->n = n; // Store the dimensions
+        if (m == 1) return 3LL * modPow(2, n - 1) % mod; // Special case for 1 row
+        if (m == 2) return 6LL * modPow(3, n - 1) % mod; // Special case for 2 rows
+
+        int sz = 1 << (m - 2); // Number of patterns
+        I = Id(sz); // Initialize the identity matrix
+        memset(map, -1, sizeof(map)); // Initialize the map
+        Type.clear(); // Clear previous types
+
+        string pattern = "01"; // Start with the first two colors
+        build_Type(m - 2, pattern); // Build types of patterns
+
+        M.assign(sz, vector<int>(sz, 0)); // Initialize the transition matrix
+
+        // Build the transition matrix based on patterns
+        for (int i = 0; i < sz; ++i) {
+            const string& s = Type[i];
+            string curr = "";
+            build_M(m - 1, curr, s, i); // Build transitions for each pattern
+        }
+
+        // Uncomment to print the transition matrix
+        // print(M);
+        
+        // Calculate the number of ways to color the grid using matrix exponentiation
+        matrix A = modPow(M, n - 1, sz); // Raise the transition matrix to the power of (n - 1)
+        long long ans = 0; // Initialize the answer
+        for (int i = 0; i < sz; i++) {
+            long long rowSum = reduce(A[i].begin(), A[i].end(), 0LL) % mod; // Sum the rows
+            ans = (ans + (6LL * rowSum) % mod) % mod; // Each type has 6 combinations
+        }
+        return ans; // Return the final answer
+    }
+};
