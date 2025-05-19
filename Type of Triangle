@@ -1,0 +1,38 @@
+question: You are given a 0-indexed integer array nums of size 3 which can form the sides of a triangle.
+
+A triangle is called equilateral if it has all sides of equal length.
+A triangle is called isosceles if it has exactly two sides of equal length.
+A triangle is called scalene if all its sides are of different lengths.
+Return a string representing the type of triangle that can be formed or "none" if it cannot form a triangle.
+
+code:
+
+class Solution {
+public:
+    // Function to determine the type of triangle based on the lengths of its sides
+    string triangleType(vector<int>& nums) {
+        // Use nth_element to find the second smallest element in nums
+        nth_element(nums.begin(), nums.begin() + 1, nums.end());
+        
+        // Check if the triangle inequality holds: a + b > c
+        // If the sum of the two smaller sides is less than or equal to the largest side, it's not a triangle
+        if (nums[2] >= nums[0] + nums[1]) return "none";
+        
+        // Check if all sides are equal for an equilateral triangle
+        if (nums[0] == nums[2]) return "equilateral";
+        
+        // Check if any two sides are equal for an isosceles triangle
+        if (nums[0] == nums[1] || nums[1] == nums[2]) return "isosceles";
+        
+        // If no sides are equal, it is a scalene triangle
+        return "scalene";
+    }
+};
+
+// Initialization block to optimize input/output operations
+auto init = []() { 
+    ios::sync_with_stdio(0); // Disable synchronization with C I/O
+    cin.tie(0);              // Untie cin from cout for faster input
+    cout.tie(0);            // Untie cout from cin for faster output
+    return 'c';             // Return a character (not used)
+}();
