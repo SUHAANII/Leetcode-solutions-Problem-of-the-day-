@@ -1,0 +1,44 @@
+question: Given an m x n integer matrix matrix, if an element is 0, set its entire row and column to 0's.
+
+You must do it in place.
+
+code:
+
+class Solution {
+public:
+    // Function to set entire row and column to zero if an element is zero
+    void setZeroes(vector<vector<int>>& matrix) {
+        // Flag to check if the first column needs to be zeroed
+        bool zeroinFirstCol = false;
+
+        // First pass: Identify zeroes and mark the first row and first column
+        for (int row = 0; row < matrix.size(); row++) {
+            // Check if the first column has a zero
+            if (matrix[row][0] == 0) 
+                zeroinFirstCol = true; // Set flag if first column has a zero
+            
+            // Check the rest of the columns
+            for (int col = 1; col < matrix[0].size(); col++) {
+                // If a zero is found, mark the corresponding first row and first column
+                if (matrix[row][col] == 0) {
+                    matrix[row][0] = 0; // Mark the start of the row
+                    matrix[0][col] = 0; // Mark the start of the column
+                }
+            }
+        }
+
+        // Second pass: Use marks to set zeroes in the matrix
+        for (int row = matrix.size() - 1; row >= 0; row--) {
+            for (int col = matrix[0].size() - 1; col >= 1; col--) {
+                // If the first row or first column is marked, set the current element to zero
+                if (matrix[row][0] == 0 || matrix[0][col] == 0) {
+                    matrix[row][col] = 0; // Set the element to zero
+                }
+            }
+            // If the first column should be zeroed, set it to zero
+            if (zeroinFirstCol) {
+                matrix[row][0] = 0; // Set the first column to zero
+            }
+        }
+    }
+};
