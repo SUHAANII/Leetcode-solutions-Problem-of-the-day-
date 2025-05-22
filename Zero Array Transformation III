@@ -1,0 +1,58 @@
+question: You are given an integer array nums of length n and a 2D array queries where queries[i] = [li, ri].
+
+Each queries[i] represents the following action on nums:
+
+Decrement the value at each index in the range [li, ri] in nums by at most 1.
+The amount by which the value is decremented can be chosen independently for each index.
+A Zero Array is an array with all its elements equal to 0.
+
+Return the maximum number of elements that can be removed from queries, such that nums can still be converted to a zero array using the remaining queries. If it is not possible to convert nums to a zero array, return
+
+code;
+
+class Solution {
+public:
+    // Function to calculate the maximum number of removable elements based on the given queries
+    static int maxRemoval(vector<int>& nums, vector<vector<int>>& queries) {
+        const int n = nums.size(); // Size of the nums array
+        const int qz = queries.size(); // Size of the queries array
+        
+        // Create a vector to store the end indices of queries starting from each index
+        vector<vector<int>> qEnd(n);
+        
+        // Populate the qEnd vector with the end indices of each query
+        for (int i = 0; i < qz; i++)
+            qEnd[queries[i][0]].push_back(queries[i][1]);
+
+        // Priority queue (max heap) to store the end indices of queries
+        priority_queue<int> pq;
+        
+        // Vector to keep track of the number of overlapping queries ending at each index
+        vector<int> cntQ(n + 1, 0);
+        
+        int dec = 0; // Variable to track the current number of decrements
+        for (int i = 0; i < n; i++) {
+            const int x = nums[i]; // Current number being processed
+            
+            // Update the decrement count with the number of queries ending at the current index
+            dec += cntQ[i];
+            
+            // Push the end indices of queries that start at the current index
+            for (int j : qEnd[i])
+                pq.push(j);
+            
+            int k; // Variable to hold the top value from the priority queue
+            // While there are still queries to process and the current number is greater than the decrements
+            for (; x > dec && pq.size() > 0 && (k = pq.top()) >= i; dec++) {
+                cntQ[k + 1]--; // Decrease the count of queries ending at k + 1
+                pq.pop(); // Remove the top element from the priority queue
+            }
+            
+            // If the current number is still greater than the decrements, return -1
+            if (x > dec) return -1;
+        }
+        
+        // Return the size of the remaining queries in the priority queue (max removable elements)
+        return pq.size();
+    }
+};
