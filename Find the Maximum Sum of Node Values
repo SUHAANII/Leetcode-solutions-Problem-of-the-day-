@@ -1,0 +1,47 @@
+question: There exists an undirected tree with n nodes numbered 0 to n - 1. You are given a 0-indexed 2D integer array edges of length n - 1, where edges[i] = [ui, vi] indicates that there is an edge between nodes ui and vi in the tree. You are also given a positive integer k, and a 0-indexed array of non-negative integers nums of length n, where nums[i] represents the value of the node numbered i.
+
+Alice wants the sum of values of tree nodes to be maximum, for which Alice can perform the following operation any number of times (including zero) on the tree:
+
+Choose any edge [u, v] connecting the nodes u and v, and update their values as follows:
+nums[u] = nums[u] XOR k
+nums[v] = nums[v] XOR k
+Return the maximum possible sum of the values Alice can achieve by performing the operation any number of times.
+
+
+
+code:
+
+class Solution {
+public:
+    // Function to calculate the maximum value sum based on the given conditions
+    static long long maximumValueSum(vector<int>& nums, const int k, vector<vector<int>>& edges) 
+    {
+        const int n = nums.size(); // Get the size of the input vector 'nums'
+        long long dp0 = 0, dp1 = INT_MIN; // Initialize two dynamic programming variables
+
+        // Loop through each element in the nums array
+        for(int i = 1; i <= n; i++) {
+            const long long x = nums[i - 1]; // Current number from the nums array
+            const long long xk = x ^ k; // XOR operation with k
+
+            // Calculate the maximum sum if the current number is included in the first set
+            const long long dp_0 = max(x + dp0, xk + dp1);
+            // Calculate the maximum sum if the current number is included in the second set
+            dp1 = max(x + dp1, xk + dp0);
+
+            // Update dp0 for the next iteration
+            dp0 = dp_0;
+        }
+
+        // Return the maximum value sum achievable
+        return dp0;
+    }
+};
+
+// Initialization to optimize input/output operations
+auto init = []() {
+    ios::sync_with_stdio(0); // Disable synchronization with C I/O for faster input/output
+    cin.tie(0); // Untie cin from cout
+    cout.tie(0); // Untie cout from cin
+    return 'c'; // Return a dummy character
+}();
