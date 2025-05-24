@@ -1,0 +1,33 @@
+question: You are given a 0-indexed array of strings words and a character x.
+
+Return an array of indices representing the words that contain the character x.
+
+Note that the returned array may be in any order.
+
+
+code:
+class Solution {
+public:
+    // Function to find indices of words containing the character 'x'
+    vector<int> findWordsContaining(vector<string>& words, char x) {
+        // Vector to store the result indices
+        vector<int> res;
+
+        // Loop through each word in the vector 'words'
+        for (int i = 0; i < words.size(); i++) {
+            // Loop through each character in the current word
+            for (int j = 0; j < words[i].size(); j++) {
+                // Check if the current character matches 'x'
+                if (words[i][j] == x) {
+                    // If found, add the index of the word to the result vector
+                    res.push_back(i);
+                    // Break out of the inner loop to avoid duplicate entries for the same word
+                    break;
+                }
+            }
+        }
+        
+        // Return the vector containing indices of words that contain the character 'x'
+        return res;
+    }
+};
