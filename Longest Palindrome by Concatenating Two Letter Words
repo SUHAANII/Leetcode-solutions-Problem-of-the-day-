@@ -1,0 +1,56 @@
+question: You are given an array of strings words. Each element of words consists of two lowercase English letters.
+
+Create the longest possible palindrome by selecting some elements from words and concatenating them in any order. Each element can be selected at most once.
+
+Return the length of the longest palindrome that you can create. If it is impossible to create any palindrome, return 0.
+
+A palindrome is a string that reads the same forward and backward.
+
+ code:
+
+class Solution {
+public:
+    // Function to calculate the longest palindrome that can be formed from the given words
+    int longestPalindrome(vector<string>& words) {
+        // Frequency array to count occurrences of word pairs
+        int freq[26][26] = {{0}}; // 26 letters in the alphabet
+        
+        // Count the occurrences of each word pair
+        for (auto& w : words) {
+            const int i = w[0] - 'a'; // First character index (0-25)
+            const int j = w[1] - 'a'; // Second character index (0-25)
+            freq[i][j]++; // Increment the frequency of the pair (i, j)
+        }
+        
+        int pal = 0; // Variable to store the length of the longest palindrome
+        bool hasDouble = false; // Flag to check if there's a word that can be placed in the middle
+        
+        // Iterate over all possible characters
+        for (int i = 0; i < 26; i++) {
+            const int fi = freq[i][i]; // Frequency of palindromic pairs (same characters)
+            pal += fi / 2 * 4; // Add pairs of palindromic words to the palindrome length
+            
+            // Check if there's an unpaired word that can be placed in the middle
+            if (!hasDouble && (fi & 1) == 1)
+                hasDouble = true; // Set flag if there's an odd count
+        }
+        
+        // If there was an unpaired word, we can add it to the center of the palindrome
+        pal += hasDouble * 2;
+        
+        // Count contributions from pairs of different characters
+        for (int i = 0; i < 26; i++)
+            for (int j = i + 1; j < 26; j++)
+                pal += min(freq[i][j], freq[j][i]) * 4; // Add pairs of different characters
+        
+        return pal; // Return the total length of the longest palindrome
+    }
+};
+
+// Initialization code to optimize input/output
+auto init = []() {
+    ios::sync_with_stdio(false); // Disable synchronization with C I/O for faster input
+    cin.tie(nullptr); // Untie cin from cout
+    cout.tie(nullptr); // Untie cout from cin
+    return 'c'; // Return a dummy character
+}();
