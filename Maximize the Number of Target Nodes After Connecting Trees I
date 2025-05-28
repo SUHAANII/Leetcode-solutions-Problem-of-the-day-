@@ -1,0 +1,68 @@
+question: There exist two undirected trees with n and m nodes, with distinct labels in ranges [0, n - 1] and [0, m - 1], respectively.
+
+You are given two 2D integer arrays edges1 and edges2 of lengths n - 1 and m - 1, respectively, where edges1[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the first tree and edges2[i] = [ui, vi] indicates that there is an edge between nodes ui and vi in the second tree. You are also given an integer k.
+
+Node u is target to node v if the number of edges on the path from u to v is less than or equal to k. Note that a node is always target to itself.
+
+Return an array of n integers answer, where answer[i] is the maximum possible number of nodes target to node i of the first tree if you have to connect one node from the first tree to another node in the second tree.
+
+Note that queries are independent from each other. That is, for every query you will remove the added edge before proceeding to the next query.
+
+code:
+
+class Solution {
+public:
+    // Function to build an adjacency list from a list of edges
+    vector<vector<int>> buildList(const vector<vector<int>>& edges) {
+        // Create an adjacency list with size equal to the number of edges + 1
+        vector<vector<int>> adj(edges.size() + 1);
+        
+        // Iterate through each edge to populate the adjacency list
+        for (auto &e : edges) {
+            // Add each edge in both directions since the graph is undirected
+            adj[e[0]].push_back(e[1]);
+            adj[e[1]].push_back(e[0]);
+        }
+        
+        // Return the constructed adjacency list
+        return adj;
+    }
+    
+    // Depth-First Search (DFS) function to count nodes within k distance from node u
+    int dfs(const vector<vector<int>>& adj, int u, int p, int k) {
+        // If k is negative, return 0 as there are no valid nodes to count
+        if (k < 0) return 0;
+        
+        int cnt = 1; // Count the current node
+        // Explore all adjacent nodes (neighbors) of the current node u
+        for (int v : adj[u]) {
+            // Avoid going back to the parent node
+            if (v != p) {
+                // Recursively count nodes in the subtree rooted at v
+                cnt += dfs(adj, v, u, k - 1);
+            }
+        }
+        return cnt; // Return the total count of nodes within k distance
+    }
+    
+    // Function to calculate the maximum target nodes for each node in the first graph
+    vector<int> maxTargetNodes(vector<vector<int>>& edges1, vector<vector<int>>& edges2, int k) {
+        // Build adjacency lists for both graphs
+        auto adj1 = buildList(edges1), adj2 = buildList(edges2);
+        
+        int n = adj1.size(), m = adj2.size(), maxiB = 0; // Sizes and max count initialization
+        vector<int> res(n); // Result vector to store the counts for each node in graph 1
+
+        // Calculate the maximum count of nodes within k distance for any node in graph 2
+        for (int i = 0; i < m; i++) {
+            maxiB = max(maxiB, dfs(adj2, i, -1, k - 1));
+        }
+        
+        // For each node in graph 1, calculate the total count of nodes within k distance
+        for (int i = 0; i < n; i++) {
+            res[i] = dfs(adj1, i, -1, k) + maxiB; // Add the maximum count from graph 2
+        }
+        
+        return res; // Return the result vector
+    }
+};
