@@ -1,0 +1,90 @@
+question: There exist two undirected trees with n and m nodes, labeled from [0, n - 1] and [0, m - 1], respectively.
+
+You are given two 2D integer arrays edges1 and edges2 of lengths n - 1 and m - 1, respectively, where edges1[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the first tree and edges2[i] = [ui, vi] indicates that there is an edge between nodes ui and vi in the second tree.
+
+Node u is target to node v if the number of edges on the path from u to v is even. Note that a node is always target to itself.
+
+Return an array of n integers answer, where answer[i] is the maximum possible number of nodes that are target to node i of the first tree if you had to connect one node from the first tree to another node in the second tree.
+
+Note that queries are independent from each other. That is, for every query you will remove the added edge before proceeding to the next query.
+
+
+code:
+
+const int N = 100000; // Maximum number of nodes
+uint64_t q[N]; // Queue for BFS
+int front, back; // Indices for the front and back of the queue
+vector<int> adj1[N], adj2[N]; // Adjacency lists for two graphs
+
+class Solution {
+public:
+    // Function to build adjacency list from edges
+    static inline void build_adj(const vector<vector<int>>& edges, auto& adj) {
+        for (const auto& e : edges) {
+            const int u = e[0], v = e[1]; // Extract nodes from edge
+            adj[u].push_back(v); // Add edge in both directions
+            adj[v].push_back(u);
+        }
+    }
+
+    // BFS function to traverse the graph and count nodes based on parity
+    static int bfs(bitset<100001>& mod2, const auto& adj) {
+        front = back = 0; // Reset queue indices
+        q[back++] = N; // Initialize queue with a placeholder
+        bool isEven = 1; // Start with even parity
+        int cnt = 0; // Count of nodes with even parity
+
+        // BFS loop
+        for (; front < back; isEven = !isEven) {
+            int qz = back - front; // Number of nodes at the current level
+            for (int a = 0; a < qz; a++) {
+                auto ip = q[front++]; // Get the current node
+                int i = ip >> 32; // Extract node index
+                int parent = ip & ULLONG_MAX; // Extract parent node
+                mod2[i] = isEven; // Mark the node with its parity
+                cnt += isEven; // Increment count if it's even
+                // Traverse adjacent nodes
+                for (int j : adj[i]) {
+                    if (j == parent) continue; // Skip the parent node
+                    q[back++] = ((uint64_t)j << 32ULL) + i; // Enqueue child with parent info
+                }
+            }
+        }
+        return cnt; // Return the count of even nodes
+    }
+
+    // Main function to determine max target nodes
+    static vector<int> maxTargetNodes(vector<vector<int>>& edges1, vector<vector<int>>& edges2) {
+        const int n = edges1.size() + 1; // Number of nodes in the first graph
+        const int m = edges2.size() + 1; // Number of nodes in the second graph
+
+        // Clear adjacency lists for reuse
+        for (int i = 0; i < n; i++) adj1[i].clear();
+        for (int j = 0; j < m; j++) adj2[j].clear();
+
+        bitset<100001> mod2 = 0; // Bitset for storing parity of nodes in the first graph
+        build_adj(edges1, adj1); // Build adjacency list for the first graph
+        build_adj(edges2, adj2); // Build adjacency list for the second graph
+
+        int y = bfs(mod2, adj2); // Perform BFS on the second graph
+        int x = bfs(mod2, adj1); // Perform BFS on the first graph
+
+        vector<int> ans(n); // Result vector for the answer
+        const int cnt2 = max(y, m - y); // Max count of nodes based on parity
+        int cnt[2] = {(n - x) + cnt2, x + cnt2}; // Possible counts based on BFS results
+
+        // Fill the answer vector based on the parity stored in mod2
+        for (int i = 0; i < n; i++) {
+            ans[i] = cnt[mod2[i]]; // Assign counts based on parity
+        }
+        return ans; // Return the final answer
+    }
+};
+
+// Initialization of input/output settings
+auto init = []() {
+    ios::sync_with_stdio(false); // Disable synchronization with C I/O
+    cin.tie(nullptr); // Untie cin from cout for faster input
+    cout.tie(nullptr); // Untie cout from cin
+    return 'c'; // Return a dummy value
+}();
