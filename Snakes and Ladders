@@ -1,0 +1,64 @@
+question: You are given an n x n integer matrix board where the cells are labeled from 1 to n2 in a Boustrophedon style starting from the bottom left of the board (i.e. board[n - 1][0]) and alternating direction each row.
+
+You start on square 1 of the board. In each move, starting from square curr, do the following:
+
+Choose a destination square next with a label in the range [curr + 1, min(curr + 6, n2)].
+This choice simulates the result of a standard 6-sided die roll: i.e., there are always at most 6 destinations, regardless of the size of the board.
+If next has a snake or ladder, you must move to the destination of that snake or ladder. Otherwise, you move to next.
+The game ends when you reach the square n2.
+A board square on row r and column c has a snake or ladder if board[r][c] != -1. The destination of that snake or ladder is board[r][c]. Squares 1 and n2 are not the starting points of any snake or ladder.
+
+Note that you only take a snake or ladder at most once per dice roll. If the destination to a snake or ladder is the start of another snake or ladder, you do not follow the subsequent snake or ladder.
+
+For example, suppose the board is [[-1,4],[-1,3]], and on the first move, your destination square is 2. You follow the ladder to square 3, but do not follow the subsequent ladder to 4.
+Return the least number of dice rolls required to reach the square n2. If it is not possible to reach the square, return -1.
+
+code:
+
+class Solution {
+public:
+    // Function to find the minimum number of rolls required to reach the end of the snakes and ladders board
+    int snakesAndLadders(vector<vector<int>>& board) {
+        // Get the size of the board (n x n)
+        int n = board.size();
+        // Initialize a vector to track the minimum rolls to reach each square; -1 means unvisited
+        vector<int> min_rolls(n * n + 1, -1);
+        // Queue for BFS traversal
+        queue<int> q;
+        // Start from square 1 (min_rolls[1] = 0 means 0 rolls to reach square 1)
+        min_rolls[1] = 0;
+        q.push(1); // Enqueue the starting position
+
+        // Perform BFS until there are no more squares to process
+        while (!q.empty()) {
+            int x = q.front(); // Get the current square
+            q.pop(); // Remove it from the queue
+            
+            // Try all possible rolls from 1 to 6
+            for (int i = 1; i <= 6 && x + i <= n * n; i++) {
+                int t = x + i; // The target square after rolling the die
+                // Calculate the row and column in the board corresponding to the target square
+                int row = (t - 1) / n;
+                int col = (t - 1) % n;
+                // Determine the value at the target square, accounting for the board's layout
+                int v = board[n - 1 - row][row % 2 ? n - 1 - col : col];
+                // If there's a ladder or snake, move to that square; otherwise, stay at t
+                int y = v > 0 ? v : t;
+
+                // If we reach the last square, return the number of rolls taken
+                if (y == n * n)
+                    return min_rolls[x] + 1;
+
+                // If this square hasn't been visited yet
+                if (min_rolls[y] == -1) {
+                    // Update the minimum rolls to reach this square
+                    min_rolls[y] = min_rolls[x] + 1;
+                    // Enqueue the new square to explore its neighbors later
+                    q.push(y);
+                }
+            }
+        }
+        // If we exit the loop without reaching the last square, return -1 (not reachable)
+        return -1;
+    }
+};
