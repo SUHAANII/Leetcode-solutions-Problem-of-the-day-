@@ -1,0 +1,43 @@
+question: You are given two positive integers n and limit.
+
+Return the total number of ways to distribute n candies among 3 children such that no child gets more than limit candies.
+
+ 
+
+code:
+
+class Solution {
+public:
+    // Function to calculate the number of ways to distribute candies
+    long long distributeCandies(int n, int limit) {
+        // Lambda function to calculate combinations C(x, 2) = x * (x - 1) / 2
+        auto C2 = [&](long long x) -> long long {
+            return (x >= 2) ? (x * (x - 1) / 2) : 0; // Return 0 if x < 2
+        };
+
+        long long N = n; // Total candies
+        long long L = limit; // Maximum limit for a single coordinate
+
+        // Total number of ways to distribute candies without constraints
+        // This is calculated using the formula C(n + 2, 2) = (n + 2) * (n + 1) / 2
+        long long total = (N + 2) * (N + 1) / 2;
+
+        // Calculate the excess for the case where one coordinate exceeds the limit
+        long long x1 = N - L + 1; // Excess when one coordinate is greater than the limit
+        long long t1 = C2(x1); // Count combinations for this case
+
+        // Calculate the excess for the case where two coordinates exceed the limit
+        long long x2 = N - 2 * L; // Excess when two coordinates are greater than the limit
+        long long t2 = C2(x2); // Count combinations for this case
+
+        // Calculate the excess for the case where three coordinates exceed the limit
+        long long x3 = N - 3 * L - 1; // Excess when three coordinates are greater than the limit
+        long long t3 = C2(x3); // Count combinations for this case
+
+        // Apply the principle of inclusion-exclusion to get the final count
+        // Start with total ways, subtract cases where coordinates exceed limit,
+        // add back cases where two exceed (to correct for double subtraction),
+        // and finally subtract cases where three exceed (to correct for over-counting).
+        return total - 3 * t1 + 3 * t2 - t3;
+    }
+};
