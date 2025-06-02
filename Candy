@@ -1,0 +1,42 @@
+question: There are n children standing in a line. Each child is assigned a rating value given in the integer array ratings.
+
+You are giving candies to these children subjected to the following requirements:
+
+Each child must have at least one candy.
+Children with a higher rating get more candies than their neighbors.
+Return the minimum number of candies you need to have to distribute the candies to the children.
+
+ 
+
+code:
+class Solution {
+public:
+    // Function to calculate the minimum number of candies to distribute
+    int candy(vector<int>& ratings, int cnt = 0) {
+        // Get the number of children (n)
+        int n = ratings.size();
+        // Initialize a vector to hold the number of candies for each child, starting with 1 candy each
+        vector<int> candies(n, 1);
+
+        // First pass: Traverse from left to right
+        for (int i = 1; i < n; i++) {
+            // If the current child's rating is greater than the previous child's rating
+            if (ratings[i] > ratings[i - 1])
+                // Give one more candy than the previous child
+                candies[i] = candies[i - 1] + 1;
+        }
+
+        // Second pass: Traverse from right to left
+        for (int i = n - 1; i > 0; i--) {
+            // If the previous child's rating is greater than the current child's rating
+            if (ratings[i - 1] > ratings[i])
+                // Ensure the previous child gets more candies than the current child
+                candies[i - 1] = max(candies[i] + 1, candies[i - 1]);
+            // Accumulate the total candies needed for the previous child
+            cnt += candies[i - 1];
+        }
+
+        // Return the total candies needed, including the last child's candies
+        return cnt + candies[n - 1];
+    }
+};
