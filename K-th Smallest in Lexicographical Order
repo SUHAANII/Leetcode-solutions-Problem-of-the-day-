@@ -1,0 +1,40 @@
+question: Given two integers n and k, return the kth lexicographically smallest integer in the range [1, n].
+
+code:
+
+class Solution {
+private:
+    // Helper function to count the number of integers in the range [a, b) that are <= n
+    int check(long a, long b, long n) {
+        int gap = 0; // Initialize the gap counter
+        // While 'a' is within the bounds of 'n'
+        while (a <= n) {
+            // Count the numbers between 'a' and 'b' that are within the limit of 'n'
+            gap += min(n + 1, b) - a; // Add the valid count to the gap
+            a *= 10; // Move to the next level in the tree (a * 10)
+            b *= 10; // Move the upper bound to the next level (b * 10)
+        }
+        return gap; // Return the total count of valid numbers
+    }
+
+public:
+    // Function to find the k-th smallest number in lexicographical order from 1 to n
+    int findKthNumber(long n, int k) {
+        long num = 1; // Start with the smallest number in lexicographical order
+        // Loop until we reach the k-th number
+        for (int i = 1; i < k;) {
+            // Count how many numbers are in the range [num, num + 1) that are <= n
+            int req = check(num, num + 1, n);
+            if (i + req <= k) {
+                // If the count of numbers is less than or equal to the required k
+                i += req; // Move the index forward by the count
+                num++; // Move to the next number
+            } else {
+                // If we need to go deeper in the tree
+                i++; // Increment the index for the current number
+                num *= 10; // Go down to the next level (current * 10)
+            }
+        }
+        return num; // Return the k-th smallest number
+    }
+};
