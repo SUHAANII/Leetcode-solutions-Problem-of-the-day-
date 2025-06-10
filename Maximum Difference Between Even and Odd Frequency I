@@ -1,0 +1,40 @@
+question: You are given a string s consisting of lowercase English letters.
+
+Your task is to find the maximum difference diff = freq(a1) - freq(a2) between the frequency of characters a1 and a2 in the string such that:
+
+a1 has an odd frequency in the string.
+a2 has an even frequency in the string.
+Return this maximum difference.
+
+code:
+
+class Solution {
+public:
+    // Function to count the number of distinct strings that can be formed
+    int countStrings(string &s) {
+        // Get the length of the string
+        int n = s.size(), ans = 0;
+        // Variable to check if there are duplicate characters
+        bool dup = false;
+        // Map to store the frequency of each character in the string
+        unordered_map<char, int> m;
+
+        // Count the frequency of each character in the string
+        for(char &i: s) {
+            m[i]++;
+        }
+
+        // Iterate through each character in the string
+        for(char &i: s) {
+            // If the character appears more than once, set dup to true
+            if(m[i] > 1) dup = true;
+            // Add to the answer the number of characters not equal to the current character
+            ans += n - m[i];
+        }
+
+        // Return the final count:
+        // (ans / 2) gives the count of distinct pairs of characters,
+        // and we add 1 if there were duplicates (to account for those cases)
+        return (ans / 2) + dup;
+    }
+};
