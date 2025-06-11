@@ -1,0 +1,80 @@
+question: You are given a string s and an integer k. Your task is to find the maximum difference between the frequency of two characters, freq[a] - freq[b], in a substring subs of s, such that:
+
+subs has a size of at least k.
+Character a has an odd frequency in subs.
+Character b has an even frequency in subs.
+Return the maximum difference.
+
+Note that subs can contain more than 2 distinct characters.
+
+code:
+
+class Solution 
+{
+public:
+    // Function to calculate the maximum difference based on the given conditions
+    int maxDifference(string s, int k) 
+    {
+        int n = s.size(); // Get the size of the input string
+        int ans = INT_MIN; // Initialize the answer to the smallest integer value
+
+        // Step 1: Try all (a, b) pairs where a and b are digits from 0 to 4
+        for (int a = 0; a <= 4; ++a) 
+        {
+            for (int b = 0; b <= 4; ++b) 
+            {
+                // Skip if both digits are the same
+                if (a == b)
+                {
+                    continue;
+                } 
+
+                // Vectors to store prefix counts for digits a and b
+                vector<int> s1(n + 1);
+                vector<int> s2(n + 1);
+                
+                // Step 2: Calculate prefix counts for digits a and b
+                for (int i = 1; i <= n; ++i) 
+                {
+                    // Count occurrences of digit 'a' and 'b' in the prefix
+                    s1[i] = s1[i - 1] + (s[i - 1] - '0' == a);
+                    s2[i] = s2[i - 1] + (s[i - 1] - '0' == b);
+                }
+
+                // Step 3: Matrix to store the best difference at each parity
+                int g[2][2] = {{INT_MIN, INT_MIN}, {INT_MIN, INT_MIN}};
+                int j = 0; // Pointer for the sliding window
+
+                // Step 4: Sliding window to find the maximum difference
+                for (int i = k; i <= n; ++i) 
+                {
+                    // While the window size is valid and both counts are increasing
+                    while (i - j >= k && s1[i] > s1[j] && s2[i] > s2[j]) 
+                    {
+                        // Get the parity of the counts
+                        int pa = s1[j] % 2; // Parity of count for digit a
+                        int pb = s2[j] % 2; // Parity of count for digit b
+                        
+                        // Update the best difference for the current parities
+                        g[pa][pb] = max(g[pa][pb], s2[j] - s1[j]);
+                        ++j; // Move the start of the window forward
+                    }
+
+                    // Step 5: Check if a valid previous state exists
+                    int pa = s1[i] % 2; // Parity of count for digit a at index i
+                    int pb = s2[i] % 2; // Parity of count for digit b at index i
+                    int need = g[1 - pa][pb]; // Get the required previous state for max difference
+                    
+                    // If a valid previous state exists, update the answer
+                    if (need != INT_MIN) 
+                    {
+                        ans = max(ans, (s1[i] - s2[i]) + need);
+                    }
+                }
+            }
+        }
+
+        // Return the result: -1 if no valid difference was found
+        return ans == INT_MIN ? -1 : ans;
+    }
+};
