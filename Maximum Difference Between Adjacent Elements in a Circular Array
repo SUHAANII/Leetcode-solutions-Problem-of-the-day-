@@ -1,0 +1,24 @@
+question: Given a circular array nums, find the maximum absolute difference between adjacent elements.
+
+Note: In a circular array, the first and last elements are adjacent.
+
+
+
+code:
+ class Solution {
+public:
+    int maxAdjacentDistance(vector<int>& nums) {
+        int maxi = 0; // Initialize a variable to keep track of the maximum distance
+        
+        // Loop through the array to find the maximum distance between adjacent elements
+        for (int i = 0; i < nums.size() - 1; i++) {
+            // Calculate the absolute difference between the current element and the next element
+            maxi = max(maxi, abs(nums[i + 1] - nums[i])); // Update maxi if the current difference is greater
+        }
+        
+        // Calculate the distance between the last and the first element
+        maxi = max(maxi, abs(nums[nums.size() - 1] - nums[0])); // Check the circular distance
+        
+        return maxi; // Return the maximum distance found
+    }
+};
