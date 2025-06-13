@@ -1,0 +1,49 @@
+question: You are given a 0-indexed integer array nums and an integer p. Find p pairs of indices of nums such that the maximum difference amongst all the pairs is minimized. Also, ensure no index appears more than once amongst the p pairs.
+
+Note that for a pair of elements at the index i and j, the difference of this pair is |nums[i] - nums[j]|, where |x| represents the absolute value of x.
+
+Return the minimum maximum difference among all p pairs. We define the maximum of an empty set to be zero
+
+code:
+
+class Solution {
+public:
+    // Function to minimize the maximum difference between pairs
+    int minimizeMax(vector<int>& nums, int p) {
+        // If no pairs need to be formed, return 0
+        if (p == 0) return 0;
+
+        // Sort the array to facilitate pair formation
+        sort(nums.begin(), nums.end());
+        
+        int n = nums.size(); // Get the size of the array
+        int left = 0; // Initialize left boundary for binary search
+        int right = nums[n - 1] - nums[0]; // Maximum possible difference
+
+        // Perform binary search to find the minimum possible maximum difference
+        while (left < right) {
+            // Calculate the mid-point of the current range
+            int mid = left + (right - left) / 2;
+            int pairs = 0; // Counter for the number of pairs formed
+            
+            // Iterate through the sorted array to count valid pairs
+            for (int i = 1; i < n; ++i) {
+                // Check if the current difference is within the allowed maximum (mid)
+                if (mid >= nums[i] - nums[i - 1]) {
+                    ++pairs; // Increment the count of pairs
+                    ++i; // Skip the next element as it's already paired
+                }
+            }
+            
+            // If the number of pairs formed is at least p, try to minimize further
+            if (pairs >= p) {
+                right = mid; // Move the right boundary down
+            } else {
+                left = mid + 1; // Increase the minimum allowed difference
+            }
+        }
+
+        // Return the minimum possible maximum difference found
+        return left;
+    }
+};
