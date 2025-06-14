@@ -1,0 +1,50 @@
+question: You are given an integer num. You know that Bob will sneakily remap one of the 10 possible digits (0 to 9) to another digit.
+
+Return the difference between the maximum and minimum values Bob can make by remapping exactly one digit in num.
+
+Notes:
+
+When Bob remaps a digit d1 to another digit d2, Bob replaces all occurrences of d1 in num with d2.
+Bob can remap a digit to itself, in which case num does not change.
+Bob can remap different digits for obtaining minimum and maximum values respectively.
+The resulting number after remapping can contain leading zeroes
+code:
+
+class Solution {
+public:
+    int minMaxDifference(int num) {
+        // Convert the integer to a string for easy manipulation
+        string str = to_string(num);
+        string ma = ""; // String to store the maximum number after replacement
+        string mi = ""; // String to store the minimum number after replacement
+        int n = str.size(); // Get the size of the number as a string
+        char ele = ' '; // Variable to hold the first non-9 digit
+
+        // Step 1: Find the first non-9 digit for max replacement
+        for (int i = 0; i < n; i++) {
+            if (str[i] != '9') {
+                ele = str[i]; // Store the first non-9 digit
+                break; // Exit the loop once found
+            }
+        }
+
+        // Step 2: Replace that digit with 9 for max
+        for (int i = 0; i < n; i++) {
+            if (ele == str[i]) 
+                ma += '9'; // Replace the first non-9 digit with 9
+            else 
+                ma += str[i]; // Keep other digits the same
+        }
+
+        // Step 3: Replace the first digit for min with 0
+        for (int i = 0; i < n; i++) {
+            if (str[0] == str[i]) 
+                mi += '0'; // Replace the first digit with 0
+            else 
+                mi += str[i]; // Keep other digits the same
+        }
+
+        // Step 4: Convert the modified strings back to integers and calculate the result
+        return stoi(ma) - stoi(mi); // Return the difference between max and min
+    }
+};
