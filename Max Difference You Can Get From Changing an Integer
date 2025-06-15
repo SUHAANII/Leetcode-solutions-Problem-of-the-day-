@@ -1,0 +1,56 @@
+question: You are given an integer num. You will apply the following steps to num two separate times:
+
+Pick a digit x (0 <= x <= 9).
+Pick another digit y (0 <= y <= 9). Note y can be equal to x.
+Replace all the occurrences of x in the decimal representation of num by y.
+Let a and b be the two results from applying the operation to num independently.
+
+Return the max difference between a and b.
+
+Note that neither a nor b may have any leading zeros, and must not be 0.
+
+
+
+code:
+
+class Solution {
+public:
+    // Function to calculate the maximum difference between modified numbers
+    int maxDiff(int num) {
+        // Convert the number to a string for easier manipulation of digits
+        string numStr = to_string(num);
+        
+        // Create a set of unique digits present in the number
+        set<char> uniqueDigits(numStr.begin(), numStr.end());
+        
+        // Initialize maxVal and minVal with the original number
+        int maxVal = num, minVal = num;
+
+        // Iterate over each unique digit in the original number
+        for (char digit : uniqueDigits) {
+            // Try replacing the current digit with every possible digit from '0' to '9'
+            for (char newDigit = '0'; newDigit <= '9'; ++newDigit) {
+                // Skip the replacement if it leads to an invalid number (leading zero)
+                if (numStr[0] == digit && newDigit == '0') continue;
+
+                // Create a copy of the original number string for modification
+                string newNumStr = numStr;
+
+                // Replace all occurrences of 'digit' with 'newDigit'
+                replace(newNumStr.begin(), newNumStr.end(), digit, newDigit);
+                
+                // Convert the modified string back to an integer
+                int newNum = stoi(newNumStr);
+                
+                // Update maxVal if the new number is greater than the current maxVal
+                maxVal = max(maxVal, newNum);
+                
+                // Update minVal if the new number is less than the current minVal
+                minVal = min(minVal, newNum);
+            }
+        }
+
+        // Return the difference between the maximum and minimum modified numbers
+        return maxVal - minVal;
+    }
+};
