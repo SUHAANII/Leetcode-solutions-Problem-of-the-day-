@@ -1,0 +1,35 @@
+question: Given a 0-indexed integer array nums of size n, find the maximum difference between nums[i] and nums[j] (i.e., nums[j] - nums[i]), such that 0 <= i < j < n and nums[i] < nums[j].
+
+Return the maximum difference. If no such i and j exists, return -1.
+
+code:
+
+class Solution {
+public:
+    int maximumDifference(vector<int>& nums) {
+        // Initialize xMin with the first element of the array
+        int xMin = nums[0];
+        // Get the size of the array
+        int n = nums.size();
+        // Initialize maxD to -1, which will hold the maximum difference found
+        int maxD = -1;
+
+        // Loop through the array starting from the second element
+        for (int i = 1; i < n; i++) {
+            // Current element
+            int x = nums[i];
+
+            // If the current element is less than or equal to the minimum seen so far
+            if (x <= xMin) {
+                // Update xMin to the current element
+                xMin = x;
+            } else {
+                // Calculate the difference between the current element and xMin
+                // Update maxD if this difference is greater than the current maxD
+                maxD = max(maxD, x - xMin);
+            }
+        }
+        // Return the maximum difference found, or -1 if no valid difference exists
+        return maxD;
+    }
+};
