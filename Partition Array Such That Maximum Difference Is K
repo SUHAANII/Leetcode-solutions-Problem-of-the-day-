@@ -1,0 +1,39 @@
+question: You are given an integer array nums and an integer k. You may partition nums into one or more subsequences such that each element in nums appears in exactly one of the subsequences.
+
+Return the minimum number of subsequences needed such that the difference between the maximum and minimum values in each subsequence is at most k.
+
+A subsequence is a sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements.
+
+ 
+
+code:
+
+class Solution {
+public:
+    // Function to partition the array into the minimum number of groups
+    // such that the difference between the maximum and minimum in each group is at most k
+    int partitionArray(std::vector<int>& nums, int k) {
+        // Sort the array in non-decreasing order
+        std::sort(nums.begin(), nums.end());
+        
+        // Initialize the number of partitions to 1 (at least one group exists)
+        int ans = 1;
+        
+        // Store the minimum value of the current partition (initially the first element)
+        int min_val = nums[0];
+        
+        // Loop through the sorted array starting from the second element
+        for (int i = 1; i < nums.size(); i++) {
+            // Check if the current element minus the minimum value exceeds k
+            if (nums[i] - min_val > k) {
+                // If it does, we need a new partition
+                ans++;
+                // Update min_val to the current element
+                min_val = nums[i];
+            }
+        }
+        
+        // Return the total number of partitions
+        return ans;
+    }
+};
