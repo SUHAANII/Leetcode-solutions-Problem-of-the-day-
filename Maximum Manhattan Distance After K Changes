@@ -1,0 +1,44 @@
+question: You are given a string s consisting of the characters 'N', 'S', 'E', and 'W', where s[i] indicates movements in an infinite grid:
+
+'N' : Move north by 1 unit.
+'S' : Move south by 1 unit.
+'E' : Move east by 1 unit.
+'W' : Move west by 1 unit.
+Initially, you are at the origin (0, 0). You can change at most k characters to any of the four directions.
+
+Find the maximum Manhattan distance from the origin that can be achieved at any time while performing the movements in order.
+
+The Manhattan Distance between two cells (xi, yi) and (xj, yj) is |xi - xj| + |yi - yj|.
+
+code:
+
+class Solution {
+public:
+    // Function to calculate the maximum distance after making k moves
+    int maxDistance(string s, int k) {
+        int ans = 0; // Variable to store the maximum distance found
+        int north = 0, south = 0, east = 0, west = 0; // Counters for each direction
+
+        // Iterate through each character in the string
+        for (int i = 0; i < s.size(); i++) {
+            char c = s[i]; // Current direction character
+            // Update the respective direction counters based on the character
+            if (c == 'N') north++;   // Increment north counter
+            else if (c == 'S') south++; // Increment south counter
+            else if (c == 'E') east++;  // Increment east counter
+            else if (c == 'W') west++;   // Increment west counter
+            
+            // Calculate the Manhattan distance in the north-south and east-west directions
+            int x = abs(north - south); // Distance in the north-south direction
+            int y = abs(east - west);    // Distance in the east-west direction
+            int MD = x + y;              // Total Manhattan distance without moves
+            
+            // Calculate the maximum possible distance considering k additional moves
+            int dis = MD + min(2 * k, i + 1 - MD);
+            // Update the maximum distance if the current distance is greater
+            ans = max(ans, dis);
+        }
+        
+        return ans; // Return the maximum distance found
+    }
+};
