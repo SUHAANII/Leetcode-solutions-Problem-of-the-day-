@@ -1,0 +1,73 @@
+question: You are given a string word and an integer k.
+
+We consider word to be k-special if |freq(word[i]) - freq(word[j])| <= k for all indices i and j in the string.
+
+Here, freq(x) denotes the frequency of the character x in word, and |y| denotes the absolute value of y.
+
+Return the minimum number of characters you need to delete to make word k-special.
+
+ 
+
+code:
+
+#include <iostream>
+#include <array>
+#include <vector>
+#include <algorithm>
+#include <climits>
+using namespace std;
+
+class Solution {
+public:
+    // Function to calculate the minimum deletions required to make the frequency of characters 
+    // in the string 'word' not exceed 'k' for any character
+    int minimumDeletions(const string& word, int k) {
+        // Array to store the frequency of each character (26 lowercase letters)
+        array<int, 26> freq{};
+        
+        // Count the frequency of each character in the input word
+        for (unsigned char c : word)
+            ++freq[c - 'a']; // Increment the frequency for the character
+
+        // Vector to hold the frequencies of characters that appear in the word
+        vector<int> freqList;
+        freqList.reserve(26); // Reserve space for 26 characters
+        for (int f : freq)
+            if (f > 0) // Only include characters that appear in the word
+                freqList.push_back(f);
+
+        // Sort the frequency list in ascending order
+        sort(begin(freqList), end(freqList));
+
+        int n = freqList.size(); // Number of unique characters in the word
+        int total = word.size(); // Total number of characters in the word
+        int removedLeft = 0; // Counter for characters removed from the left side
+        int inWindowSum = 0; // Sum of frequencies within the current window
+        int best = INT_MAX; // Initialize the best result to a large value
+        int r = 0; // Right pointer for the sliding window
+
+        // Iterate over each character's frequency from the left
+        for (int l = 0; l < n; ++l) {
+            int base = freqList[l]; // The frequency of the current character
+            int limit = base + k; // The upper limit for frequencies that can be kept
+
+            // Expand the right pointer to include all frequencies that are within the limit
+            while (r < n && freqList[r] <= limit)
+                inWindowSum += freqList[r++]; // Add to the in-window sum and move right pointer
+
+            int rightCount = n - r; // Count of characters that are outside the current window
+            int rightSum = total - inWindowSum; // Sum of frequencies outside the window
+            int delRight = rightSum - rightCount * limit; // Calculate deletions needed for the right side
+
+            // Update the best result found so far
+            best = min(best, removedLeft + delRight);
+
+            // Prepare for the next iteration by updating totals
+            total -= freqList[l]; // Remove the current character's frequency from total
+            removedLeft += freqList[l]; // Increment the removed count
+            inWindowSum -= freqList[l]; // Remove the current character's frequency from the in-window sum
+        }
+
+        return best; // Return the minimum deletions required
+    }
+};
