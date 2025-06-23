@@ -1,0 +1,67 @@
+question: A k-mirror number is a positive integer without leading zeros that reads the same both forward and backward in base-10 as well as in base-k.
+
+For example, 9 is a 2-mirror number. The representation of 9 in base-10 and base-2 are 9 and 1001 respectively, which read the same both forward and backward.
+On the contrary, 4 is not a 2-mirror number. The representation of 4 in base-2 is 100, which does not read the same both forward and backward.
+Given the base k and the number n, return the sum of the n smallest k-mirror numbers.
+
+code:
+
+class Solution {
+public:
+    // Function to create a palindrome from a number
+    long long createPalindrome(long long num, bool odd) {
+        long long x = num; // Store the original number
+        if (odd) x /= 10; // If it's an odd-length palindrome, remove the last digit
+        
+        // Append the reverse of the number to itself
+        while (x > 0) {
+            num = num * 10 + x % 10; // Add the last digit of x to num
+            x /= 10; // Remove the last digit from x
+        }
+        return num; // Return the complete palindrome
+    }
+
+    // Function to check if a number is a palindrome in a given base
+    bool isPalindrome(long long num, int base) {
+        vector<int> digits; // Vector to store the digits of the number in the given base
+        
+        // Convert the number to the specified base and store its digits
+        while (num > 0) {
+            digits.push_back(num % base); // Store the last digit in the base
+            num /= base; // Remove the last digit
+        }
+        
+        // Check if the digits form a palindrome
+        int i = 0, j = digits.size() - 1; // Initialize two pointers
+        while (i < j) {
+            if (digits[i++] != digits[j--]) return false; // If digits don't match, it's not a palindrome
+        }
+        return true; // It is a palindrome
+    }
+
+    // Function to find the sum of the first n k-mirror numbers
+    long long kMirror(int k, int n) {
+        long long sum = 0; // Variable to store the sum of k-mirror numbers
+        
+        // Iterate over possible lengths of numbers
+        for (long long len = 1; n > 0; len *= 10) {
+            // Generate odd-length palindromes
+            for (long long i = len; n > 0 && i < len * 10; i++) {
+                long long p = createPalindrome(i, true); // Create an odd-length palindrome
+                if (isPalindrome(p, k)) { // Check if it's a k-mirror number
+                    sum += p; // Add to the sum
+                    n--; // Decrease the count of k-mirror numbers needed
+                }
+            }
+            // Generate even-length palindromes
+            for (long long i = len; n > 0 && i < len * 10; i++) {
+                long long p = createPalindrome(i, false); // Create an even-length palindrome
+                if (isPalindrome(p, k)) { // Check if it's a k-mirror number
+                    sum += p; // Add to the sum
+                    n--; // Decrease the count of k-mirror numbers needed
+                }
+            }
+        }
+        return sum; // Return the total sum of k-mirror numbers
+    }
+};
