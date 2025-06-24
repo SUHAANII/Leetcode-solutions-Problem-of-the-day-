@@ -1,0 +1,35 @@
+question: You are given a 0-indexed integer array nums and two integers key and k. A k-distant index is an index i of nums for which there exists at least one index j such that |i - j| <= k and nums[j] == key.
+
+Return a list of all k-distant indices sorted in increasing order.
+
+ 
+
+code;
+
+class Solution {
+public:
+    // Function to find all indices in the array that are within k distance from any occurrence of key
+    vector<int> findKDistantIndices(vector<int>& nums, int key, int k) {
+        vector<int> res;  // Vector to store the result indices
+        int r = 0;        // Unjudged minimum index for the current range
+        int n = nums.size(); // Get the size of the input array
+        
+        // Iterate through each index in the nums array
+        for (int j = 0; j < n; ++j) {
+            // Check if the current element is equal to the key
+            if (nums[j] == key) {
+                // Calculate the left boundary of the range
+                int l = max(r, j - k); // Ensure we do not go below 0
+                // Update the right boundary of the range
+                r = min(n - 1, j + k) + 1; // Ensure we do not go beyond the last index
+                
+                // Add all indices from l to r-1 (inclusive) to the result
+                for (int i = l; i < r; ++i) {
+                    res.push_back(i); // Store the index
+                }
+            }
+        }
+        
+        return res; // Return the final list of indices
+    }
+};
