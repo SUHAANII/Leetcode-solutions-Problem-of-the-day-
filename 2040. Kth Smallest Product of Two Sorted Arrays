@@ -1,0 +1,66 @@
+question: Given two sorted 0-indexed integer arrays nums1 and nums2 as well as an integer k, return the kth (1-based) smallest product of nums1[i] * nums2[j] where 0 <= i < nums1.length and 0 <= j < nums2.length.
+
+code:
+
+class Solution {
+public:
+    // Function to find the k-th smallest product of pairs from nums1 and nums2
+    long long kthSmallestProduct(vector<int>& nums1, vector<int>& nums2, long long k) {
+        // Define the search space for the product values
+        long long left = -1e10; // Lower bound for the product
+        long long right = 1e10; // Upper bound for the product
+
+        // Binary search for the k-th smallest product
+        while (left < right) {
+            long long mid = left + (right - left) / 2; // Midpoint of the current range
+            
+            // Count the number of products less than or equal to mid
+            if (countProducts(nums1, nums2, mid) < k) {
+                left = mid + 1; // Move to the right half if count is less than k
+            } else {
+                right = mid; // Otherwise, move to the left half
+            }
+        }
+        return left; // The left pointer will be at the k-th smallest product
+    }
+
+    // Helper function to count how many products are less than or equal to the target
+    long long countProducts(vector<int>& nums1, vector<int>& nums2, long long target) {
+        long long count = 0; // Initialize count of products
+
+        // Iterate through each number in nums1
+        for (int num1 : nums1) {
+            // Special case for zero; if num1 is zero, all products will be zero
+            if (num1 == 0) {
+                if (target >= 0) count += nums2.size(); // All products are valid if target >= 0
+                continue; // Skip to the next number in nums1
+            }
+
+            // Binary search to find how many products are <= target
+            int low = 0, high = nums2.size();
+            while (low < high) {
+                int mid = (low + high) / 2; // Midpoint for binary search
+                long long prod = 1LL * num1 * nums2[mid]; // Calculate product
+                
+                // Decide which half to search based on the product comparison
+                if (prod <= target) {
+                    if (num1 > 0) {
+                        low = mid + 1; // Move right if num1 is positive
+                    } else {
+                        high = mid; // Move left if num1 is negative
+                    }
+                } else {
+                    if (num1 > 0) {
+                        high = mid; // Move left if num1 is positive
+                    } else {
+                        low = mid + 1; // Move right if num1 is negative
+                    }
+                }
+            }
+
+            // Count valid products based on the sign of num1
+            count += (num1 > 0) ? low : (nums2.size() - low);
+        }
+        return count; // Return the total count of products <= target
+    }
+};
