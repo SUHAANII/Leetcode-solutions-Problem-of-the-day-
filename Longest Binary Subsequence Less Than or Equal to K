@@ -1,0 +1,42 @@
+question: You are given a binary string s and a positive integer k.
+
+Return the length of the longest subsequence of s that makes up a binary number less than or equal to k.
+
+Note:
+
+The subsequence can contain leading zeroes.
+The empty string is considered to be equal to 0.
+A subsequence is a string that can be derived from another string by deleting some or no characters without changing the order of the remaining characters.
+
+code:
+
+class Solution {
+public:
+    // Function to find the longest subsequence of binary string s whose value is less than or equal to k
+    int longestSubsequence(string s, int k) {
+        int power = 0; // Variable to keep track of the power of 2 (bit position)
+        int count = 0; // Variable to count the number of valid subsequence elements
+        int n = s.size(); // Get the length of the input string
+        long long val = 0; // Variable to store the computed value of the subsequence
+
+        // Iterate through the string from the last character to the first
+        for(int i = n - 1; i >= 0; i--) {
+            // If the current character is '0', it can always be included in the subsequence
+            if(s[i] == '0') {
+                count++; // Increment the count of valid subsequence elements
+            } else {
+                // If the current character is '1', we need to compute its contribution
+                if(power < 32) { // Ensure we don't exceed the limits of a 32-bit integer
+                    // Add the value of 2 raised to the current power to val
+                    val += (1LL << power); // 1LL is used to ensure we use long long for large values
+                    // Check if the computed value is still less than or equal to k
+                    if(val <= k) {
+                        count++; // If valid, include this '1' in the count
+                    }
+                }
+            }
+            power++; // Move to the next bit position (power of 2)
+        }
+        return count; // Return the total count of valid subsequence elements
+    }
+};
