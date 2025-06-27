@@ -1,0 +1,57 @@
+question: You are given a string s of length n, and an integer k. You are tasked to find the longest subsequence repeated k times in string s.
+
+A subsequence is a string that can be derived from another string by deleting some or no characters without changing the order of the remaining characters.
+
+A subsequence seq is repeated k times in the string s if seq * k is a subsequence of s, where seq * k represents a string constructed by concatenating seq k times.
+
+For example, "bba" is repeated 2 times in the string "bababcba", because the string "bbabba", constructed by concatenating "bba" 2 times, is a subsequence of the string "bababcba".
+Return the longest subsequence repeated k times in string s. If multiple such subsequences are found, return the lexicographically largest one. If there is no such subsequence, return an empty string.
+
+code:
+
+class Solution {
+public:
+    // Function to find the longest subsequence that appears at least 'k' times in string 's'
+    string longestSubsequenceRepeatedK(string s, int k) {
+        string result = ""; // Variable to store the longest valid subsequence
+        queue<string> q;   // Queue to hold potential subsequences for exploration
+        q.push("");        // Start with an empty subsequence
+
+        // Explore all possible subsequences using a breadth-first search approach
+        while (!q.empty()) {
+            string curr = q.front(); // Get the current subsequence from the queue
+            q.pop();                 // Remove it from the queue
+
+            // Iterate through all lowercase letters from 'a' to 'z'
+            for (char ch = 'a'; ch <= 'z'; ++ch) {
+                string next = curr + ch; // Create a new subsequence by adding the current character
+
+                // Check if the new subsequence appears at least 'k' times in the original string
+                if (isK(next, s, k)) {
+                    result = next; // Update the result with the current valid subsequence
+                    q.push(next);  // Add the new subsequence to the queue for further exploration
+                }
+            }
+        }
+        return result; // Return the longest valid subsequence found
+    }
+
+    // Helper function to check if the subsequence 'sub' appears at least 'k' times in string 't'
+    bool isK(string sub, string t, int k) {
+        int count = 0; // Counter for occurrences of the subsequence
+        int i = 0;     // Index for tracking position in the subsequence
+
+        // Iterate through each character in the string 't'
+        for (char ch : t) {
+            // If the current character matches the current character in the subsequence
+            if (ch == sub[i]) {
+                // Move to the next character in the subsequence
+                if (++i == sub.size()) {
+                    i = 0; // Reset index to start checking from the beginning of 'sub'
+                    if (++count == k) return true; // If we found 'k' occurrences, return true
+                }
+            }
+        }
+        return false; // If we finish checking 't' without finding 'k' occurrences, return false
+    }
+};
