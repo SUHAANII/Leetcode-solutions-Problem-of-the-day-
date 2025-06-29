@@ -1,0 +1,49 @@
+question: You are given an array of integers nums and an integer target.
+
+Return the number of non-empty subsequences of nums such that the sum of the minimum and maximum element on it is less or equal to target. Since the answer may be too large, return it modulo 109 + 7.
+
+ 
+
+code:
+
+
+class Solution {
+public:
+    // Function to count the number of non-empty subsequences of nums
+    // such that the sum of the minimum and maximum elements in each subsequence
+    // is less than or equal to target.
+    int numSubseq(vector<int>& nums, int target) {
+        int mod = 1e9 + 7; // Define a large prime number for modulo operations.
+        int n = nums.size(); // Get the size of the input array.
+        
+        // Sort the array to facilitate two-pointer technique.
+        sort(nums.begin(), nums.end());
+
+        // Precompute powers of 2 up to n-1 (number of subsequences).
+        vector<int> power(n, 1);
+        for (int i = 1; i < n; ++i) {
+            power[i] = (power[i - 1] * 2) % mod; // power[i] = 2^i % mod
+        }
+
+        int left = 0; // Left pointer starts at the beginning of the array.
+        int right = n - 1; // Right pointer starts at the end of the array.
+        int result = 0; // Variable to store the total count of valid subsequences.
+
+        // Use two-pointer technique to find valid subsequences.
+        while (left <= right) {
+            // Check if the sum of the smallest and largest elements is within the target.
+            if (nums[left] + nums[right] <= target) {
+                // If valid, count all subsequences that can be formed with nums[left] and nums[right].
+                // The number of such subsequences is 2^(right - left), as we can choose to include or exclude
+                // each of the elements between left and right.
+                result = (result + power[right - left]) % mod;
+                ++left; // Move left pointer to the right to explore new pairs.
+            } else {
+                --right; // Move right pointer to the left to reduce the sum.
+            }
+        }
+        
+        return result; // Return the total count of valid subsequences.
+    }
+};
+
