@@ -1,0 +1,34 @@
+question: We define a harmonious array as an array where the difference between its maximum value and its minimum value is exactly 1.
+
+Given an integer array nums, return the length of its longest harmonious subsequence among all its possible subsequences.
+
+code:
+
+class Solution {
+public:
+    // Function to find the length of the longest harmonious subsequence
+    int findLHS(vector<int>& nums) {
+        unordered_map<int, int> hash; // Create a hash map to store the frequency of each number
+        int longest = 0; // Variable to track the length of the longest harmonious subsequence
+
+        // Count the frequency of each number in the input array
+        for (int num : nums) {
+            hash[num]++;
+        }
+
+        // Iterate through each unique number in the hash map
+        for (auto& pair : hash) {
+            int key = pair.first; // Get the current number (key)
+
+            // Check if the next consecutive number (key + 1) exists in the hash map
+            if (hash.count(key + 1)) {
+                // Calculate the length of the harmonious subsequence
+                // which consists of the current number and the next consecutive number
+                longest = max(longest, hash[key] + hash[key + 1]);
+            }
+        }
+
+        // Return the length of the longest harmonious subsequence found
+        return longest;
+    }
+};
