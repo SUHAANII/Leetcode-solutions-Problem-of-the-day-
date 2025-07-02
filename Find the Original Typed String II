@@ -1,0 +1,72 @@
+question: Alice is attempting to type a specific string on her computer. However, she tends to be clumsy and may press a key for too long, resulting in a character being typed multiple times.
+
+You are given a string word, which represents the final output displayed on Alice's screen. You are also given a positive integer k.
+
+Return the total number of possible original strings that Alice might have intended to type, if she was trying to type a string of size at least k.
+
+Since the answer may be very large, return it modulo 109 + 7.
+
+ 
+
+
+
+code:
+
+class Solution {
+    static const int MOD = 1e9 + 7; // Define a constant for modulo operations
+
+public:
+    int possibleStringCount(std::string word, int k) {
+        // If the input string is empty, return 0
+        if (word.empty()) return 0;
+
+        std::vector<int> groups; // Vector to store the counts of consecutive characters
+        int count = 1; // Initialize a count for the current group of characters
+        
+        // Iterate through the string to count consecutive characters
+        for (size_t i = 1; i < word.size(); ++i) {
+            if (word[i] == word[i - 1]) {
+                count++; // Increment count if the current character is the same as the previous one
+            } else {
+                groups.push_back(count); // Store the count of the previous group
+                count = 1; // Reset count for the new character
+            }
+        }
+        groups.push_back(count); // Add the last group count
+
+        long long total = 1; // Variable to store the total number of possible strings
+        // Calculate the product of the sizes of each group
+        for (int num : groups) {
+            total = (total * num) % MOD; // Multiply and take modulo
+        }
+
+        // If k is less than or equal to the number of groups, return total
+        if (k <= (int)groups.size()) return total;
+
+        std::vector<int> dp(k, 0); // DP array to store counts of valid combinations
+        dp[0] = 1; // Base case: one way to select 0 groups
+
+        // Iterate through each group to update the DP array
+        for (int num : groups) {
+            std::vector<int> newDp(k, 0); // New DP array for the current group
+            long long sum = 0; // Variable to store cumulative sums for valid selections
+            
+            // Update the DP array based on the current group
+            for (int s = 0; s < k; ++s) {
+                if (s > 0) sum = (sum + dp[s - 1]) % MOD; // Add the previous count to the sum
+                if (s > num) sum = (sum - dp[s - num - 1] + MOD) % MOD; // Exclude invalid selections
+                newDp[s] = sum; // Store the valid combinations for this selection
+            }
+            dp = newDp; // Move to the next group
+        }
+
+        long long invalid = 0; // Variable to track invalid combinations
+        // Calculate the total number of invalid combinations
+        for (int s = groups.size(); s < k; ++s) {
+            invalid = (invalid + dp[s]) % MOD; // Sum invalid counts
+        }
+
+        // Return the total valid combinations minus the invalid ones
+        return (total - invalid + MOD) % MOD;
+    }
+};
