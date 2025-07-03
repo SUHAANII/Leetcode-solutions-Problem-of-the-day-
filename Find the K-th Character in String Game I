@@ -1,0 +1,45 @@
+question: Alice and Bob are playing a game. Initially, Alice has a string word = "a".
+
+You are given a positive integer k.
+
+Now Bob will ask Alice to perform the following operation forever:
+
+Generate a new string by changing each character in word to its next character in the English alphabet, and append it to the original word.
+For example, performing the operation on "c" generates "cd" and performing the operation on "zb" generates "zbac".
+
+Return the value of the kth character in word, after enough operations have been done for word to have at least k characters.
+
+Note that the character 'z' can be changed to 'a' in the operation.
+
+
+
+code;
+
+ static char kthCharacter(int k) {
+        // Base case: if k is 1, return 'a'
+        if (k == 1) return 'a';
+
+        int shift = 0;
+
+        // Calculate the bit ceiling to find the range of k
+        for (int b = bit_ceil((unsigned)k); b > 1; b >>= 1) {
+            // If k is in the second half of the current range
+            if (k > b / 2) {
+                k -= b / 2; // Adjust k to reflect its position in the first half
+                shift++; // Increment the shift counter
+            }
+        }
+
+        // Return the character shifted by how many times it moved into the second half
+        return 'a' + (shift % 26);
+    }
+
+private:
+    // Function to calculate the next power of 2 greater than or equal to k
+    static int bit_ceil(unsigned k) {
+        if (k == 0) return 1; // If k is 0, the next power of 2 is 1
+        int power = 1;
+        while (power < k) {
+            power <<= 1; // Double the power of 2
+        }
+        return power; 
