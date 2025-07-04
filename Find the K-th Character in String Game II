@@ -1,0 +1,57 @@
+question: Alice and Bob are playing a game. Initially, Alice has a string word = "a".
+
+You are given a positive integer k. You are also given an integer array operations, where operations[i] represents the type of the ith operation.
+
+Now Bob will ask Alice to perform all operations in sequence:
+
+If operations[i] == 0, append a copy of word to itself.
+If operations[i] == 1, generate a new string by changing each character in word to its next character in the English alphabet, and append it to the original word. For example, performing the operation on "c" generates "cd" and performing the operation on "zb" generates "zbac".
+Return the value of the kth character in word after performing all the operations.
+
+Note that the character 'z' can be changed to 'a' in the second type of operation.
+
+code:
+
+class Solution {
+public:
+    // Function to find the k-th character after performing the given operations
+    char kthCharacter(long long k, vector<int>& operations) {
+        // Initialize a variable to track the number of shifts (for character changes)
+        int shift = 0;
+        
+        // Vector to store the lengths of the sequences generated at each operation
+        vector<long long> lengths;
+        
+        // Initial length of the sequence (starting with 'a')
+        long long len = 1;
+
+        // Loop through each operation to calculate the lengths of sequences
+        for (int op : operations) {
+            // Each operation doubles the length of the sequence
+            len *= 2;
+            lengths.push_back(len);
+            // If the current length exceeds or equals k, we can stop processing further
+            if (len >= k) break;
+        }
+
+        // Traverse the lengths in reverse to find the k-th character
+        for (int i = lengths.size() - 1; i >= 0; --i) {
+            // Calculate the half length of the current sequence
+            long long half = lengths[i] / 2;
+            int op = operations[i]; // Get the current operation
+            
+            // If k is in the second half of the sequence
+            if (k > half) {
+                // Adjust k to reflect its position in the first half
+                k -= half;
+                // If the operation is a shift (1), increment the shift counter
+                if (op == 1) shift++;
+            }
+            // If k is in the first half, we do not need to adjust it
+        }
+
+        // Calculate the final character based on the number of shifts
+        // Use modulo 26 to ensure it wraps around the alphabet
+        return (char)((('a' - 'a' + shift) % 26) + 'a');
+    }
+};
