@@ -1,0 +1,33 @@
+question:Given an array of integers arr, a lucky integer is an integer that has a frequency in the array equal to its value.
+
+Return the largest lucky integer in the array. If there is no lucky integer return -1.
+
+code:
+
+class Solution {
+public:
+    // Function to find the lucky integer in the array
+    int findLucky(vector<int>& arr) {
+        // Create a hash map to store the frequency of each number
+        unordered_map<int, int> freq;
+
+        // Iterate through the array to populate the frequency map
+        for (int num : arr) {
+            freq[num]++; // Increment the count for each number
+        }
+
+        int lucky = -1; // Initialize lucky number to -1 (default if no lucky number found)
+
+        // Iterate through the frequency map to find the lucky number
+        for (auto& [key, value] : freq) {
+            // Check if the number (key) is equal to its frequency (value)
+            if (key == value) {
+                // Update lucky to the maximum lucky number found so far
+                lucky = max(lucky, key);
+            }
+        }
+
+        // Return the largest lucky number found, or -1 if none exists
+        return lucky;
+    }
+};
