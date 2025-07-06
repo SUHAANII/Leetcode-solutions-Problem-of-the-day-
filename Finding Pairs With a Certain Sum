@@ -1,0 +1,50 @@
+question: You are given two integer arrays nums1 and nums2. You are tasked to implement a data structure that supports queries of two types:
+
+Add a positive integer to an element of a given index in the array nums2.
+Count the number of pairs (i, j) such that nums1[i] + nums2[j] equals a given value (0 <= i < nums1.length and 0 <= j < nums2.length).
+Implement the FindSumPairs class:
+
+FindSumPairs(int[] nums1, int[] nums2) Initializes the FindSumPairs object with two integer arrays nums1 and nums2.
+void add(int index, int val) Adds val to nums2[index], i.e., apply nums2[index] += val.
+int count(int tot) Returns the number of pairs (i, j) such that nums1[i] + nums2[j] == tot.
+ 
+
+code:
+
+class FindSumPairs {
+private:
+    vector<int> n1, n2; // Two vectors to hold the input arrays
+    unordered_map<int, int> m; // Hash map to store the frequency of elements in n2
+
+public:
+    // Constructor to initialize the class with two arrays
+    FindSumPairs(vector<int>& nums1, vector<int>& nums2) {
+        n1 = nums1; // Store the first array
+        n2 = nums2; // Store the second array
+        // Populate the hash map with the frequency of each element in n2
+        for (int x : n2) {
+            m[x]++;
+        }
+    }
+
+    // Method to add a value v to the element at index i in n2
+    void add(int i, int v) {
+        // Decrease the count of the old value in the map
+        m[n2[i]]--;
+        // Update n2 at index i by adding v
+        n2[i] += v;
+        // Increase the count of the new value in the map
+        m[n2[i]]++;
+    }
+
+    // Method to count the number of pairs (x, y) such that x + y = t
+    int count(int t) {
+        int c = 0; // Initialize the count of pairs
+        // Iterate through each element in n1
+        for (int x : n1) {
+            // Check how many times (t - x) appears in n2 using the hash map
+            c += m[t - x];
+        }
+        return c; // Return the total count of pairs
+    }
+};
