@@ -1,0 +1,66 @@
+question; You are given an array of events where events[i] = [startDayi, endDayi]. Every event i starts at startDayi and ends at endDayi.
+
+You can attend an event i at any day d where startTimei <= d <= endTimei. You can only attend one event at any time d.
+
+Return the maximum number of events you can attend.
+
+
+code:
+
+class Solution 
+{
+public:
+    // Function to calculate the maximum number of events that can be attended
+    int maxEvents(vector<vector<int>>& events) 
+    {
+        // Step 1: Sort events by start day
+        sort(events.begin(), events.end());
+
+        // Step 2: Min-heap for end days
+        priority_queue<int, vector<int>, greater<int>> minHeap; 
+        
+        int i = 0; // Index to track events
+        int count = 0; // Counter for attended events
+        int n = events.size(); // Total number of events
+
+        // Step 3: Find the last day to simulate
+        int lastDay = 0;
+        for (const auto& e : events) 
+        {
+            lastDay = max(lastDay, e[1]); // Determine the maximum end day from all events
+        }
+
+        // Step 4: Simulate each day from day 1 to lastDay
+        for (int day = 1; day <= lastDay; day++) 
+        {
+            // Step 4.1: Add all events starting today to the min-heap
+            while (i < n && events[i][0] == day) 
+            {
+                minHeap.push(events[i][1]); // Push the end day of the event onto the heap
+                i++; // Move to the next event
+            }
+
+            // Step 4.2: Remove expired events from the min-heap
+            while (!minHeap.empty() && minHeap.top() < day) 
+            {
+                minHeap.pop(); // Remove events that have already ended
+            }
+
+            // Step 4.3: Attend one event with the earliest end day
+            if (!minHeap.empty()) 
+            {
+                minHeap.pop(); // Attend the event that ends the earliest
+                count++; // Increment the count of attended events
+            }
+
+            // Step 5: Early stop if all events have been processed and no events are left in the heap
+            if (i == n && minHeap.empty())
+            {
+                break; // Exit the loop early if there are no more events to process
+            }
+        }
+
+        // Step 6: Return the total number of events attended
+        return count;
+    }
+};
