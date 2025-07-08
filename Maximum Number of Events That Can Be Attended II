@@ -1,0 +1,65 @@
+question: You are given an array of events where events[i] = [startDayi, endDayi, valuei]. The ith event starts at startDayi and ends at endDayi, and if you attend this event, you will receive a value of valuei. You are also given an integer k which represents the maximum number of events you can attend.
+
+You can only attend one event at a time. If you choose to attend an event, you must attend the entire event. Note that the end day is inclusive: that is, you cannot attend two events where one of them starts and the other ends on the same day.
+
+Return the maximum sum of values that you can receive by attending events.
+
+ 
+
+code:
+class Solution {
+public:
+    int maxValue(vector<vector<int>>& events, int k) {
+        // Sort events based on their end time (second element of each event)
+        sort(events.begin(), events.end(), [](const vector<int>& a, const vector<int>& b) {
+            return a[1] < b[1];
+        });
+
+        // Get the number of events
+        int n = events.size();
+        
+        // Create a DP table where dp[i][j] represents the maximum value
+        // obtainable by considering the first i events and attending at most j events
+        vector<vector<int>> dp(n + 1, vector<int>(k + 1, 0));
+
+        // Iterate through each event
+        for (int i = 1; i <= n; ++i) {
+            // Find the last event that ends before the current event starts
+            int prev = binarySearch(events, events[i - 1][0]);
+
+            // Iterate through the number of events we can attend (1 to k)
+            for (int j = 1; j <= k; ++j) {
+                // Calculate the maximum value by either skipping the current event
+                // or attending it and adding its value to the best value from previous events
+                dp[i][j] = max(dp[i - 1][j], dp[prev + 1][j - 1] + events[i - 1][2]);
+            }
+        }
+
+        // The answer is the maximum value obtainable by attending at most k events
+        return dp[n][k];
+    }
+
+private:
+    // Helper function to perform binary search
+    int binarySearch(vector<vector<int>>& events, int currentStart) {
+        int left = 0, right = events.size() - 1;
+        int result = -1; // Initialize result to -1 (no valid previous event found)
+
+        // Perform binary search to find the last event that ends before currentStart
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            // If the end time of the mid event is less than currentStart,
+            // it means we can consider this event
+            if (events[mid][1] < currentStart) {
+                result = mid; // Update result to mid
+                left = mid + 1; // Move to the right half
+            } else {
+                right = mid - 1; // Move to the left half
+            }
+        }
+
+        return result; // Return the index of the last non-overlapping event
+    }
+};
+
+
