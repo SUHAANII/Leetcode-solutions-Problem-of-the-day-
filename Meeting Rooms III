@@ -1,0 +1,80 @@
+question: You are given an integer n. There are n rooms numbered from 0 to n - 1.
+
+You are given a 2D integer array meetings where meetings[i] = [starti, endi] means that a meeting will be held during the half-closed time interval [starti, endi). All the values of starti are unique.
+
+Meetings are allocated to rooms in the following manner:
+
+Each meeting will take place in the unused room with the lowest number.
+If there are no available rooms, the meeting will be delayed until a room becomes free. The delayed meeting should have the same duration as the original meeting.
+When a room becomes unused, meetings that have an earlier original start time should be given the room.
+Return the number of the room that held the most meetings. If there are multiple rooms, return the room with the lowest number.
+
+A half-closed interval [a, b) is the interval between a and b including a and not including b.
+
+ 
+
+code:
+
+class Solution {
+public:
+
+    // Structure to hold the end time and room ID
+    struct T {
+        long endTime; // The time when the meeting ends
+        int roomId;   // ID of the room
+    };
+
+    // Function to find the most booked meeting room
+    int mostBooked(int n, vector<vector<int>>& meetings) {
+        // Vector to keep track of the number of meetings in each room
+        vector<int> count(n);
+
+        // Sort meetings based on their start time
+        ranges::sort(meetings);
+
+        // Custom comparator for the priority queue
+        auto compare = [](const T& a, const T& b) {
+            // Compare by end time first, then by room ID (in reverse order)
+            return a.endTime == b.endTime ? a.roomId > b.roomId
+                                            : a.endTime > b.endTime;
+        };
+
+        // Priority queue to manage occupied rooms (sorted by end time)
+        priority_queue<T, vector<T>, decltype(compare)> occupied(compare);
+        // Min-heap to manage available room IDs
+        priority_queue<int, vector<int>, greater<>> availableRoomIds;
+
+        // Initialize available room IDs
+        for (int i = 0; i < n; ++i)
+            availableRoomIds.push(i);
+
+        // Iterate over each meeting
+        for (const vector<int>& meeting : meetings) {
+            const int start = meeting[0]; // Meeting start time
+            const int end = meeting[1];   // Meeting end time
+
+            // Free up rooms that are occupied but have ended before the current meeting starts
+            while (!occupied.empty() && occupied.top().endTime <= start) {
+                availableRoomIds.push(occupied.top().roomId); // Add room back to available
+                occupied.pop(); // Remove from occupied
+            }
+
+            // If no rooms are available, we need to extend the meeting in the room that ends the earliest
+            if (availableRoomIds.empty()) {
+                const auto [newStart, roomId] = occupied.top(); // Get the room that ends first
+                occupied.pop(); // Remove it from occupied
+                ++count[roomId]; // Increment the count for this room
+                occupied.push({newStart + (end - start), roomId}); // Extend the meeting time
+            } else {
+                // If a room is available, use it
+                const int roomId = availableRoomIds.top(); // Get the available room ID
+                availableRoomIds.pop(); // Remove it from available
+                ++count[roomId]; // Increment the count for this room
+                occupied.push({end, roomId}); // Mark this room as occupied until the meeting ends
+            }
+        }
+
+        // Return the ID of the room with the maximum number of meetings
+        return ranges::max_element(count) - count.begin();
+    }
+};
