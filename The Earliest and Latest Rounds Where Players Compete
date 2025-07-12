@@ -1,0 +1,109 @@
+question: There is a tournament where n players are participating. The players are standing in a single row and are numbered from 1 to n based on their initial standing position (player 1 is the first player in the row, player 2 is the second player in the row, etc.).
+
+The tournament consists of multiple rounds (starting from round number 1). In each round, the ith player from the front of the row competes against the ith player from the end of the row, and the winner advances to the next round. When the number of players is odd for the current round, the player in the middle automatically advances to the next round.
+
+For example, if the row consists of players 1, 2, 4, 6, 7
+Player 1 competes against player 7.
+Player 2 competes against player 6.
+Player 4 automatically advances to the next round.
+After each round is over, the winners are lined back up in the row based on the original ordering assigned to them initially (ascending order).
+
+The players numbered firstPlayer and secondPlayer are the best in the tournament. They can win against any other player before they compete against each other. If any two other players compete against each other, either of them might win, and thus you may choose the outcome of this round.
+
+Given the integers n, firstPlayer, and secondPlayer, return an integer array containing two values, the earliest possible round number and the latest possible round number in which these two players will compete against each other, respectively.
+
+ 
+
+code:
+class Solution 
+{
+public:
+    // Depth-First Search (DFS) function to find the earliest and latest rounds
+    pair<int, int> dfs(int n, int p1, int p2) 
+    {
+        // Step 1: Base case — check if players meet
+        if (p1 + p2 == n + 1) 
+        {
+            // If they meet, they both reach the next round
+            return {1, 1}; // Return {earliest round, latest round}
+        }
+
+        // Step 2: Normalize player positions
+        // Ensure p1 is always less than or equal to p2 for consistency
+        if (p1 > p2) 
+        {
+            swap(p1, p2); // Swap positions if p1 is greater than p2
+        }
+        
+        // If there are 4 or fewer players, the outcome is fixed
+        if (n <= 4) 
+        {
+            return {2, 2}; // Both players reach the next round in 2 rounds
+        }
+
+        // Calculate the midpoint of the current player count
+        int m = (n + 1) / 2;
+        int minR = INT_MAX; // Initialize minimum round
+        int maxR = INT_MIN; // Initialize maximum round
+
+        // Step 3: Use symmetry to reduce the state space
+        // If player 1 is far ahead, adjust positions based on symmetry
+        if (p1 - 1 > n - p2) 
+        {
+            int t = n + 1 - p1; // Calculate the new position for p1
+            p1 = n + 1 - p2; // Adjust p1 to be the mirrored position
+            p2 = t; // Set p2 to the new calculated position
+        }
+
+        // Step 4: Simulate all possible scenarios
+        // Check if player 2 is in the first half of the tournament
+        if (p2 * 2 <= n + 1) 
+        {
+            int a = p1 - 1; // Players before p1
+            int b = p2 - p1 - 1; // Players between p1 and p2
+
+            // Iterate through all combinations of players before p1 and between p1 and p2
+            for (int i = 0; i <= a; ++i) 
+            {
+                for (int j = 0; j <= b; ++j) 
+                {
+                    // Recursively call dfs for the next round with updated player positions
+                    auto [r1, r2] = dfs(m, i + 1, i + j + 2);
+                    minR = min(minR, r1 + 1); // Update minimum round
+                    maxR = max(maxR, r2 + 1); // Update maximum round
+                }
+            }
+        } 
+        else 
+        {
+            // Handle the case where player 2 is in the second half of the tournament
+            int p4 = n + 1 - p2; // Calculate the mirrored position for p2
+            int a = p1 - 1; // Players before p1
+            int b = p4 - p1 - 1; // Players between p1 and p4
+            int c = p2 - p4 - 1; // Players between p4 and p2
+
+            // Iterate through all combinations of players before p1 and between p1 and p4
+            for (int i = 0; i <= a; ++i) 
+            {
+                for (int j = 0; j <= b; ++j) 
+                {
+                    // Calculate an offset for the next round
+                    int offset = i + j + 1 + (c + 1) / 2 + 1;
+                    auto [r1, r2] = dfs(m, i + 1, offset); // Recursive call
+                    minR = min(minR, r1 + 1); // Update minimum round
+                    maxR = max(maxR, r2 + 1); // Update maximum round
+                }
+            }
+        }
+
+        // Step 5: Return the earliest and latest round results
+        return {minR, maxR}; // Return the computed rounds
+    }
+
+    // Public function to get the earliest and latest rounds for the players
+    vector<int> earliestAndLatest(int n, int firstPlayer, int secondPlayer) 
+    {
+        auto [earliest, latest] = dfs(n, firstPlayer, secondPlayer); // Call DFS
+        return {earliest, latest}; // Return the results
+    }
+};
