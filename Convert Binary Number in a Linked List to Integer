@@ -1,0 +1,28 @@
+question: Given head which is a reference node to a singly-linked list. The value of each node in the linked list is either 0 or 1. The linked list holds the binary representation of a number.
+
+Return the decimal value of the number in the linked list.
+
+The most significant bit is at the head of the linked list.
+
+code:
+
+class Solution {
+public:
+    // Function to convert a binary number represented by a linked list to a decimal integer
+    int getDecimalValue(ListNode* head) {
+        int result = 0; // Initialize result to store the decimal value
+
+        // Traverse the linked list until we reach the end
+        while (head != nullptr) {
+            // Shift the current result left by 1 bit (equivalent to multiplying by 2)
+            // Then use bitwise OR to add the current node's value (0 or 1) to the result
+            result = (result << 1) | head->val;
+
+            // Move to the next node in the linked list
+            head = head->next;
+        }
+
+        // Return the final decimal value
+        return result;
+    }
+};
