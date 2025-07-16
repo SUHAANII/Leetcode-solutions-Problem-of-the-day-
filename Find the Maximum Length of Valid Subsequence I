@@ -1,0 +1,45 @@
+question: You are given an integer array nums.
+A subsequence sub of nums with length x is called valid if it satisfies:
+
+(sub[0] + sub[1]) % 2 == (sub[1] + sub[2]) % 2 == ... == (sub[x - 2] + sub[x - 1]) % 2.
+Return the length of the longest valid subsequence of nums.
+
+A subsequence is an array that can be derived from another array by deleting some or no elements without changing the order of the remaining elements.
+
+code:
+
+class Solution {
+public:
+    // Function to find the maximum length of a subsequence with alternating even and odd numbers
+    int maximumLength(vector<int>& nums) {
+        // Initialize counters for even and odd numbers
+        int count_even = 0, count_odd = 0;
+
+        // Count the total number of even and odd numbers in the input vector
+        for (int num : nums) {
+            if (num % 2 == 0) {
+                count_even++; // Increment even counter
+            } else {
+                count_odd++; // Increment odd counter
+            }
+        }
+
+        // Initialize dynamic programming variables for tracking maximum lengths
+        int even_dp = 0; // Maximum length of subsequence ending with an even number
+        int odd_dp = 0;  // Maximum length of subsequence ending with an odd number
+
+        // Iterate through the numbers again to calculate maximum alternating subsequence lengths
+        for (int num : nums) {
+            if (num % 2 == 0) {
+                // If the current number is even, we can extend the odd subsequence
+                even_dp = max(even_dp, odd_dp + 1);
+            } else {
+                // If the current number is odd, we can extend the even subsequence
+                odd_dp = max(odd_dp, even_dp + 1);
+            }
+        }
+
+        // Return the maximum length found: either total counts or the best alternating subsequence
+        return max({count_even, count_odd, even_dp, odd_dp});
+    }
+};
