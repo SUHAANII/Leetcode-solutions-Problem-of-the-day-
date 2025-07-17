@@ -1,0 +1,48 @@
+question: You are given an integer array nums and a positive integer k.
+A subsequence sub of nums with length x is called valid if it satisfies:
+
+(sub[0] + sub[1]) % k == (sub[1] + sub[2]) % k == ... == (sub[x - 2] + sub[x - 1]) % k.
+Return the length of the longest valid subsequence of nums.
+
+code:
+
+// Declare a static array for dynamic programming
+short dp[1000];
+
+class Solution {
+public:
+    // Function to find the maximum length of a subsequence with a sum divisible by k
+    static int maximumLength(vector<int>& nums, int k) {
+        // Initialize the answer to 0
+        short ans = 0;
+
+        // Iterate over each possible starting position modulo k
+        for (int i = 0; i < k; i++) {
+            // Fill the dp array with zeros for each starting position
+            fill(dp, dp + k, 0); // Reset dp array for the current iteration
+            
+            // Iterate through each number in the input vector
+            for (int x : nums) {
+                int j = x % k; // Get the remainder of x when divided by k
+                
+                // Update the dp array
+                // dp[j] will store the maximum length of subsequence ending with a sum mod k equal to j
+                dp[j] = max(dp[j], short(dp[(i + k - j) % k] + 1));
+                
+                // Update the overall maximum length found so far
+                ans = max(ans, dp[j]);
+            }
+        }
+        
+        // Return the maximum length of the subsequence found
+        return ans;
+    }
+};
+
+// Initialization block to optimize input/output
+auto init = []() {
+    ios::sync_with_stdio(0); // Fast input/output
+    cin.tie(0);              // Untie cin from cout
+    cout.tie(0);            // Untie cout from cin
+    return 'c';
+}();
