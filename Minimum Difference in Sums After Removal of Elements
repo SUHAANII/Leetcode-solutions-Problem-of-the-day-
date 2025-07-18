@@ -1,0 +1,81 @@
+question: You are given a 0-indexed integer array nums consisting of 3 * n elements.
+
+You are allowed to remove any subsequence of elements of size exactly n from nums. The remaining 2 * n elements will be divided into two equal parts:
+
+The first n elements belonging to the first part and their sum is sumfirst.
+The next n elements belonging to the second part and their sum is sumsecond.
+The difference in sums of the two parts is denoted as sumfirst - sumsecond.
+
+For example, if sumfirst = 3 and sumsecond = 2, their difference is 1.
+Similarly, if sumfirst = 2 and sumsecond = 3, their difference is -1.
+Return the minimum difference possible between the sums of the two parts after the removal of n elements.
+
+code:
+
+#include <vector>
+#include <queue>
+#include <numeric>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+public:
+    // Function to calculate the minimum difference between the sums of three parts
+    static long long minimumDifference(vector<int>& nums) {
+        // Calculate n as one-third of the size of the input vector
+        const int n = nums.size() / 3;
+        
+        // Vector to store the difference of sums for each configuration
+        vector<long long> diff(n + 1, 0);
+        
+        // Priority queues for maintaining the largest n elements from the left
+        priority_queue<int> pqL(nums.begin(), nums.begin() + n);
+        // Priority queue for maintaining the smallest n elements from the right
+        priority_queue<int, vector<int>, greater<int>> pqR(nums.begin() + 2 * n, nums.end());
+        
+        // Calculate the initial sum of the first n elements
+        long long sum = accumulate(nums.begin(), nums.begin() + n, 0LL);
+        
+        // Fill the diff array for the first segment of n elements
+        for (int i = n; i <= 2 * n; i++) {
+            diff[i - n] = sum;  // Store the current sum
+            int x = nums[i];     // Current element from the second segment
+            
+            // If the current element is larger than or equal to the largest in pqL, skip
+            if (x >= pqL.top()) continue;
+            
+            // Otherwise, replace the largest element in pqL with the current element
+            sum += x - pqL.top(); // Update the sum
+            pqL.pop();            // Remove the largest element
+            pqL.push(x);         // Add the current element
+        }
+
+        // Calculate the sum of the last n elements (from the right segment)
+        sum = accumulate(nums.begin() + 2 * n, nums.end(), 0LL);
+        
+        // Fill the diff array for the second segment of n elements
+        for (int i = 2 * n - 1; i >= n - 1; i--) {
+            diff[i - n + 1] -= sum;  // Update the difference
+            int x = nums[i];          // Current element from the third segment
+            
+            // If the current element is less than or equal to the smallest in pqR, skip
+            if (x <= pqR.top()) continue;
+            
+            // Otherwise, replace the smallest element in pqR with the current element
+            sum += x - pqR.top(); // Update the sum
+            pqR.pop();            // Remove the smallest element
+            pqR.push(x);         // Add the current element
+        }
+        
+        // Return the minimum difference found in the diff array
+        return *min_element(diff.begin(), diff.end());
+    }
+};
+
+// Initialization of I/O settings for faster input/output
+auto init = []() {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    return 'c'; // Return a character to satisfy the lambda function's requirement
+}();
