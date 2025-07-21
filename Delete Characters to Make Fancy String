@@ -1,0 +1,38 @@
+question: A fancy string is a string where no three consecutive characters are equal.
+
+Given a string s, delete the minimum possible number of characters from s to make it fancy.
+
+Return the final string after the deletion. It can be shown that the answer will always be unique.
+
+code:
+
+class Solution {
+public:
+    string makeFancyString(string s) {
+        // Convert the input string into a vector of characters for easier manipulation
+        vector<char> chars(s.begin(), s.end());
+        
+        // Initialize variables to track the last character, its count, and the position to write in the vector
+        char last = chars[0]; // Start with the first character
+        int count = 1;        // Count occurrences of the last character
+        int pos = 1;          // Position for the next character to be added to the result
+
+        // Loop through the characters starting from the second character
+        for (int i = 1; i < chars.size(); ++i) {
+            // If the current character is different from the last one
+            if (chars[i] != last) {
+                last = chars[i]; // Update the last character
+                count = 0;       // Reset the count for the new character
+            }
+
+            // Increment the count of the current character
+            if (++count > 2) continue; // Skip adding this character if it exceeds 2 occurrences
+
+            // Add the current character to the result at the current position
+            chars[pos++] = chars[i];
+        }
+
+        // Create a new string from the modified character vector, up to the current position
+        return string(chars.begin(), chars.begin() + pos);
+    }
+};
