@@ -1,0 +1,49 @@
+question: You are given an array of positive integers nums and want to erase a subarray containing unique elements. The score you get by erasing the subarray is equal to the sum of its elements.
+
+Return the maximum score you can get by erasing exactly one subarray.
+
+An array b is called to be a subarray of a if it forms a contiguous subsequence of a, that is, if it is equal to a[l],a[l+1],...,a[r] for some (l,r).
+
+code:
+
+#include <vector>
+#include <unordered_set>
+#include <algorithm>
+
+using namespace std;
+
+class Solution {
+public:
+    int maximumUniqueSubarray(vector<int>& nums) {
+        // Get the size of the input array
+        int n = nums.size();
+        
+        // Create an unordered set to keep track of unique elements in the current subarray
+        unordered_set<int> seen;
+        
+        // Initialize pointers and variables for the sliding window approach
+        int left = 0;                // Left pointer for the current subarray
+        int currentSum = 0;         // Sum of the current unique subarray
+        int maxSum = 0;             // Maximum sum of unique subarrays found
+        
+        // Iterate through the array using the right pointer
+        for (int right = 0; right < n; ++right) {
+            // If the current number is already seen, shrink the window from the left
+            while (seen.find(nums[right]) != seen.end()) {
+                currentSum -= nums[left];  // Subtract the leftmost element from the current sum
+                seen.erase(nums[left]);     // Remove the leftmost element from the set
+                ++left;                     // Move the left pointer to the right
+            }
+            
+            // Add the current number to the current sum and the set of seen numbers
+            currentSum += nums[right];
+            seen.insert(nums[right]);
+            
+            // Update the maximum sum if the current sum is greater
+            maxSum = max(maxSum, currentSum);
+        }
+        
+        // Return the maximum sum of unique subarrays found
+        return maxSum;
+    }
+};
