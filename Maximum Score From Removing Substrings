@@ -1,0 +1,59 @@
+question: You are given a string s and two integers x and y. You can perform two types of operations any number of times.
+
+Remove substring "ab" and gain x points.
+For example, when removing "ab" from "cabxbae" it becomes "cxbae".
+Remove substring "ba" and gain y points.
+For example, when removing "ba" from "cabxbae" it becomes "cabxe".
+Return the maximum points you can gain after applying the above operations on s.
+
+code:
+
+class Solution {
+public:
+    // Function to calculate the maximum gain from removing substrings "ab" and "ba"
+    int maximumGain(string s, int x, int y) {
+        // Initialize the result variable to store the total score
+        int res = 0;
+        string top, bot; // Strings to determine which substring to prioritize
+        int top_score, bot_score; // Scores associated with each substring
+
+        // Determine which substring gives more points
+        if (y > x) {
+            top = "ba";         // If 'y' is greater, prioritize "ba"
+            top_score = y;      // Assign score for "ba"
+            bot = "ab";         // "ab" will be the secondary substring
+            bot_score = x;      // Assign score for "ab"
+        } else {
+            top = "ab";         // If 'x' is greater or equal, prioritize "ab"
+            top_score = x;      // Assign score for "ab"
+            bot = "ba";         // "ba" will be secondary
+            bot_score = y;      // Assign score for "ba"
+        }
+
+        // First pass: Remove the top substring (higher score)
+        vector<char> stack; // Stack to keep track of characters
+        for (char ch : s) { // Iterate through each character in the string
+            // Check if the current character and the top of the stack form the top substring
+            if (ch == top[1] && !stack.empty() && stack.back() == top[0]) {
+                res += top_score; // Increment the result by the top substring's score
+                stack.pop_back();  // Remove the matching pair from the stack
+            } else {
+                stack.push_back(ch); // If no match, push the character onto the stack
+            }
+        }
+
+        // Second pass: Remove the bot substring (lower score)
+        vector<char> new_stack; // New stack to keep track of remaining characters
+        for (char ch : stack) { // Iterate through the remaining characters in the first stack
+            // Check if the current character and the top of the new stack form the bot substring
+            if (ch == bot[1] && !new_stack.empty() && new_stack.back() == bot[0]) {
+                res += bot_score; // Increment the result by the bot substring's score
+                new_stack.pop_back(); // Remove the matching pair from the new stack
+            } else {
+                new_stack.push_back(ch); // If no match, push the character onto the new stack
+            }
+        }
+
+        return res; // Return the total score accumulated from removing substrings
+    }
+};
