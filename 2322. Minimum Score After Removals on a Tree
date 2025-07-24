@@ -1,0 +1,107 @@
+question: There is an undirected connected tree with n nodes labeled from 0 to n - 1 and n - 1 edges.
+
+You are given a 0-indexed integer array nums of length n where nums[i] represents the value of the ith node. You are also given a 2D integer array edges of length n - 1 where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the tree.
+
+Remove two distinct edges of the tree to form three connected components. For a pair of removed edges, the following steps are defined:
+
+Get the XOR of all the values of the nodes for each of the three components respectively.
+The difference between the largest XOR value and the smallest XOR value is the score of the pair.
+For example, say the three components have the node values: [4,5,7], [1,9], and [3,3,3]. The three XOR values are 4 ^ 5 ^ 7 = 6, 1 ^ 9 = 8, and 3 ^ 3 ^ 3 = 3. The largest XOR value is 8 and the smallest XOR value is 3. The score is then 8 - 3 = 5.
+Return the minimum score of any possible pair of edge removals on the given tree.
+
+code:
+
+#include <vector>
+#include <numeric>
+#include <algorithm>
+#include <unordered_set>
+
+class Solution {
+public:
+    // Vector to store the XOR of the subtree rooted at each node
+    std::vector<int> subtree_xor;
+    
+    // Vector of unordered sets to keep track of descendants for each node
+    std::vector<std::unordered_set<int>> descendants;
+    
+    // Adjacency list representation of the graph (tree)
+    std::vector<std::vector<int>> graph;
+
+    // Depth-First Search (DFS) to calculate subtree XOR and descendants
+    void dfs(int node, int parent, const std::vector<int>& nums) {
+        // Initialize the XOR value of the current node with its value
+        subtree_xor[node] = nums[node];
+        
+        // Add the current node to its own descendants
+        descendants[node].insert(node);
+
+        // Explore all neighbors of the current node
+        for (int neighbor : graph[node]) {
+            // Skip the parent node to avoid cycles
+            if (neighbor != parent) {
+                // Recursive DFS call for the neighbor
+                dfs(neighbor, node, nums);
+                
+                // Update the subtree XOR for the current node
+                subtree_xor[node] ^= subtree_xor[neighbor];
+                
+                // Merge the descendants of the neighbor into the current node's descendants
+                descendants[node].insert(descendants[neighbor].begin(), descendants[neighbor].end());
+            }
+        }
+    }
+
+    // Function to calculate the minimum score based on subtree XOR values
+    int minimumScore(std::vector<int>& nums, std::vector<std::vector<int>>& edges) {
+        int n = nums.size(); // Number of nodes in the tree
+        graph.assign(n, std::vector<int>()); // Initialize the graph
+        subtree_xor.assign(n, 0); // Initialize subtree_xor vector
+        descendants.assign(n, std::unordered_set<int>()); // Initialize descendants sets
+
+        // Build the adjacency list from the edges
+        for (const auto& edge : edges) {
+            graph[edge[0]].push_back(edge[1]);
+            graph[edge[1]].push_back(edge[0]);
+        }
+
+        // Perform DFS starting from the root node (0) with no parent (-1)
+        dfs(0, -1, nums);
+
+        // Total XOR of the entire tree
+        int total_xor = subtree_xor[0];
+        int min_score = INT_MAX; // Initialize minimum score to maximum possible value
+
+        // Iterate through pairs of nodes to calculate scores
+        for (int i = 1; i < n; ++i) {
+            for (int j = i + 1; j < n; ++j) {
+                int xor_i = subtree_xor[i]; // XOR of the subtree rooted at node i
+                int xor_j = subtree_xor[j]; // XOR of the subtree rooted at node j
+                int val1, val2, val3;
+
+                // Check if node j is in the subtree of node i
+                if (descendants[i].count(j)) { // j is in i's subtree
+                    val1 = xor_j; // Value contributed by j
+                    val2 = xor_i ^ xor_j; // Value contributed by the combined subtree
+                    val3 = total_xor ^ xor_i; // Value contributed by the rest of the tree
+                } else if (descendants[j].count(i)) { // i is in j's subtree
+                    val1 = xor_i; // Value contributed by i
+                    val2 = xor_j ^ xor_i; // Value contributed by the combined subtree
+                    val3 = total_xor ^ xor_j; // Value contributed by the rest of the tree
+                } else { // Independent subtrees
+                    val1 = xor_i; // Value contributed by i
+                    val2 = xor_j; // Value contributed by j
+                    val3 = total_xor ^ xor_i ^ xor_j; // Value contributed by the rest of the tree
+                }
+                
+                // Calculate the score based on the max and min of the three values
+                int score = std::max({val1, val2, val3}) - std::min({val1, val2, val3});
+                
+                // Update the minimum score found
+                min_score = std::min(min_score, score);
+            }
+        }
+
+        // Return the minimum score calculated
+        return min_score;
+    }
+};
