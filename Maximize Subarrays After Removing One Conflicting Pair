@@ -1,0 +1,59 @@
+question: You are given an integer n which represents an array nums containing the numbers from 1 to n in order. Additionally, you are given a 2D array conflictingPairs, where conflictingPairs[i] = [a, b] indicates that a and b form a conflicting pair.
+
+Remove exactly one element from conflictingPairs. Afterward, count the number of non-empty subarrays of nums which do not contain both a and b for any remaining conflicting pair [a, b].
+
+Return the maximum number of subarrays possible after removing exactly one conflicting pair.
+
+code:
+
+#include <vector>
+#include <algorithm>
+
+class Solution {
+public:
+    // Function to calculate the maximum number of valid subarrays
+    long long maxSubarrays(int n, std::vector<std::vector<int>>& conflictingPairs) {
+        // Create a vector of vectors to store conflicting pairs
+        std::vector<std::vector<int>> right(n + 1);
+        
+        // Populate the right vector with conflicting pairs
+        for (const auto& pair : conflictingPairs) {
+            // For each conflicting pair, store the smaller index in the vector of the larger index
+            right[std::max(pair[0], pair[1])].push_back(std::min(pair[0], pair[1]));
+        }
+
+        long long ans = 0; // Variable to store the total count of valid subarrays
+        std::vector<long long> left = {0, 0}; // Vector to keep track of the top two largest values
+        std::vector<long long> bonus(n + 1, 0); // Vector to store bonus values for each index
+
+        // Iterate through each index r from 1 to n
+        for (int r = 1; r <= n; ++r) {
+            // Check all conflicting pairs for the current index r
+            for (int l_val : right[r]) {
+                // Manually update the top two values in the left vector
+                if (l_val > left[0]) {
+                    left = {static_cast<long long>(l_val), left[0]}; // Update first largest
+                } else if (l_val > left[1]) {
+                    left = {left[0], static_cast<long long>(l_val)}; // Update second largest
+                }
+            }
+
+            // Calculate the number of valid subarrays ending at r
+            ans += r - left[0];
+
+            // If the largest value is greater than 0, update the bonus for that value
+            if (left[0] > 0) {
+                bonus[left[0]] += left[0] - left[1]; // Calculate the difference for bonus
+            }
+        }
+        
+        long long max_bonus = 0; // Variable to find the maximum bonus value
+        // Iterate through the bonus vector to find the maximum bonus
+        for (long long b : bonus) {
+            max_bonus = std::max(max_bonus, b); // Update max_bonus if a larger bonus is found
+        }
+
+        // Return the total count of valid subarrays plus the maximum bonus
+        return ans + max_bonus;
+    }
+};
