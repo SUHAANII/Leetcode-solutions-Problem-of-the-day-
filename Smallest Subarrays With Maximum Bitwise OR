@@ -1,0 +1,42 @@
+quesztion: You are given a 0-indexed array nums of length n, consisting of non-negative integers. For each index i from 0 to n - 1, you must determine the size of the minimum sized non-empty subarray of nums starting at i (inclusive) that has the maximum possible bitwise OR.
+
+In other words, let Bij be the bitwise OR of the subarray nums[i...j]. You need to find the smallest subarray starting at i, such that bitwise OR of this subarray is equal to max(Bik) where i <= k <= n - 1.
+The bitwise OR of an array is the bitwise OR of all the numbers in it.
+
+Return an integer array answer of size n where answer[i] is the length of the minimum sized subarray starting at i with maximum bitwise OR.
+
+A subarray is a contiguous non-empty sequence of elements within an array.
+
+code:
+
+class Solution {
+public:
+    // Function to find the smallest subarrays for each element in nums
+    vector<int> smallestSubarrays(vector<int>& nums) {
+        // Get the size of the input array
+        int n = nums.size();
+        
+        // Vector to keep track of the last seen index of each bit (0 to 29)
+        vector<int> lastSeen(30, 0);
+        
+        // Result vector initialized to 1 (minimum subarray size)
+        vector<int> res(n, 1);
+        
+        // Traverse the nums array from right to left
+        for (int i = n - 1; i >= 0; --i) {
+            // Check each bit position from 0 to 29
+            for (int bit = 0; bit < 30; ++bit) {
+                // If the current bit is set in nums[i]
+                if ((nums[i] & (1 << bit)) > 0) {
+                    // Update the last seen index for this bit
+                    lastSeen[bit] = i;
+                }
+                // Calculate the size of the subarray that includes this bit
+                res[i] = max(res[i], lastSeen[bit] - i + 1);
+            }
+        }
+        
+        // Return the result vector containing the sizes of the smallest subarrays
+        return res;
+    }
+};
