@@ -1,0 +1,44 @@
+question: Given an integer array arr, return the number of distinct bitwise ORs of all the non-empty subarrays of arr.
+
+The bitwise OR of a subarray is the bitwise OR of each integer in the subarray. The bitwise OR of a subarray of one integer is that integer.
+
+A subarray is a contiguous non-empty sequence of elements within an array.
+
+ 
+code:
+
+class Solution {
+public:
+    int powerfulInteger(vector<vector<int>>& intervals, int k) {
+        // Step 1: Create a map to track the start and end of each interval
+        map<int,int> mp; // Using map for automatic sorting of keys (the points)
+
+        // Iterate through each interval
+        for(vector<int> &x : intervals){
+            mp[x[0]]++;       // Increment count at the start of the interval (x[0])
+            mp[x[1]+1]--;     // Decrement count just after the end of the interval (x[1] + 1)
+        }
+        
+        // Step 2: Convert the map to a vector for easier prefix sum processing
+        vector<pair<int,int>> temp;
+        for(auto &x : mp){
+            temp.push_back({x.first, x.second}); // Store each point and its count in a vector
+        }
+        
+        // Step 3: Compute the prefix sum to determine the frequency of active intervals at each point
+        for(int i = 1; i < temp.size(); ++i){
+            temp[i].second += temp[i-1].second; // Accumulate counts to get the total active intervals at each point
+        }
+        
+        // Step 4: Find the maximum integer that has at least k active intervals
+        int ans = -1; // Initialize answer to -1 (indicating no valid integer found)
+        for(int i = 1; i < temp.size(); ++i){
+            // Check if the frequency at the previous point is at least k
+            if(temp[i-1].second >= k){
+                ans = temp[i].first - 1; // Update the answer to the highest possible integer in this range
+            }
+        }
+        
+        return ans; // Return the maximum powerful integer found
+    }
+};
