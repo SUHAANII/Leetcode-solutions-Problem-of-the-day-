@@ -1,0 +1,51 @@
+question: You have two fruit baskets containing n fruits each. You are given two 0-indexed integer arrays basket1 and basket2 representing the cost of fruit in each basket. You want to make both baskets equal. To do so, you can use the following operation as many times as you want:
+
+Chose two indices i and j, and swap the ith fruit of basket1 with the jth fruit of basket2.
+The cost of the swap is min(basket1[i],basket2[j]).
+Two baskets are considered equal if sorting them according to the fruit cost makes them exactly the same baskets.
+
+Return the minimum cost to make both the baskets equal or -1 if impossible.
+
+code:
+class Solution {
+public:
+    long long minCost(vector<int>& basket1, vector<int>& basket2) {
+        unordered_map<int, int> mpp; // Create a map to track the counts of items in both baskets
+
+        // Count the occurrences of each item in basket1
+        for(int b : basket1) 
+            mpp[b]++; // Increment count for each item
+
+        // Count the occurrences of each item in basket2
+        for(int b : basket2) 
+            mpp[b]--; // Decrement count for each item
+
+        int minEle = INT_MAX; // Initialize the minimum element to a large value
+        vector<int> temp; // Temporary vector to store items that need to be balanced
+
+        // Iterate through the map to check the balance of items
+        for(auto& [u, v] : mpp) {
+            // If the count (v) is odd, it's impossible to balance the baskets
+            if(v % 2 == 1) 
+                return -1; // Return -1 indicating it's not possible to balance
+
+            // If the count is even, we can balance it
+            for(int i = 0; i < abs(v) / 2; i++) 
+                temp.push_back(u); // Add the item to the temp vector (half the imbalance)
+
+            // Update the minimum element found
+            minEle = min(minEle, u); // Keep track of the smallest element
+        }
+
+        sort(temp.begin(), temp.end()); // Sort the temp vector for efficient pairing
+        long long ans = 0; // Initialize the answer variable
+
+        // Calculate the minimum cost to balance the baskets
+        for(int i = 0; i < temp.size() / 2; i++) {
+            // For each pair, add the minimum cost of swapping or doubling the smallest element
+            ans += min(temp[i], 2 * minEle); // Choose the cheaper option
+        }
+
+        return ans; // Return the total minimum cost
+    }
+};
