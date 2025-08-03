@@ -1,0 +1,42 @@
+question: Fruits are available at some positions on an infinite x-axis. You are given a 2D integer array fruits where fruits[i] = [positioni, amounti] depicts amounti fruits at the position positioni. fruits is already sorted by positioni in ascending order, and each positioni is unique.
+
+You are also given an integer startPos and an integer k. Initially, you are at the position startPos. From any position, you can either walk to the left or right. It takes one step to move one unit on the x-axis, and you can walk at most k steps in total. For every position you reach, you harvest all the fruits at that position, and the fruits will disappear from that position.
+
+Return the maximum total number of fruits you can harvest.
+
+code:
+class Solution {
+public:
+    // Function to calculate the maximum total fruits that can be collected
+    int maxTotalFruits(vector<vector<int>>& fruits, int startPos, int k) {
+        int left = 0;         // Left pointer for the sliding window
+        int sum = 0;          // Sum of fruits collected in the current window
+        int maxFruits = 0;    // Maximum fruits collected so far
+
+        // Iterate through the right pointer for the sliding window
+        for (int right = 0; right < fruits.size(); ++right) {
+            sum += fruits[right][1]; // Add fruits at the right pointer to sum
+
+            // Check if the total steps required to collect fruits from left to right exceeds k
+            while (left <= right && minSteps(fruits[left][0], fruits[right][0], startPos) > k) {
+                sum -= fruits[left][1]; // Remove fruits at the left pointer from sum
+                left++;                  // Move the left pointer to the right
+            }
+
+            // Update the maximum fruits collected
+            maxFruits = max(maxFruits, sum);
+        }
+
+        // Return the maximum fruits that can be collected within k steps
+        return maxFruits;
+    }
+
+    // Function to calculate the minimum steps required to collect fruits between left and right positions
+    int minSteps(int left, int right, int start) {
+        // Calculate the minimum steps required in two scenarios:
+        // 1. Starting from 'left' and moving to 'right'
+        // 2. Starting from 'right' and moving back to 'left'
+        return min(abs(start - left) + (right - left), // Steps from start to left, then left to right
+                   abs(start - right) + (right - left)); // Steps from start to right, then right to left
+    }
+};
