@@ -1,0 +1,44 @@
+question: You are visiting a farm that has a single row of fruit trees arranged from left to right. The trees are represented by an integer array fruits where fruits[i] is the type of fruit the ith tree produces.
+
+You want to collect as much fruit as possible. However, the owner has some strict rules that you must follow:
+
+You only have two baskets, and each basket can only hold a single type of fruit. There is no limit on the amount of fruit each basket can hold.
+Starting from any tree of your choice, you must pick exactly one fruit from every tree (including the start tree) while moving to the right. The picked fruits must fit in one of your baskets.
+Once you reach a tree with fruit that cannot fit in your baskets, you must stop.
+Given the integer array fruits, return the maximum number of fruits you can pick.
+
+code:
+
+class Solution {
+public:
+    // Function to find the maximum number of fruits that can be collected
+    int totalFruit(vector<int>& fruits) {
+        // Using a hash map to count the number of each type of fruit in the basket
+        unordered_map<int, int> basket;
+        int left = 0;  // Left pointer for the sliding window
+        int maxFruits = 0;  // Variable to store the maximum number of fruits collected
+
+        // Iterate through the fruits array using the right pointer
+        for (int right = 0; right < fruits.size(); right++) {
+            // Add the current fruit to the basket
+            basket[fruits[right]]++;
+
+            // If we have more than 2 types of fruits in the basket, shrink from the left
+            while (basket.size() > 2) {
+                // Decrease the count of the fruit at the left pointer
+                basket[fruits[left]]--;
+                // If the count becomes zero, remove that fruit type from the basket
+                if (basket[fruits[left]] == 0)
+                    basket.erase(fruits[left]);
+                // Move the left pointer to the right to shrink the window
+                left++;
+            }
+
+            // Update the maximum number of fruits collected in the current valid window
+            maxFruits = max(maxFruits, right - left + 1);
+        }
+
+        // Return the maximum number of fruits collected
+        return maxFruits;
+    }
+};
