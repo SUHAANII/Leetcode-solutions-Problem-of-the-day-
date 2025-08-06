@@ -1,0 +1,81 @@
+question: You are given two arrays of integers, fruits and baskets, each of length n, where fruits[i] represents the quantity of the ith type of fruit, and baskets[j] represents the capacity of the jth basket.
+
+From left to right, place the fruits according to these rules:
+
+Each fruit type must be placed in the leftmost available basket with a capacity greater than or equal to the quantity of that fruit type.
+Each basket can hold only one type of fruit.
+If a fruit type cannot be placed in any basket, it remains unplaced.
+Return the number of fruit types that remain unplaced after all possible allocations are made.
+
+code:
+class Solution {
+public:
+    // Function to count the number of unplaced fruits based on available baskets
+    int numOfUnplacedFruits(vector<int>& fruits, vector<int>& baskets) {
+        vector<int> sect_mx; // Vector to store the maximum capacity of each sector
+        int m = baskets.size(); // Total number of baskets
+        int a = sqrt(m); // Size of one sector (determined by the square root of the number of baskets)
+
+        int cnt = 0; // Counter for the number of baskets in the current sector
+        int mx = 0;  // Variable to track the maximum capacity in the current sector
+
+        // Loop through each basket to determine the maximums for each sector
+        for(int i = 0; i < m; i++) {
+            if(cnt == a) {
+                // If the current sector is full (size a), push the max to sect_mx
+                sect_mx.push_back(mx);
+                mx = baskets[i]; // Start a new sector with the current basket's capacity
+                cnt = 1; // Reset the counter for the new sector
+            } else {
+                // Increment the counter and update the maximum capacity for the current sector
+                cnt++;
+                mx = max(mx, baskets[i]);
+            }
+        }
+
+        // Add the maximum of the last sector
+        sect_mx.push_back(mx);
+
+        int remain = 0; // Counter for the number of fruits that could not be placed
+
+        // Start allocating fruits to the baskets
+        for(int i = 0; i < fruits.size(); i++) {
+            int k = 0; // Index for the current sector
+            int set = 1; // Flag to check if the fruit could be placed (1 means it cannot be placed)
+
+            // Loop through each sector
+            for(int j = 0; j < m; j += a) {
+                // If the maximum capacity of the current sector is less than the fruit's size, skip this sector
+                if(sect_mx[k] < fruits[i]) {
+                    k++; // Move to the next sector
+                    continue;
+                }
+
+                // Find a place to allocate the fruit in the current sector
+                for(int r = j; r < min(j + a, m); r++) {
+                    if(baskets[r] >= fruits[i]) {
+                        set = 0; // The fruit can be placed
+                        baskets[r] = 0; // Mark the basket as used (set its capacity to 0)
+                        break; // Exit the inner loop since the fruit is placed
+                    }
+                }
+
+                // If the fruit was allocated in a sector
+                if(set == 0) {
+                    sect_mx[k] = 0; // Reset the maximum for this sector
+                    // Update the new maximum capacity for the sector
+                    for(int r = j; r < min(j + a, m); r++) {
+                        sect_mx[k] = max(baskets[r], sect_mx[k]);
+                    }
+                    break; // Exit the outer loop since the fruit is placed
+                }
+            }
+
+            // If the fruit could not be placed, increment the remain counter
+            remain += set;
+        }
+
+        // Return the total number of fruits that could not be placed
+        return remain;
+    }
+};
