@@ -1,0 +1,35 @@
+question: You are given an integer n. We reorder the digits in any order (including the original order) such that the leading digit is not zero.
+
+Return true if and only if we can do this so that the resulting number is a power of two.
+
+
+
+code:
+
+class Solution {
+public:
+    // Function to determine if n can be rearranged to form a power of 2
+    bool reorderedPowerOf2(int n) {
+        // Lambda function to count and sort the digits of a number
+        auto countDigits = [](int x) {
+            // Convert the number to string
+            string s = to_string(x);
+            // Sort the characters in the string to group identical digits together
+            sort(s.begin(), s.end());
+            // Return the sorted string
+            return s;
+        };
+
+        // Get the sorted digit representation of the input number n
+        string target = countDigits(n);
+
+        // Check for powers of 2 from 2^0 to 2^30 (since 2^31 > 10^9)
+        for (int i = 0; i < 31; i++) {
+            // Compare the sorted digits of the current power of 2 with the target
+            if (countDigits(1 << i) == target) return true; // If they match, return true
+        }
+
+        // If no matching power of 2 found, return false
+        return false;
+    }
+};
