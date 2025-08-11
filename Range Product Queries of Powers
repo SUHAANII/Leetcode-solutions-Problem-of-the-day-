@@ -1,0 +1,57 @@
+question: Given a positive integer n, there exists a 0-indexed array called powers, composed of the minimum number of powers of 2 that sum to n. The array is sorted in non-decreasing order, and there is only one way to form the array.
+
+You are also given a 0-indexed 2D integer array queries, where queries[i] = [lefti, righti]. Each queries[i] represents a query where you have to find the product of all powers[j] with lefti <= j <= righti.
+
+Return an array answers, equal in length to queries, where answers[i] is the answer to the ith query. Since the answer to the ith query may be too large, each answers[i] should be returned modulo 109 + 7.
+
+code:
+
+#include <vector>
+#include <bitset>
+#include <numeric>
+
+static constexpr int mod = 1e9 + 7; // Modulus value for calculations
+static constexpr int B30 = (1 << 30) % mod; // Precomputed value of 2^30 modulo mod
+
+class Solution {
+public:
+    // Function to compute x raised to the power of exp modulo mod using exponentiation by squaring
+    static int modPow(long long x, int exp) {
+        if (exp == 0) return 1; // Base case: x^0 = 1
+        long long y = (exp & 1) ? x : 1; // If exp is odd, include x in the product
+        // Recursively compute (x^2)^(exp/2) and multiply by y if needed
+        return modPow(x * x % mod, exp >> 1) * y % mod;
+    }
+
+    // Function to compute 2^exp modulo mod
+    static int pow2mod(int exp) {
+        if (exp < 30) return 1 << exp; // If exp is less than 30, directly compute 2^exp
+        auto [q, r] = div(exp, 30); // Divide exp by 30 to get quotient and remainder
+        long long B = modPow(B30, q); // Compute (2^30)^q modulo mod
+        return B * (1 << r) % mod; // Multiply by 2^r and take modulo
+    }
+
+    // Function to answer product queries based on the binary representation of n
+    static vector<int> productQueries(int n, vector<vector<int>>& queries) {
+        const int m = queries.size(); // Number of queries
+        bitset<30> B(n); // Bitset to represent the binary form of n
+        vector<int> exp2; // Vector to store the powers of 2 corresponding to set bits in n
+        
+        // Collect the positions of set bits in the binary representation of n
+        for (int i = 0; i < 30; i++)
+            if (B[i]) exp2.push_back(i);
+
+        // Compute the prefix sums of the powers of 2
+        partial_sum(exp2.cbegin(), exp2.cend(), exp2.begin());
+
+        vector<int> ans(m); // Vector to store the results of each query
+        for (int i = 0; i < m; i++) {
+            const int s = queries[i][0]; // Starting index of the query
+            const int e = queries[i][1]; // Ending index of the query
+            // Calculate the exponent by subtracting prefix sums
+            const int exp = exp2[e] - ((s == 0) ? 0 : exp2[s - 1]);
+            ans[i] = pow2mod(exp); // Compute 2^exp modulo mod and store it in the answer
+        }
+        return ans; // Return the results of all queries
+    }
+};
