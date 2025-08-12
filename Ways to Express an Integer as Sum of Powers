@@ -1,0 +1,52 @@
+question: Given two positive integers n and x.
+
+Return the number of ways n can be expressed as the sum of the xth power of unique positive integers, in other words, the number of sets of unique integers [n1, n2, ..., nk] where n = n1x + n2x + ... + nkx.
+
+Since the result can be very large, return it modulo 109 + 7.
+
+For example, if n = 160 and x = 3, one way to express n is n = 23 + 33 + 53.
+
+ 
+
+code:
+
+#include <vector>
+using namespace std;
+
+// Define a constant for the modulo operation
+static const int MOD = 1'000'000'007;
+
+class Solution {
+public:
+    int numberOfWays(int n, int x) {
+        // Vector to store the powers of integers that are less than or equal to n
+        vector<int> powers;
+        
+        // Collect powers i^x where i starts from 1 and increments
+        for (int i = 1; ; ++i) {
+            long long p = 1; // Initialize p to 1 for calculating powers
+            // Calculate i raised to the power x
+            for (int k = 0; k < x; ++k) p *= i;
+            // Break the loop if p exceeds n
+            if (p > n) break;
+            // Add the calculated power to the powers vector
+            powers.push_back((int)p);
+        }
+
+        // Create a dynamic programming array to count the ways to form sums up to n
+        vector<long long> dp(n + 1, 0);
+        dp[0] = 1; // Base case: There's one way to sum up to 0 (using no elements)
+
+        // Iterate over each power collected
+        for (int p : powers) {
+            // Update the dp array from back to front
+            for (int s = n; s >= p; --s) {
+                // Update the number of ways to form the sum s
+                dp[s] = (dp[s] + dp[s - p]) % MOD;
+            }
+        }
+        
+        // Return the number of ways to form the sum n
+        return (int)dp[n];
+    }
+};
