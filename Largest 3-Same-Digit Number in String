@@ -1,0 +1,33 @@
+question: You are given a string num representing a large integer. An integer is good if it meets the following conditions:
+
+It is a substring of num with length 3.
+It consists of only one unique digit.
+Return the maximum good integer as a string or an empty string "" if no such integer exists.
+
+Note:
+
+A substring is a contiguous sequence of characters within a string.
+There may be leading zeroes in num or a good integer.
+
+code:
+
+class Solution {
+public:
+    // Function to find the largest good integer in the given string
+    string largestGoodInteger(string num) {
+        string best = ""; // Initialize an empty string to hold the best (largest) good integer
+        
+        // Iterate through the string, checking for groups of three identical digits
+        for (int i = 0; i + 2 < num.size(); i++) {
+            // Check if the current digit and the next two digits are the same
+            if (num[i] == num[i + 1] && num[i] == num[i + 2]) {
+                // If they are the same, extract the substring of the three digits
+                // and compare it with the current best
+                best = max(best, num.substr(i, 3));
+            }
+        }
+        
+        // Return the largest good integer found, or an empty string if none were found
+        return best;
+    }
+};
