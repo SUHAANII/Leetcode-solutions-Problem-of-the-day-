@@ -1,0 +1,23 @@
+question: Given an integer n, return true if it is a power of four. Otherwise, return false.
+
+An integer n is a power of four, if there exists an integer x such that n == 4x.
+
+
+
+code:
+class Solution {
+public:
+    bool isPowerOfFour(int n) {
+        // Check if the number is less than or equal to zero
+        // Since powers of four are positive numbers, return false for non-positive numbers
+        if (n <= 0) return false;
+
+        // Calculate the exponent by counting leading zeros in the binary representation of n
+        // exp = 31 - countl_zero((unsigned)n) gives the position of the highest set bit
+        int exp = 31 - __builtin_clz((unsigned)n); // log2(n)
+
+        // Check if the exponent is even (which means n is a power of 4)
+        // Also check if n is exactly equal to 2 raised to the power of exp
+        return (exp & 1) == 0 && n == (1 << exp);
+    }
+};
