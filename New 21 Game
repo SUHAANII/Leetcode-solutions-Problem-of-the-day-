@@ -1,0 +1,53 @@
+question: Alice plays the following game, loosely based on the card game "21".
+
+Alice starts with 0 points and draws numbers while she has less than k points. During each draw, she gains an integer number of points randomly from the range [1, maxPts], where maxPts is an integer. Each draw is independent and the outcomes have equal probabilities.
+
+Alice stops drawing numbers when she gets k or more points.
+
+Return the probability that Alice has n or fewer points.
+
+Answers within 10-5 of the actual answer are considered accepted.
+
+code;
+
+class Solution {
+public:
+    // Function to calculate the probability of winning the new 21 game
+    double new21Game(int n, int k, int maxPts) {
+        // If k is 0 (no cards to draw) or if n is greater than or equal to the maximum possible score,
+        // the player has already won, so return 1.0
+        if (k == 0 || n >= k - 1 + maxPts) return 1.0;
+
+        // Create a vector to store probabilities for the last 'maxPts' scores
+        vector<double> dp(maxPts, 0.0);
+        dp[0] = 1.0; // Probability of drawing 0 points is 1 (initial state)
+
+        double windowSum = 1.0; // Sum of probabilities in the current window
+        double result = 0.0; // Resulting probability of winning
+
+        // Iterate through scores from 1 to n
+        for (int i = 1; i <= n; i++) {
+            // Calculate the probability of achieving score i
+            double prob = windowSum / maxPts;
+
+            // If the score i is less than k, add the probability to the window
+            if (i < k) {
+                windowSum += prob; // Extend the window of possible scores
+            } else {
+                // If score i is greater than or equal to k, add to the result
+                result += prob; // Count this probability towards winning
+            }
+
+            // Maintain the window size by removing the probability that is no longer in the range
+            if (i >= maxPts) {
+                windowSum -= dp[i % maxPts]; // Subtract the probability that is out of the window
+            }
+
+            // Update the dp array with the current probability
+            dp[i % maxPts] = prob; // Store the current probability in the circular buffer
+        }
+
+        // Return the total probability of winning
+        return result;
+    }
+};
