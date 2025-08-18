@@ -1,0 +1,71 @@
+question: You are given an integer array cards of length 4. You have four cards, each containing a number in the range [1, 9]. You should arrange the numbers on these cards in a mathematical expression using the operators ['+', '-', '*', '/'] and the parentheses '(' and ')' to get the value 24.
+
+You are restricted with the following rules:
+
+The division operator '/' represents real division, not integer division.
+For example, 4 / (1 - 2 / 3) = 4 / (1 / 3) = 12.
+Every operation done is between two numbers. In particular, we cannot use '-' as a unary operator.
+For example, if cards = [1, 1, 1, 1], the expression "-1 - 1 - 1 - 1" is not allowed.
+You cannot concatenate numbers together
+For example, if cards = [1, 2, 1, 2], the expression "12 + 12" is not valid.
+Return true if you can get such expression that evaluates to 24, and false otherwise.
+
+
+code:
+class Solution {
+    const double EPS = 1e-6; // Small epsilon value for floating-point comparison
+
+public:
+    bool judgePoint24(vector<int>& cards) {
+        vector<double> nums; // Vector to hold the card values as doubles
+        // Convert each integer card to double and store in nums
+        for (int n : cards) nums.push_back((double)n);
+        // Start the depth-first search (DFS) to check if we can form 24
+        return dfs(nums);
+    }
+
+private:
+    // Depth-first search to explore all combinations of numbers
+    bool dfs(vector<double>& nums) {
+        // Base case: If only one number remains, check if it's close to 24
+        if (nums.size() == 1) {
+            return fabs(nums[0] - 24.0) < EPS; // Use EPS for floating-point comparison
+        }
+
+        // Iterate through all pairs of numbers in nums
+        for (int i = 0; i < nums.size(); i++) {
+            for (int j = 0; j < nums.size(); j++) {
+                if (i == j) continue; // Skip if both indices are the same
+
+                vector<double> next; // Vector to hold the next state of numbers
+                // Add all numbers except the two selected for the operation
+                for (int k = 0; k < nums.size(); k++) {
+                    if (k != i && k != j) next.push_back(nums[k]);
+                }
+
+                // Compute all possible results from the two selected numbers
+                for (double val : compute(nums[i], nums[j])) {
+                    next.push_back(val); // Add the computed value to the next state
+                    // Recursively call dfs with the new set of numbers
+                    if (dfs(next)) return true; // If a solution is found, return true
+                    next.pop_back(); // Remove the last added value to try the next combination
+                }
+            }
+        }
+        return false; // Return false if no combination results in 24
+    }
+
+    // Compute possible results from two numbers a and b
+    vector<double> compute(double a, double b) {
+        vector<double> res; // Vector to hold the results
+        res.push_back(a + b); // Addition
+        res.push_back(a - b); // Subtraction a - b
+        res.push_back(b - a); // Subtraction b - a
+        res.push_back(a * b); // Multiplication
+        // Division checks to prevent division by zero
+        if (fabs(b) > EPS) res.push_back(a / b); // a divided by b
+        if (fabs(a) > EPS) res.push_back(b / a); // b divided by a
+        return res; // Return all computed results
+    }
+};
+
