@@ -1,0 +1,29 @@
+question: Given an integer array nums, return the number of subarrays filled with 0.
+
+A subarray is a contiguous non-empty sequence of elements within an array.
+
+code:
+
+class Solution {
+public:
+    long long zeroFilledSubarray(vector<int>& nums) {
+        // Initialize count of zero-filled subarrays and the current streak of zeros
+        long long cnt = 0, streak = 0;
+        
+        // Iterate through each number in the input array
+        for (int num : nums) {
+            if (num == 0) {
+                // If the current number is zero, increment the streak
+                streak++;
+                // Add the current streak to the total count
+                cnt += streak;
+            } else {
+                // If the current number is not zero, reset the streak to zero
+                streak = 0;
+            }
+        }
+        
+        // Return the total count of zero-filled subarrays
+        return cnt;
+    }
+};
