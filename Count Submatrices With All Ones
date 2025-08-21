@@ -1,0 +1,57 @@
+question:Given an m x n binary matrix mat, return the number of submatrices that have all ones.
+
+
+
+code:
+
+class Solution {
+public:
+    // Function to count the number of submatrices with all 1s
+    int numSubmat(vector<vector<int>>& mat) {
+        // Get the number of rows and columns in the matrix
+        int r = mat.size(), c = mat[0].size(), ans = 0;
+        
+        // Vector to store the height of consecutive 1s for each column
+        vector<int> h(c);
+        
+        // Iterate through each row of the matrix
+        for (int i = 0; i < r; i++) {
+            // Update the height array for the current row
+            for (int j = 0; j < c; j++) {
+                // If the current cell is 1, increase the height; otherwise, reset it to 0
+                h[j] = mat[i][j] ? h[j] + 1 : 0;
+            }
+            
+            // Vector to store the number of submatrices ending at each column
+            vector<int> sum(c);
+            // Stack to keep track of indices of columns
+            stack<int> st;
+            
+            // Iterate through each column to calculate submatrices
+            for (int j = 0; j < c; j++) {
+                // Maintain a monotonically increasing stack based on heights
+                while (!st.empty() && h[st.top()] >= h[j]) {
+                    st.pop(); // Pop from the stack if the current height is less than or equal to the height at the top of the stack
+                }
+                
+                // If the stack is not empty, calculate the number of submatrices
+                if (!st.empty()) {
+                    int p = st.top(); // Get the index of the last column with a smaller height
+                    // Calculate the number of submatrices using the heights
+                    sum[j] = sum[p] + h[j] * (j - p);
+                } else {
+                    // If the stack is empty, all columns up to j can form submatrices
+                    sum[j] = h[j] * (j + 1);
+                }
+                
+                // Push the current index onto the stack
+                st.push(j);
+                // Add to the total count of submatrices
+                ans += sum[j];
+            }
+        }
+        
+        // Return the total number of submatrices with all 1s
+        return ans;
+    }
+};
