@@ -1,0 +1,42 @@
+question: You are given a 2D binary array grid. Find a rectangle with horizontal and vertical sides with the smallest area, such that all the 1's in grid lie inside this rectangle.
+
+Return the minimum possible area of the rectangle.
+
+
+
+code:
+
+class Solution {
+public:
+    // Function to calculate the minimum area of a rectangle that can enclose all '1's in the grid
+    int minimumArea(vector<vector<int>>& grid) {
+        // Get the number of rows (m) and columns (n) in the grid
+        int m = grid.size(), n = grid[0].size();
+        
+        // Initialize variables to track the extreme rows and columns
+        int minRow = m;    // Minimum row index where '1' is found (initially set to m)
+        int maxRow = -1;   // Maximum row index where '1' is found (initially set to -1)
+        int minCol = n;    // Minimum column index where '1' is found (initially set to n)
+        int maxCol = -1;   // Maximum column index where '1' is found (initially set to -1)
+
+        // Loop through each cell in the grid
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                // Check if the current cell contains '1'
+                if (grid[i][j] == 1) {
+                    // Update the minimum and maximum row indices
+                    minRow = min(minRow, i);  // Update minRow if the current row index is smaller
+                    maxRow = max(maxRow, i);  // Update maxRow if the current row index is larger
+                    
+                    // Update the minimum and maximum column indices
+                    minCol = min(minCol, j);  // Update minCol if the current column index is smaller
+                    maxCol = max(maxCol, j);  // Update maxCol if the current column index is larger
+                }
+            }
+        }
+
+        // Calculate the area of the rectangle that encloses all '1's
+        // The area is given by the width (maxCol - minCol + 1) and height (maxRow - minRow + 1)
+        return (maxRow - minRow + 1) * (maxCol - minCol + 1);
+    }
+};
