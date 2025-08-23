@@ -1,0 +1,132 @@
+question: You are given a 2D binary array grid. You need to find 3 non-overlapping rectangles having non-zero areas with horizontal and vertical sides such that all the 1's in grid lie inside these rectangles.
+
+Return the minimum possible sum of the area of these rectangles.
+
+Note that the rectangles are allowed to touch.
+
+code:
+
+unsigned A[30], T[30]; // Global arrays to hold bit representations of rows and columns
+
+class Solution {
+public:
+    // Function to build the A and T arrays from the grid
+    static void build_A_T(vector<vector<int>>& grid, int n, int m) {
+        fill(A, A+n, 0); // Reset A array
+        fill(T, T+m, 0); // Reset T array (transpose)
+
+        // Populate A and T based on the grid
+        for (int i=0; i<n; i++) {
+            for (int j=0; j<m; j++) {
+                if (grid[i][j] == 0) continue; // Skip if the cell is 0
+                A[i] |= (1U << j);  // Set the j-th bit for row i
+                T[j] |= (1U << i);  // Set the i-th bit for column j (transpose)
+            }
+        }
+    }
+
+    // Calculate the area of the bounding box of 1s in submatrix [i0..iN][j0..jN]
+    static int minRect(int i0, int iN, int j0, int jN) {
+        int iMin = 30, iMax = -1, jMin = 30, jMax = -1;
+
+        // Find the top row with any 1 in [j0..jN]
+        for (int i = i0; i <= iN; i++) {
+            unsigned row = A[i];
+            unsigned mRow = (row >> j0) << j0; // Mask to only consider columns j0 to jN
+            mRow &= ((1u << (jN + 1)) - 1u); // Limit to jN
+            if (mRow) { iMin = i; break; } // Found a row with 1s
+        }
+        if (iMin == 30) return 1e8; // No 1s in this submatrix
+
+        // Find the bottom row
+        for (int i = iN; i >= iMin; i--) {
+            unsigned row = A[i];
+            unsigned mRow = (row >> j0) << j0; // Same masking as above
+            mRow &= ((1u << (jN + 1)) - 1u);
+            if (mRow) { iMax = i; break; } // Found a row with 1s
+        }
+
+        // Find the left column
+        for (int j = j0; j <= jN; j++) {
+            unsigned col = T[j];
+            unsigned mCol = (col >> i0) << i0; // Mask to only consider rows i0 to iN
+            mCol &= ((1u << (iN + 1)) - 1u); // Limit to iN
+            if (mCol) { jMin = j; break; } // Found a column with 1s
+        }
+
+        // Find the right column
+        for (int j = jN; j >= jMin; j--) {
+            unsigned col = T[j];
+            unsigned mCol = (col >> i0) << i0; // Same masking as above
+            mCol &= ((1u << (iN + 1)) - 1u);
+            if (mCol) { jMax = j; break; } // Found a column with 1s
+        }
+
+        // Calculate and return the area of the rectangle
+        return (iMax - iMin + 1) * (jMax - jMin + 1);
+    }
+
+    // Function to find the minimum sum of areas of rectangles formed by partitions
+    static int minimumSum(vector<vector<int>>& grid) {
+        const int n = grid.size(), m = grid[0].size(); // Get dimensions of the grid
+        build_A_T(grid, n, m); // Build the A and T arrays
+
+        int ans = INT_MAX; // Initialize answer to maximum integer value
+
+        // 2 vertical cuts
+        for (int c1 = 0; c1 < m - 2; c1++) {
+            for (int c2 = c1 + 1; c2 < m - 1; c2++) {
+                int a = minRect(0, n - 1, 0, c1);
+                int b = minRect(0, n - 1, c1 + 1, c2);
+                int c = minRect(0, n - 1, c2 + 1, m - 1);
+                ans = min(ans, a + b + c); // Update minimum area sum
+            }
+        }
+
+        // 2 horizontal cuts
+        for (int r1 = 0; r1 < n - 2; r1++) {
+            for (int r2 = r1 + 1; r2 < n - 1; r2++) {
+                int a = minRect(0, r1, 0, m - 1);
+                int b = minRect(r1 + 1, r2, 0, m - 1);
+                int c = minRect(r2 + 1, n - 1, 0, m - 1);
+                ans = min(ans, a + b + c); // Update minimum area sum
+            }
+        }
+
+        // T-shapes (3-rectangle partitions)
+        for (int r = 0; r < n - 1; r++) {
+            for (int c = 0; c < m - 1; c++) {
+                // Top, bottom-left & bottom-right
+                {
+                    int top = minRect(0, r, 0, m - 1);
+                    int bl = minRect(r + 1, n - 1, 0, c);
+                    int br = minRect(r + 1, n - 1, c + 1, m - 1);
+                    ans = min(ans, top + bl + br);
+                }
+                // Bottom, top-left & top-right
+                {
+                    int bottom = minRect(r + 1, n - 1, 0, m - 1);
+                    int tl = minRect(0, r, 0, c);
+                    int tr = minRect(0, r, c + 1, m - 1);
+                    ans = min(ans, bottom + tl + tr);
+                }
+                // Left, top-right & bottom-right
+                {
+                    int left = minRect(0, n - 1, 0, c);
+                    int tr = minRect(0, r, c + 1, m - 1);
+                    int br = minRect(r + 1, n - 1, c + 1, m - 1);
+                    ans = min(ans, left + tr + br);
+                }
+                // Right, top-left & bottom-left
+                {
+                    int right = minRect(0, n - 1, c + 1, m - 1);
+                    int tl = minRect(0, r, 0, c);
+                    int bl = minRect(r + 1, n - 1, 0, c);
+                    ans = min(ans, right + tl + bl);
+                }
+            }
+        }
+
+        return ans; // Return the minimum area sum found
+    }
+};
