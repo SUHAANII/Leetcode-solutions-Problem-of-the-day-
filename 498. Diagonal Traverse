@@ -1,0 +1,44 @@
+question: Given an m x n matrix mat, return an array of all the elements of the array in a diagonal order.
+
+
+code:
+class Solution {
+public:
+    vector<int> findDiagonalOrder(vector<vector<int>>& matrix) {
+        // Check if the matrix is empty or if the first row is empty
+        if (matrix.empty() || matrix[0].empty()) return {};
+
+        // Get the number of rows (m) and columns (n) in the matrix
+        int m = matrix.size(), n = matrix[0].size();
+        // Create a result vector to store the elements in diagonal order
+        vector<int> result(m * n);
+        // Initialize starting row and column indices
+        int row = 0, col = 0;
+
+        // Iterate through each element in the matrix
+        for (int i = 0; i < m * n; i++) {
+            // Assign the current element to the result vector
+            result[i] = matrix[row][col];
+
+            // Check if we are moving in the upward direction
+            if ((row + col) % 2 == 0) {
+                // If we are at the last column, move down to the next row
+                if (col == n - 1) row++;
+                // If we are at the first row, move right to the next column
+                else if (row == 0) col++;
+                // Otherwise, move diagonally up-right
+                else { row--; col++; }
+            } else { // We are moving in the downward direction
+                // If we are at the last row, move right to the next column
+                if (row == m - 1) col++;
+                // If we are at the first column, move down to the next row
+                else if (col == 0) row++;
+                // Otherwise, move diagonally down-left
+                else { row++; col--; }
+            }
+        }
+
+        // Return the result vector containing elements in diagonal order
+        return result;
+    }
+};
