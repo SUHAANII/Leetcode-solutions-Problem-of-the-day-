@@ -1,0 +1,37 @@
+question: You are given a 2D 0-indexed integer array dimensions.
+
+For all indices i, 0 <= i < dimensions.length, dimensions[i][0] represents the length and dimensions[i][1] represents the width of the rectangle i.
+
+Return the area of the rectangle having the longest diagonal. If there are multiple rectangles with the longest diagonal, return the area of the rectangle having the maximum area.
+
+code;
+
+class Solution {
+public:
+    // Function to calculate the area of the rectangle with the maximum diagonal
+    int areaOfMaxDiagonal(vector<vector<int>>& dimensions) {
+        // Initialize variables to track the maximum area and maximum diagonal length
+        int maxArea = 0; // Stores the maximum area found
+        int maxDiag = 0; // Stores the maximum diagonal squared found
+
+        // Iterate through each rectangle's dimensions
+        for (int i = 0; i < dimensions.size(); i++) {
+            // Extract length and width of the current rectangle
+            int l = dimensions[i][0]; // Length of the rectangle
+            int w = dimensions[i][1]; // Width of the rectangle
+            
+            // Calculate the square of the current diagonal using the Pythagorean theorem
+            int currDiag = l * l + w * w; // Diagonal squared = length^2 + width^2
+
+            // Check if the current diagonal is greater than the maximum found so far
+            // Or if the diagonal is equal, check if the area is greater
+            if (currDiag > maxDiag || (currDiag == maxDiag && l * w > maxArea)) {
+                // Update the maximum diagonal and the corresponding area
+                maxDiag = currDiag; // Update the maximum diagonal
+                maxArea = l * w;    // Update the maximum area
+            }
+        }
+        // Return the area of the rectangle with the maximum diagonal
+        return maxArea;
+    }
+};
