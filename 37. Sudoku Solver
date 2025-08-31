@@ -1,0 +1,51 @@
+question: Write a program to solve a Sudoku puzzle by filling the empty cells.
+
+A sudoku solution must satisfy all of the following rules:
+
+Each of the digits 1-9 must occur exactly once in each row.
+Each of the digits 1-9 must occur exactly once in each column.
+Each of the digits 1-9 must occur exactly once in each of the 9 3x3 sub-boxes of the grid.
+The '.' character indicates empty cells.
+
+code:
+
+class Solution {
+    // Size of the Sudoku board (3x3 sub-boxes, 9x9 overall)
+    int n = 3, N = 9;
+
+    // Arrays to track the counts of numbers placed in rows, columns, and boxes
+    int rows[9][10] = {}, cols[9][10] = {}, boxes[9][10] = {};
+    
+    // Pointer to the Sudoku board
+    vector<vector<char>>* boardPtr;
+    
+    // Flag to indicate if the Sudoku is solved
+    bool sudokuSolved = false;
+
+    // Function to check if a number can be placed in a given cell
+    bool couldPlace(int d, int row, int col) {
+        // Calculate the index of the 3x3 box
+        int idx = (row / n) * n + col / n;
+        // Check if the number is already used in the row, column, or box
+        return rows[row][d] + cols[col][d] + boxes[idx][d] == 0;
+    }
+
+    // Function to place a number in a given cell
+    void placeNumber(int d, int row, int col) {
+        // Calculate the index of the 3x3 box
+        int idx = (row / n) * n + col / n;
+        // Increment the counts for the row, column, and box
+        rows[row][d]++;
+        cols[col][d]++;
+        boxes[idx][d]++;
+        // Place the number on the board (convert to char)
+        (*boardPtr)[row][col] = d + '0';
+    }
+
+    // Function to remove a number from a given cell
+    void removeNumber(int d, int row, int col) {
+        // Calculate the index of the 3x3 box
+        int idx = (row / n) * n + col / n;
+        // Decrement the counts for the row, column, and box
+        rows[row][d]--;
+        cols[col][d]--;
