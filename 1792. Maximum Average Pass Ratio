@@ -1,0 +1,64 @@
+question: There is a school that has classes of students and each class will be having a final exam. You are given a 2D integer array classes, where classes[i] = [passi, totali]. You know beforehand that in the ith class, there are totali total students, but only passi number of students will pass the exam.
+
+You are also given an integer extraStudents. There are another extraStudents brilliant students that are guaranteed to pass the exam of any class they are assigned to. You want to assign each of the extraStudents students to a class in a way that maximizes the average pass ratio across all the classes.
+
+The pass ratio of a class is equal to the number of students of the class that will pass the exam divided by the total number of students of the class. The average pass ratio is the sum of pass ratios of all the classes divided by the number of the classes.
+
+Return the maximum possible average pass ratio after assigning the extraStudents students. Answers within 10-5 of the actual answer will be accepted.
+
+ 
+
+code:
+
+using info = tuple<double, int, int>; // Define a tuple type to hold (increment, passed, total)
+info A[100000]; // Array to store the information for each class
+
+class Solution {
+public:
+    // Function to calculate the maximum average ratio after k operations
+    static double maxAverageRatio(vector<vector<int>>& classes, int k) {
+        const int n = classes.size(); // Get the number of classes
+        double sum = 0.0; // Initialize the sum of averages
+        int i = 0; // Index for array A
+        
+        // Iterate through each class to calculate initial ratios and increments
+        for (auto& pq : classes) {
+            int p = pq[0], q = pq[1]; // p = passed students, q = total students
+            sum += (double)p / q; // Add the initial ratio to the sum
+            
+            // Calculate the potential increment in ratio if one more student passes
+            double inc = (double)(q - p) / (q * (q + 1.0));
+            A[i++] = {inc, p, q}; // Store the increment and current counts in the array
+        }
+        
+        // Create a max-heap using the std::make_heap function
+        make_heap(A, A + n);
+        
+        // Perform k operations to maximize the average ratio
+        for (int i = 0; i < k; i++) {
+            pop_heap(A, A + n); // Remove the class with the maximum increment from the heap
+            auto [r, p, q] = A[n - 1]; // Get the details of the class
+            
+            if (r == 0) break; // If no increment is possible, break early
+            
+            // Add the current increment to the sum
+            sum += r;
+            // Calculate the new increment after one more student passes
+            double r2 = (double)(q - p) / ((q + 1.0) * (q + 2.0));
+            // Update the class information in the array
+            A[n - 1] = {r2, p + 1, q + 1}; // Increment passed and total students
+            push_heap(A, A + n); // Reinsert the updated class back into the heap
+        }
+        
+        // Return the final average ratio
+        return sum / n;
+    }
+};
+
+// Initialization of I/O optimizations
+auto init = []() {
+    ios::sync_with_stdio(false); // Disable synchronization with C I/O for faster input/output
+    cin.tie(nullptr); // Untie cin from cout
+    cout.tie(nullptr); // Untie cout from cin
+    return 'c'; // Return a character (not used)
+}();
