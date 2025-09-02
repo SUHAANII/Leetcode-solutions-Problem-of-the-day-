@@ -1,0 +1,53 @@
+question: You are given a 2D array points of size n x 2 representing integer coordinates of some points on a 2D plane, where points[i] = [xi, yi].
+
+Count the number of pairs of points (A, B), where
+
+A is on the upper left side of B, and
+there are no other points in the rectangle (or line) they make (including the border).
+Return the count.
+
+code:
+
+class Solution {
+public:
+    // Comparator function to sort pairs based on the first element in descending order,
+    // and if they are equal, by the second element in ascending order
+    static bool cmp(vector<int>& p, vector<int>& q) {
+        return (p[0] == q[0]) ? p[1] < q[1] : p[0] > q[0]; // Order by (x, >)
+    }
+
+    // Function to count the number of valid pairs in the vector P
+    int numberOfPairs(vector<vector<int>>& P) {
+        // Sort the pairs using the custom comparator
+        sort(P.begin(), P.end(), cmp);
+        
+        int n = P.size(); // Get the size of the vector
+        int ans = 0;      // Initialize the answer counter
+        
+        // Iterate through each pair in the sorted list
+        for (int i = 0; i < n - 1; i++) {
+            int y = INT_MAX; // Initialize y to the maximum possible integer value
+            
+            // Check pairs starting from the next element
+            for (int j = i + 1; j < n; j++) {
+                // If the second element of the current pair is greater than or equal to
+                // the second element of the pair at index i and is less than y
+                if (P[j][1] >= P[i][1] && y > P[j][1]) {
+                    ans++; // Increment the count of valid pairs
+                    y = P[j][1]; // Update y to the second element of the current pair
+                }
+            }
+        }
+        
+        // Return the total count of valid pairs found
+        return ans;
+    }
+};
+
+// Initialization block to optimize input/output operations
+auto init = []() { 
+    ios::sync_with_stdio(0); // Disable synchronization with C I/O for faster input/output
+    cin.tie(0);              // Untie cin from cout for faster input
+    cout.tie(0);            // Untie cout from cin for faster output
+    return 'c';             // Return a character (not used further)
+}();
