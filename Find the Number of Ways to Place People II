@@ -1,0 +1,59 @@
+question: You are given a 2D array points of size n x 2 representing integer coordinates of some points on a 2D-plane, where points[i] = [xi, yi].
+
+We define the right direction as positive x-axis (increasing x-coordinate) and the left direction as negative x-axis (decreasing x-coordinate). Similarly, we define the up direction as positive y-axis (increasing y-coordinate) and the down direction as negative y-axis (decreasing y-coordinate)
+
+You have to place n people, including Alice and Bob, at these points such that there is exactly one person at every point. Alice wants to be alone with Bob, so Alice will build a rectangular fence with Alice's position as the upper left corner and Bob's position as the lower right corner of the fence (Note that the fence might not enclose any area, i.e. it can be a line). If any person other than Alice and Bob is either inside the fence or on the fence, Alice will be sad.
+
+Return the number of pairs of points where you can place Alice and Bob, such that Alice does not become sad on building the fence.
+
+Note that Alice can only build a fence with Alice's position as the upper left corner, and Bob's position as the lower right corner. For example, Alice cannot build either of the fences in the picture below with four corners (1, 1), (1, 3), (3, 1), and (3, 3), because:
+
+With Alice at (3, 3) and Bob at (1, 1), Alice's position is not the upper left corner and Bob's position is not the lower right corner of the fence.
+With Alice at (1, 3) and Bob at (1, 1), Bob's position is not the lower right corner of the fence.
+code:
+class Solution {
+public:
+    // Comparison function for sorting
+    static bool cmp(const vector<int>& p, const vector<int>& q) {
+        // Sort primarily by the first element in descending order
+        // If the first elements are equal, sort by the second element in ascending order
+        return (p[0] == q[0]) ? p[1] < q[1] : p[0] > q[0];
+    }
+
+    // Function to count the number of valid pairs
+    static int numberOfPairs(vector<vector<int>>& P) {
+        // Sort the vector P using the custom comparison function
+        sort(P.begin(), P.end(), cmp);
+        
+        int n = P.size(); // Get the size of the vector
+        int ans = 0; // Initialize the count of valid pairs
+
+        // Iterate through each element except the last one
+        for (int i = 0; i < n - 1; i++) {
+            int y = INT_MAX; // Initialize y to a maximum value
+            int yi = P[i][1]; // Get the second element of the current pair
+            
+            // Iterate through the subsequent elements
+            for (int j = i + 1; j < n; j++) {
+                const int yj = P[j][1]; // Get the second element of the next pair
+                
+                // Check if the current pair can form a valid pair
+                if (yj >= yi && y > yj) { // P[j] cannot be in between P[i]
+                    ans++; // Increment the count of valid pairs
+                    y = yj; // Update y to the current second element
+                    if (yi == yj) break; // If both second elements are equal, break
+                }
+            }
+        }
+        return ans; // Return the total count of valid pairs
+    }
+};
+
+// Auto initialization for faster I/O
+auto init = []() { 
+    ios::sync_with_stdio(0); // Disable synchronization with C I/O
+    cin.tie(0); // Untie cin from cout
+    cout.tie(0); // Untie cout from cin
+    return 'c'; // Return a character (not used)
+}();
+
