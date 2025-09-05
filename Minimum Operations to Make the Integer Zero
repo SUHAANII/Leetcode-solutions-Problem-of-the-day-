@@ -1,0 +1,35 @@
+question: You are given two integers num1 and num2.
+
+In one operation, you can choose integer i in the range [0, 60] and subtract 2i + num2 from num1.
+
+Return the integer denoting the minimum number of operations needed to make num1 equal to 0.
+
+If it is impossible to make num1 equal to 0, return -1.
+
+
+
+code:
+
+class Solution {
+public:
+    int makeTheIntegerZero(int num1, int num2) {
+        // Iterate over possible values of k from 1 to 60
+        for (int k = 1; k <= 60; k++) {
+            // Calculate x as num1 minus num2 multiplied by k
+            long long x = num1 - 1LL * num2 * k;
+
+            // If x is less than k, it is impossible to make num1 zero
+            if (x < k) {
+                return -1; // Return -1 indicating failure
+            }
+
+            // Check if the number of 1s in the binary representation of x
+            // is less than or equal to k
+            if (k >= __builtin_popcountll(x)) {
+                return k; // Return k as it is a valid solution
+            }
+        }
+        // If no valid k is found, return -1
+        return -1;
+    }
+};
