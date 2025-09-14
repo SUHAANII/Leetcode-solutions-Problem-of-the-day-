@@ -1,0 +1,93 @@
+question: Given a wordlist, we want to implement a spellchecker that converts a query word into a correct word.
+
+For a given query word, the spell checker handles two categories of spelling mistakes:
+
+Capitalization: If the query matches a word in the wordlist (case-insensitive), then the query word is returned with the same case as the case in the wordlist.
+Example: wordlist = ["yellow"], query = "YellOw": correct = "yellow"
+Example: wordlist = ["Yellow"], query = "yellow": correct = "Yellow"
+Example: wordlist = ["yellow"], query = "yellow": correct = "yellow"
+Vowel Errors: If after replacing the vowels ('a', 'e', 'i', 'o', 'u') of the query word with any vowel individually, it matches a word in the wordlist (case-insensitive), then the query word is returned with the same case as the match in the wordlist.
+Example: wordlist = ["YellOw"], query = "yollow": correct = "YellOw"
+Example: wordlist = ["YellOw"], query = "yeellow": correct = "" (no match)
+Example: wordlist = ["YellOw"], query = "yllw": correct = "" (no match)
+In addition, the spell checker operates under the following precedence rules:
+
+When the query exactly matches a word in the wordlist (case-sensitive), you should return the same word back.
+When the query matches a word up to capitlization, you should return the first such match in the wordlist.
+When the query matches a word up to vowel errors, you should return the first such match in the wordlist.
+If the query has no matches in the wordlist, you should return the empty string.
+Given some queries, return a list of words answer, where answer[i] is the correct word for query = queries[i]
+
+code:
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    // Main function to spell check the queries against the word list
+    vector<string> spellchecker(vector<string>& wordlist, vector<string>& queries) {
+        // Create a set for exact matches from the word list
+        unordered_set<string> exact(wordlist.begin(), wordlist.end());
+        
+        // Maps to store case-insensitive and vowel-replaced versions of words
+        unordered_map<string, string> caseMap;   // For case-insensitive matches
+        unordered_map<string, string> vowelMap;  // For matches ignoring vowels
+
+        // Populate the maps using the word list
+        for (string w : wordlist) {
+            string lower = toLower(w);        // Convert word to lowercase
+            string devowel = deVowel(lower);  // Replace vowels with '*'
+            
+            // If the lowercase version is not already in the map, add it
+            if (!caseMap.count(lower)) caseMap[lower] = w;
+            // If the devowel version is not already in the map, add it
+            if (!vowelMap.count(devowel)) vowelMap[devowel] = w;
+        }
+
+        vector<string> result; // Vector to store results for queries
+        // Process each query
+        for (string q : queries) {
+            // Check for an exact match first
+            if (exact.count(q)) {
+                result.push_back(q); // Add the exact match to the result
+            } else {
+                string lower = toLower(q);        // Convert query to lowercase
+                string devowel = deVowel(lower);  // Replace vowels with '*'
+
+                // Check for case-insensitive match
+                if (caseMap.count(lower)) {
+                    result.push_back(caseMap[lower]); // Add the matched word
+                }
+                // Check for vowel-ignored match
+                else if (vowelMap.count(devowel)) {
+                    result.push_back(vowelMap[devowel]); // Add the matched word
+                } else {
+                    result.push_back(""); // No match found, add an empty string
+                }
+            }
+        }
+        return result; // Return the results for all queries
+    }
+
+private:
+    // Helper function to convert a string to lowercase
+    string toLower(string s) {
+        for (char &c : s) c = tolower(c); // Iterate and convert each character
+        return s; // Return the modified string
+    }
+
+    // Helper function to replace vowels in a string with '*'
+    string deVowel(string s) {
+        for (char &c : s) {
+            if (isVowel(c)) c = '*'; // Replace vowel with '*'
+        }
+        return s; // Return the modified string
+    }
+
+    // Helper function to check if a character is a vowel
+    bool isVowel(char c) {
+        c = tolower(c); // Convert character to lowercase for comparison
+        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u'; // Check for vowels
+    }
+};
+
