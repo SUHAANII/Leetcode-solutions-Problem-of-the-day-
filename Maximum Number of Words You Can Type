@@ -1,0 +1,47 @@
+question: There is a malfunctioning keyboard where some letter keys do not work. All other keys on the keyboard work properly.
+
+Given a string text of words separated by a single space (no leading or trailing spaces) and a string brokenLetters of all distinct letter keys that are broken, return the number of words in text you can fully type using this keyboard.
+
+ 
+
+code:
+
+class Solution {
+public:
+    // Function to count how many words in 'text' can be typed without using broken keys
+    int canBeTypedWords(string text, string broken) {
+        // Create a set to store broken characters for quick lookup
+        unordered_set<char> brokenKeys;
+        int count = 0; // Initialize a counter for words that cannot be typed
+
+        // Populate the set with broken characters
+        for (auto& c : broken) {
+            brokenKeys.insert(c);
+        }
+
+        // Use stringstream to split the text into words
+        stringstream ss(text);
+        string word; // Variable to hold each word
+        vector<string> words; // Vector to store all words
+
+        // Extract words from the text and store them in the vector
+        while (ss >> word) {
+            words.push_back(word);
+        }
+
+        // Iterate over each word to check for broken characters
+        for (auto w : words) {
+            // Check each character in the word
+            for (char c : w) {
+                // If the character is found in the set of broken keys
+                if (brokenKeys.find(c) != brokenKeys.end()) {
+                    count++; // Increment the count of untypeable words
+                    break; // No need to check further characters in this word
+                }
+            }
+        }
+
+        // Return the total number of words minus the count of untypeable words
+        return words.size() - count;
+    }
+};
